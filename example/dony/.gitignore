@@ -1,0 +1,7 @@
+
+!.gitignore
+!uv.lock
+!pyproject.toml
+!.python-version
+!README.md
+.venv

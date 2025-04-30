@@ -1,0 +1,9 @@
+[project]
+name = "dony-tool"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "questionary==2.1.0",
+]
