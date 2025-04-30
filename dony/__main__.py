@@ -142,7 +142,7 @@ def main():
 
     # - Cd into dony dir
 
-    print("⚙️dony called from ", dony_dir)
+    print("⚙️ dony called from ", dony_dir)
 
     os.chdir(dony_dir)
 
