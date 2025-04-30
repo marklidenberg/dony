@@ -16,9 +16,58 @@ def hello_world(name: str = "John"):
     print(f"Hello, {name}!")	
 ```
 
-Run `dony` to fuzzy search your command.
+Run `dony` to fuzzy-search your commands.
 
-## Getting Started
+## Defining Commands
+
+Create commands as Python functions. All parameters MUST have defaults to allow invocation without explicit arguments. Use prompts to get inputs from the user
+```python
+import dony
+
+@dony.command()
+def greet(
+	greeting: str = 'Hello', 
+	suffix: str = lambda: ',',
+	real_greeting: str = lambda kwargs: kwargs['greeting'] + kwargs['suffix'],
+	name: str = lambda: dony.input('What is your name?')
+):
+    dony.shell(f"echo {real_greeting}, {name}!")
+```
+
+- All arguments should have to be `str` or `List[str]` for now. Support for other types may come later
+- Default values may be literals or callables:
+	- Simple defaults (`'Hello'`)
+	- Lazily-evaluated callables (`lambda: ...` or `lambda kwargs: ...`)
+	- Interactive prompts via `dony.input`, `dony.select`, `dony.confirm`, etc.
+	- `dony.shell(...)` runs shell commands from the directory, where `dony/` is located
+
+## Running commands
+
+Run commands interactively:
+
+```bash
+dony
+```
+
+Run commands directly:
+
+```bash
+dony <command_name> [--arg1 value --arg2 value]
+```
+
+## Project Structure
+
+```text
+dony/
+... (uv environment) 
+├── commands/
+│   ├── my_global_command.py # one command per file
+│   ├── my-service/         
+│   │   ├── service_command.py  # will be displayed as `my-service/service_command`
+│   │   └── _helper.py       # private module (ignored)
+```
+
+## Installation
 
 Ensure you have the following prerequisites:
 - Python 3.8 or higher
@@ -39,56 +88,6 @@ dony --init
 This creates a `dony/` directory containing:
 - A `commands/` directory containing a sample command
 - A `uv` virtual environment
-
-## Running commands 
-
-Run commands interactively:
-
-```bash
-dony
-```
-
-Run commands directly:
-
-```bash
-dony <command_name> [--arg1 value --arg2 value]
-```
-
-## Defining Commands
-
-Create commands as Python functions. All parameters must have defaults to allow invocation without explicit arguments. 
-
-```python
-import dony
-
-@dony.command()
-def greet(
-        greeting: str = 'Hello', 
-        suffix: str = lambda: ',',
-        real_greeting: str = lambda kwargs: kwargs['greeting'] + kwargs['suffix'],
-        name: str = lambda: dony.input('What is your name?')
-):
-    dony.shell(f"echo {real_greeting}, {name}!")
-```
-
-- All arguments should have to be `str` or `List[str]` for now. Support for other types may come later
-- Default values may be literals or callables:
-	- Simple defaults (`'Hello'`)
-	- Lazily-evaluated callables (`lambda: ...` or `lambda kwargs: ...`)
-	- Interactive prompts via `dony.input`, `dony.select`, `dony.confirm`, etc.
-	- `dony.shell(...)` runs shell commands from the directory, where `dony/` is located
-
-## Project Structure
-
-```text
-dony/
-... (uv environment) 
-├── commands/
-│   ├── my_global_command.py # one command per file
-│   ├── my-service/         
-│   │   ├── service_command.py  # will be displayed as `my-service/service_command`
-│   │   └── _helper.py       # private module (ignored)
-```
 
 ## License
 
