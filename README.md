@@ -1,4 +1,4 @@
-# 🧙‍♂️ dony
+# ⚙️ dony
 
 A lightweight Python command runner providing a simple, consistent workflow for managing and executing project 
 commands. dony serves as an alternative to `Justfile`, leveraging Python for flexibility and extensibility.

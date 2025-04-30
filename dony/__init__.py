@@ -8,4 +8,4 @@ from .prompts.input import input
 from .prompts.path import path
 from .prompts.press_any_key_to_continue import press_any_key_to_continue
 from .prompts.select import select
-from dony.run_dony.run_dony import run_dony
+from .run_dony.run_dony import run_dony

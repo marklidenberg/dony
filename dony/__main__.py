@@ -142,14 +142,15 @@ def main():
 
     # - Cd into dony dir
 
-    print("🧙‍Running dony from", dony_dir)
+    print("⚙️dony called from ", dony_dir)
+
     os.chdir(dony_dir)
 
-    # - Run run_dony in local uv environment
+    # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """
-    uv run python -c "import dony; import json; from pathlib import Path; import sys; dony.run_dony(dony_dir=Path({}), args={})"
+    uv run python -c "import sys; sys.path.pop(0); import dony; import json; from pathlib import Path; import sys; dony.run_dony(dony_dir=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",
@@ -157,6 +158,7 @@ def main():
             json.dumps(args).replace('"', '\\"'),
         ),
         echo_commands=False,
+        working_directory=os.path.dirname(dony_dir),  # start from the root of the project
     )
 
 
