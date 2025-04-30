@@ -16,7 +16,7 @@ def hello_world(name: str = "John"):
     print(f"Hello, {name}!")	
 ```
 
-Run `dony` to fuzzy-search your commands.
+Run `dony` to fuzzy-search your commands from anywhere in your project.
 
 ## Defining Commands
 
