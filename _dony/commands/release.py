@@ -23,7 +23,9 @@ def release(
                 # 
                 # git fetch origin && git diff --quiet HEAD origin/master ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
 
-                # - Bump and get new version
+                # - Bump and
+
+                get new version
 
                 cd ${0%/*}/..
                 pwd
