@@ -84,7 +84,7 @@ def shell(
             output=output,
         )
 
-    # - Rreturn output
+    # - Return output
 
     return output
 
@@ -94,7 +94,12 @@ def example():
     print(shell('echo "{"a": "b"}"'))
 
     # Disable only echoing of commands
-    print(shell('echo "no x prefix here"', echo_commands=False))
+    print(
+        shell(
+            'echo "no x prefix here"',
+            echo_commands=False,
+        )
+    )
 
     # Run in a different directory
     output = shell("ls", working_directory="/tmp")
