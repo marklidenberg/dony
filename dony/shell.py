@@ -34,7 +34,8 @@ def shell(
         subprocess.CalledProcessError: If the command exits with a non-zero status.
     """
 
-    # Build the `set` prefix from the enabled flags
+    # - Build the `set` prefix from the enabled flags
+
     flags = "".join(
         flag
         for flag, enabled in (
@@ -46,10 +47,12 @@ def shell(
     )
     prefix = f"set -{flags}; " if flags else ""
 
-    # Dedent and combine the command
+    # - Dedent and combine the command
+
     full_cmd = prefix + dedent(command.strip())
 
-    # Execute with optional working directory
+    # - Execute with optional working directory
+
     proc = subprocess.Popen(
         full_cmd,
         shell=True,
@@ -59,7 +62,8 @@ def shell(
         cwd=working_directory,
     )
 
-    # Capture output
+    # - Capture output
+
     buffer = []
     assert proc.stdout is not None
     for line in proc.stdout:
@@ -67,13 +71,20 @@ def shell(
         if capture_output:
             buffer.append(line)
     proc.stdout.close()
-    retcode = proc.wait()
+    return_code = proc.wait()
 
     output = "".join(buffer) if capture_output else None
 
-    # Raise if exit code is non-zero
-    if retcode != 0:
-        raise subprocess.CalledProcessError(retcode, full_cmd, output=output)
+    # - Raise if exit code is non-zero
+
+    if return_code != 0:
+        raise subprocess.CalledProcessError(
+            returncode=return_code,
+            cmd=full_cmd,
+            output=output,
+        )
+
+    # - Rreturn output
 
     return output
 
