@@ -20,8 +20,12 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
+    "questionary>=2.1.0"
+]
+
+[project.optional-dependencies]
+dev = [
     "build>=1.2.2.post1",
-    "questionary>=2.1.0",
     "twine>=6.1.0",
 ]
 

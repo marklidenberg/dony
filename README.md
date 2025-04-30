@@ -1,6 +1,6 @@
 # ⚙️ dony
 
-A lightweight Python command runner providing a simple, consistent workflow for managing and executing project 
+A lightweight Python command runner with simple and consistent workflow for managing project 
 commands. A `Justfile` alternative.
 
 ## How it works
@@ -17,6 +17,9 @@ def hello_world(name: str = "John"):
 ```
 
 Run `dony` to fuzzy-search your commands from anywhere in your project.
+
+Common use cases: build, release, publish, test, deploy, configure, format, run static analyzers, manage databases, 
+generate documentation, run benchmarks, get useful links, create release notes and much more
 
 ## Defining Commands
 
