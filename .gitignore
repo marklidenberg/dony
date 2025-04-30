@@ -1,0 +1,11 @@
+# forbid all
+
+**/*.*
+
+# allow subdirectories with a dot
+!**/*.*/
+!../sage/__init__.py
+!.gitignore
+
+# forbid .venv
+.venv
