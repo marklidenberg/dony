@@ -55,18 +55,6 @@ Run commands directly:
 dony <command_name> [--arg1 value --arg2 value]
 ```
 
-## Project Structure
-
-```text
-dony/
-... (uv environment) 
-├── commands/
-│   ├── my_global_command.py # one command per file
-│   ├── my-service/         
-│   │   ├── service_command.py  # will be displayed as `my-service/service_command`
-│   │   └── _helper.py       # private module (ignored)
-```
-
 ## Installation
 
 Ensure you have the following prerequisites:
@@ -88,6 +76,18 @@ dony --init
 This creates a `dony/` directory containing:
 - A `commands/` directory containing a sample command
 - A `uv` virtual environment
+
+## Dony directory structure
+
+```text
+dony/
+... (uv environment) 
+├── commands/
+│   ├── my_global_command.py # one command per file
+│   ├── my-service/         
+│   │   ├── service_command.py  # will be displayed as `my-service/service_command`
+│   │   └── _helper.py       # private module (ignored)
+```
 
 ## License
 
