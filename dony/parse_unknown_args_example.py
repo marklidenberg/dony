@@ -1,4 +1,4 @@
-from marklidenberg.dony.dony.__main__.parse_unknown_args import parse_unknown_args
+from dony.parse_unknown_args import parse_unknown_args
 
 if __name__ == "__main__":
     import sys

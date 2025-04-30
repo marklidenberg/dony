@@ -1,6 +1,6 @@
 import os
 
-from marklidenberg.dony import dony
+import dony
 
 
 @dony.command()

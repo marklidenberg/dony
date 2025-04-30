@@ -49,7 +49,7 @@ Create commands as Python functions. All parameters must have defaults to allow 
 ```python
 # dony/commands/my_global_command.py
 
-from marklidenberg.dony import dony
+import dony
 
 
 @dony.command(path='my/custom/path')
