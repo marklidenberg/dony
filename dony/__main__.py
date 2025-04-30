@@ -121,7 +121,6 @@ def main():
             current_path = Path(root)
 
             while True:
-                print(current_path)
                 candidates = [
                     (current_path / "_dony"),  # for this exact project, since dony directory is already used
                     (current_path / "dony"),

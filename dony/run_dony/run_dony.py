@@ -115,6 +115,12 @@ def run_dony(
 
     print("🧙 Running", path + "...")
 
+    # - If no commands - exit early
+
+    if not commands:
+        print('No commands found. Exiting...')
+        sys.exit(0)
+
     # - Run command with passed arguments
 
     run_with_list_arguments(
