@@ -5,7 +5,7 @@ commands. A `Justfile` alternative.
 
 ## How it works
 
-Define your commands like this:
+Define your commands in `dony/` in the root of your project.
 
 ```python
 # dony/commands/hello_world.py
