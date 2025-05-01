@@ -18,7 +18,7 @@ def hello_world(name: str = "John"):
     print(f"Hello, {name}!")	
 ```
 
-Run `dony` to fuzzy-search your commands from anywhere in your project or run commands directly with `dony <command_name> [--arg value]`
+Run `dony` to fuzzy-search your commands from anywhere in your project.
 
 ```
                                                                                                                                                                                                                    
@@ -34,19 +34,20 @@ Select command 👆
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
+Or call them directly: `dony <command_name> [--arg value]`.
+
 ## Commands
 
-Create commands as Python functions
 ```python
 import dony
 
 @dony.command()
 def greet(
-	greeting: str = 'Hello',
-	name: str = None
+  greeting: str = 'Hello',
+  name: str = None
 ):
-	name = name or dony.input('What is your name?')
-	dony.shell(f"echo {greeting}, {name}!")
+  name = name or dony.input('What is your name?')
+  dony.shell(f"echo {greeting}, {name}!")
 ```
 
 - Use convenient shell wrapper `dony.shell`
@@ -62,8 +63,8 @@ import dony
 
 @dony.command()
 def squash_and_migrate(
-	new_branch: str = None,
-	commit_message: str = None,
+  new_branch: str = None,
+  commit_message: str = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
@@ -96,7 +97,7 @@ def squash_and_migrate(
                 break
             dony.print("Only conventional commits are allowed, try again")
 
-    # - Do the process
+    # - Squash and migrate
 
     dony.shell(
         f"""
