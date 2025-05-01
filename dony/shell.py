@@ -1,6 +1,11 @@
+import os.path
 import subprocess
+from inspect import currentframe
+from pathlib import Path
 from textwrap import dedent
 from typing import Optional
+
+from dony.get_dony_dir import get_dony_path
 
 
 def shell(
@@ -10,8 +15,8 @@ def shell(
     text: bool = True,
     exit_on_error: bool = True,
     error_on_unset: bool = True,
-    echo_commands: bool = True,
-    working_directory: Optional[str] = None,
+    echo_commands: bool = False,
+    working_directory: Optional[str] = "DONY_ROOT_PATH",
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -33,6 +38,17 @@ def shell(
     Raises:
         subprocess.CalledProcessError: If the command exits with a non-zero status.
     """
+
+    # - Find dony root path
+
+    if working_directory == "DONY_ROOT_PATH":
+        # - Get caller filename
+
+        caller_filename = currentframe().f_back.f_back.f_code.co_filename
+
+        # - Get dony root path
+
+        working_directory = os.path.dirname(get_dony_path(Path(caller_filename)))
 
     # - Build the `set` prefix from the enabled flags
 
@@ -80,8 +96,8 @@ def shell(
     if return_code != 0:
         raise subprocess.CalledProcessError(
             returncode=return_code,
-            cmd=full_cmd,
-            output=output,
+            cmd=full_cmd[:30] + "..." if len(full_cmd) > 30 else full_cmd,
+            output="",
         )
 
     # - Return output

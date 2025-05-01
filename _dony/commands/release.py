@@ -1,4 +1,5 @@
 import os
+from subprocess import CalledProcessError
 
 import dony
 
@@ -14,34 +15,36 @@ def release(
         ],
     ),
 ):
-    dony.shell("""
+    try:
+        dony.shell("""
 
-                # - Exit if there are staged changes
+            # - Exit if there are staged changes
 
-                git diff --cached --name-only | grep -q . && { echo "There are staged changes. Exiting."; exit 1; }
+            git diff --cached --name-only | grep -q . && { echo "There are staged changes. Exiting."; exit 1; }
 
-                # - Exit if there are unpulled commits
+            # - Exit if there are unpulled commits
 
-                git fetch origin && git diff --quiet HEAD origin/master ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
+            git fetch origin && git diff --quiet HEAD origin/master ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
+""")
+    except CalledProcessError:
+        return
 
-                # - Bump and
+    dony.shell(
+        f"""
+            # - Bump
 
-                get new version
+            VERSION=$(uv version --bump {version} --short)
+            echo $VERSION
 
-                cd ${0%/*}/..
-                pwd
-                echo $PWD
-                # # poetry version major
-                # VERSION=0.1.0
-                # # 
-                # # # - Commit, tag and push
-                # # 
-                # git add pyproject.toml
-                # git commit --mesdony "chore: release-$VERSION"
-                # git tag --annotate "release-$VERSION" --mesdony "chore: release-$VERSION" HEAD
-                # git push
-                # git push origin "release-$VERSION" # push tag to origin
-            """)
+            # - Commit, tag and push
+
+            git add pyproject.toml
+            git commit --message "chore: release-$VERSION"
+            git tag --annotate "release-$VERSION" --message "chore: release-$VERSION" HEAD
+            git push
+            git push origin "release-$VERSION" # push tag to origin,
+            """
+    )
 
 
 if __name__ == "__main__":
