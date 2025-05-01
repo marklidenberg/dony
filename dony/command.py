@@ -89,8 +89,10 @@ def command(path: str = None):
             func._path = path
 
         # - Crop to last dony folder
-
-        func._path = re.sub(r"^.*/_?dony/", "", func._path).replace(".py", "")
+        
+        # dony_
+        func._path = re.sub(r"^.*/dony_twin/", "", func._path).replace(".py", "")
+        func._path = re.sub(r"^.*/dony/", "", func._path)
 
         if func._path.startswith("commands/"):
             func._path = func._path[len("commands/") :]

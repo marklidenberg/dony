@@ -6,7 +6,7 @@ def get_dony_path(path: Path) -> Path:
 
     while True:
         candidates = [
-            (current_path / "_dony"),  # for this exact project, since dony directory is already used
+            (current_path / "dony_twin"),  # for this exact project, since dony directory is already used
             (current_path / "dony"),
         ]
 

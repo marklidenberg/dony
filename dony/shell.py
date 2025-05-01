@@ -5,7 +5,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Optional
 
-from dony.get_dony_dir import get_dony_path
+from dony.get_dony_path import get_dony_path
 
 
 def shell(

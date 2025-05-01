@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from dony import shell
-from dony.get_dony_dir import get_dony_path
+from dony.get_dony_path import get_dony_path
 from dony.parse_unknown_args import parse_unknown_args
 
 
@@ -140,8 +140,6 @@ def main():
             ('"' + str(dony_path) + '"').replace('"', '\\"'),
             json.dumps(args).replace('"', '\\"'),
         ),
-        echo_commands=False,
-        working_directory=os.path.dirname(dony_path),  # start from the root of the project
     )
 
 
