@@ -35,7 +35,7 @@ def main():
             assert len(args["keyword"]) == 1, "help command takes no arguments"
             print(
                 dedent("""
-                        Udony: dony [OPTIONS] COMMAND [ARGS]
+                        dony: dony [OPTIONS] COMMAND [ARGS]
                 
                         Options:
                           --version       Show version information and exit
@@ -56,14 +56,14 @@ def main():
             assert first_value == [True]
             assert len(args["keyword"]) == 1, "init command takes no arguments"
 
-            # - Create dony dir if it does not exist
+            # - Create donyfiles dir if it does not exist
 
-            if not (Path.cwd() / "dony").exists():
-                os.mkdir(Path.cwd() / "dony")
+            if not (Path.cwd() / "donyfiles").exists():
+                os.mkdir(Path.cwd() / "donyfiles")
 
             # - Os into dony dir
 
-            os.chdir(Path.cwd() / "dony")
+            os.chdir(Path.cwd() / "donyfiles")
 
             # - Run uv init
 

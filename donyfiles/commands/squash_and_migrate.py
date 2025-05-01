@@ -1,14 +1,19 @@
-import os
 import re
-from subprocess import CalledProcessError
-
 import dony
-from dony.shell import DonyShellError
 
 
 @dony.command()
-def squash_and_migrate():
+def squash_and_migrate(
+    new_branch: str = None,
+    commit_message: str = None,
+):
     """Squashes current branch to main, checkouts to a new branch"""
+
+    # - Get default branch if not set
+
+    new_branch = (
+        new_branch or f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
+    )
 
     # - Get current branch
 
@@ -17,24 +22,21 @@ def squash_and_migrate():
         quiet=True,
     )
 
-    # - New branch - current date and time
+    # - Get commit message from the user
 
-    new_branch = f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
-
-    # - Get commit message
-
-    while True:
-        commit_message = dony.input(
-            f"Enter commit message for merging branch {original_branch} to main:"
-        )
-        if bool(
-            re.match(
-                r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
-                commit_message.splitlines()[0],
+    if not commit_message:
+        while True:
+            commit_message = dony.input(
+                f"Enter commit message for merging branch {original_branch} to main:"
             )
-        ):
-            break
-        dony.print("Only conventional commits are allowed, try again")
+            if bool(
+                re.match(
+                    r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
+                    commit_message.splitlines()[0],
+                )
+            ):
+                break
+            dony.print("Only conventional commits are allowed, try again")
 
     # - Do the process
 
@@ -43,7 +45,7 @@ def squash_and_migrate():
 
         # - Make up to date
 
-        git diff --cached --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
+        git diff --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
         git checkout main
         git pull
 

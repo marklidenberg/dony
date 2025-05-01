@@ -1,14 +1,16 @@
 # 🍥️ dony
 
 A lightweight Python command runner with simple and consistent workflow for managing project 
-commands. A `Justfile` alternative.
+commands.
+
+A `Justfile` alternative.
 
 ## How it works
 
-Define your commands in `dony/` in the root of your project.
+Define your commands in `donyfiles/` in the root of your project.
 
 ```python
-# dony/commands/hello_world.py
+# donyfiles/commands/hello_world.py
 import dony
 
 @dony.command()
@@ -18,10 +20,7 @@ def hello_world(name: str = "John"):
 
 Run `dony` to fuzzy-search your commands from anywhere in your project.
 
-Common use cases: build, release, publish, test, deploy, configure, format, run static analyzers, manage databases, 
-generate documentation, run benchmarks, get useful links, create release notes and much more
-
-## Defining Commands
+## Commands
 
 Create commands as Python functions
 ```python
@@ -33,7 +32,7 @@ def greet(
 	name: str = None
 ):
 	name = name or dony.input('What is your name?')
-    dony.shell(f"echo {greeting}, {name}!")
+	dony.shell(f"echo {greeting}, {name}!")
 ```
 
 - All parameters must provide defaults to allow invocation with no arguments, and any missing values should be requested via user prompts
@@ -53,6 +52,89 @@ Run commands directly:
 dony <command_name> [--arg1 value --arg2 value]
 ```
 
+## Example
+
+
+```python
+import re
+import dony
+
+
+@dony.command()
+def squash_and_migrate(
+	new_branch: str = None,
+	commit_message: str = None,
+):
+    """Squashes current branch to main, checkouts to a new branch"""
+
+    # - Get default branch if not set
+
+    new_branch = (
+            new_branch or f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
+    )
+
+    # - Get current branch
+
+    original_branch = dony.shell(
+        "git branch --show-current",
+        quiet=True,
+    )
+
+    # - Get commit message from the user
+
+    if not commit_message:
+        while True:
+            commit_message = dony.input(
+                f"Enter commit message for merging branch {original_branch} to main:"
+            )
+            if bool(
+                    re.match(
+                        r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
+                        commit_message.splitlines()[0],
+                    )
+            ):
+                break
+            dony.print("Only conventional commits are allowed, try again")
+
+    # - Do the process
+
+    dony.shell(
+        f"""
+
+        # - Make up to date
+
+        git diff --cached --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
+        git checkout main
+        git pull
+
+        # - Merge
+
+        git merge --squash {original_branch}
+        git commit -m "{commit_message}"
+        git push 
+
+        # - Remove current branch
+
+        git branch -D {original_branch}
+        git push origin --delete {original_branch}
+
+        # - Create new branch
+
+        git checkout -b {new_branch}
+        git push --set-upstream origin {new_branch}
+    """,
+    )
+
+```
+
+## Use cases:
+- Build & Configuration
+- Quality & Testing
+- Release Management
+- Deployment & Operations
+- Documentation & Resources
+- Git management
+
 ## Installation
 
 Ensure you have the following prerequisites:
@@ -71,11 +153,12 @@ Initialize your project:
 dony --init
 ```
 
-This creates a `dony/` directory:
+This creates a `donyfiles/` directory:
 - A `commands/` directory containing a sample command
 - A dedicated `uv` virtual environment
 
-## Dony directory structure
+
+## donyfiles structure
 
 ```text
 dony/
