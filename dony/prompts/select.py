@@ -15,11 +15,11 @@ from questionary import Choice
 
 
 def select(
-        message: str,
+    message: str,
     choices: Sequence[Union[str, Tuple[str, str], Tuple[str, str, str]]],
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
-    fuzzy: bool = True,
+    fuzzy: bool = False,
 ) -> Union[None, str, Sequence[str]]:
     """
     Prompt the user to select from a list of choices, each of which can have:
