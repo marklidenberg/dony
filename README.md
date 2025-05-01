@@ -18,7 +18,19 @@ def hello_world(name: str = "John"):
     print(f"Hello, {name}!")	
 ```
 
-Run `dony` to fuzzy-search your commands from anywhere in your project.
+Run `dony` to fuzzy-search your commands from anywhere in your project or run commands directly with `dony <command_name> [--arg value]`
+
+```
+📝 squash_and_migrate                                                                                                                                                                                             
+▌ 📝 release                                                                                                                                                                                                        
+2/2 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Select command 👆                                                                                                                                                                                                   
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Bump version and publish to PyPI                                                                                                                                                                                 │
+│                                                                                                                                                                                                                  │
+│                                                                                                                                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 
 ## Commands
 
@@ -35,22 +47,9 @@ def greet(
 	dony.shell(f"echo {greeting}, {name}!")
 ```
 
-- All parameters must provide defaults to allow invocation with no arguments, and any missing values should be requested via user prompts
-- Currently, only str and List[str] parameter types are supported.
-
-## Running commands
-
-Run commands interactively:
-
-```bash
-dony
-```
-
-Run commands directly:
-
-```bash
-dony <command_name> [--arg1 value --arg2 value]
-```
+- Use convenient shell wrapper `dony.shell`
+- Use a bundle of useful user interaction functions, like `input`, `confirm`, `press_any_key_to_continue` and others
+- Run any command without any arguments - defaults are mandatory
 
 ## Example
 
@@ -58,7 +57,6 @@ dony <command_name> [--arg1 value --arg2 value]
 ```python
 import re
 import dony
-
 
 @dony.command()
 def squash_and_migrate(
@@ -127,7 +125,7 @@ def squash_and_migrate(
 
 ```
 
-## Use cases:
+## Use cases
 - Build & Configuration
 - Quality & Testing
 - Release Management
@@ -153,15 +151,13 @@ Initialize your project:
 dony --init
 ```
 
-This creates a `donyfiles/` directory:
-- A `commands/` directory containing a sample command
-- A dedicated `uv` virtual environment
+This creates a `donyfiles/` directory with sample command and a separate `uv` environment.
 
 
-## donyfiles structure
+## donyfiles/
 
 ```text
-dony/
+donyfiles/
 ... (uv environment) 
 ├── commands/
 │   ├── my_global_command.py # one command per file
