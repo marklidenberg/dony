@@ -13,6 +13,7 @@ def release(
             "minor",
             "major",
         ],
+        fuzzy=True
     ),
 ):
     try:

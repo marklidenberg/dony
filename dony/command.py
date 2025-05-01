@@ -89,8 +89,7 @@ def command(path: str = None):
             func._path = path
 
         # - Crop to last dony folder
-        
-        # dony_
+
         func._path = re.sub(r"^.*/dony_twin/", "", func._path).replace(".py", "")
         func._path = re.sub(r"^.*/dony/", "", func._path)
 
