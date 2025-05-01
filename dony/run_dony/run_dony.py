@@ -119,7 +119,7 @@ def run_dony(
     if not path:
         return
 
-    print("️⚙️ Running", path + "...")
+    print("️🍥 Running", path + "...")
 
     # - Run command with passed arguments
 
