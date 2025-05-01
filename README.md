@@ -1,7 +1,6 @@
 # 🍥️ dony
 
-A lightweight Python command runner with simple and consistent workflow for managing project 
-commands.
+A lightweight Python command runner with a simple, consistent workflow for managing project commands.
 
 A `Justfile` alternative.
 
@@ -15,7 +14,7 @@ import dony
 @dony.command()
 def hello_world():
     """Prints "Hello, World!" """
-    dony.shell('echo "Hello, World!')
+    dony.shell('echo "Hello, World!"')
 ```
 
 Run `dony` to fuzzy-search your commands from anywhere in your project.
@@ -36,6 +35,41 @@ Select command 👆
 
 Or call them directly: `dony <command_name> [--arg value]`.
 
+## Quick Start
+
+1. **Install Prerequisites**: Python 3.8+, `pipx`, `fzf`
+
+   For macOS, run 
+
+   ```bash
+   brew install pipx
+   brew install fzf 
+   ```
+
+2. **Install** `dony`:
+
+    ```bash
+    pipx install dony
+    ```
+3. **cd** into your project:
+
+   ```bash
+   cd my/project/path
+   ```
+
+4. **Create** `donyfiles/` with a sample command and a `uv` environment:
+
+    ```bash
+    dony --init
+    ```
+
+5. **Add your own commands** under `donyfiles/commands/`.
+6. **Use**:
+
+    ```bash
+    dony
+    ```
+
 ## Commands
 
 ```python
@@ -50,9 +84,9 @@ def greet(
     dony.shell(f"echo {greeting}, {name}!")
 ```
 
-- Use convenient shell wrapper `dony.shell`
+- Use the convenient shell wrapper `dony.shell`
 - Use a bundle of useful user interaction functions, like `input`, `confirm` and `press_any_key_to_continue`
-- Run any command without any arguments - defaults are mandatory
+- Run commands without arguments – defaults are mandatory
 
 ## Example
 
@@ -136,27 +170,6 @@ def squash_and_migrate(
 - Documentation & Resources
 - Git management
 
-## Installation
-
-Ensure you have the following prerequisites:
-- Python 3.8 or higher
-- `pipx` for isolated installation (`brew install pipx` on macOS)
-- `fzf` for fuzzy command selection (`brew install fzf` on macOS)
-
-Then install the package with `pipx`:
-```bash
-pipx install dony
-```
-
-Initialize your project:
-
-```bash
-dony --init
-```
-
-Creates a `donyfiles/` folder with a sample command and a `uv` virtual environment.
-
-
 ## donyfiles/
 
 ```text
@@ -169,11 +182,26 @@ donyfiles/
 │   │   └── _helper.py       # non-command file
 ```
 
+## Things to know
+
+- All commands run from the project root (where `donyfiles/` is located)
+- Available prompts based on `questionary`:
+  - `autocomplete`: suggestion-driven input
+  - `confirm`: yes/no ([Y/n] or [y/N])
+  - `error`: ❌ error message
+  - `input`: free-text entry
+  - `path`: filesystem path entry
+  - `press_any_key_to_continue`: pause until keypress
+  - `print`: styled text output
+  - `select`: option picker (supports multi & fuzzy)
+  - `success`: ✅ success message
+- `dony` enforces files to be named after functions and will rename them automatically when invoked
+
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT License.
 
 ## Author
 
-Mark Lidenberg [marklidenberg@gmail.com](mailto\:marklidenberg@gmail.com)
+Mark Lidenberg [marklidenberg@gmail.com](mailto:marklidenberg@gmail.com)
 
