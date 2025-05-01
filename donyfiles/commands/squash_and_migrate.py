@@ -7,15 +7,8 @@ from dony.shell import DonyShellError
 
 
 @dony.command()
-def merge_to_main():
-    # - Validate git status
-
-    try:
-        dony.shell("""
-                
-    """)
-    except DonyShellError:
-        return
+def squash_and_migrate():
+    """Squashes current branch to main, checkouts to a new branch"""
 
     # - Get current branch
 
@@ -50,7 +43,7 @@ def merge_to_main():
 
         # - Make up to date
 
-        git diff --cached --name-only | grep -q . && git stash merge_to_main-{new_branch}
+        git diff --cached --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
         git checkout main
         git pull
 
@@ -63,6 +56,7 @@ def merge_to_main():
         # - Remove current branch
 
         git branch -D {original_branch}
+        git push origin --delete {original_branch}
 
         # - Create new branch
 
@@ -73,4 +67,4 @@ def merge_to_main():
 
 
 if __name__ == "__main__":
-    merge_to_main()
+    squash_and_migrate()

@@ -1,8 +1,6 @@
 import os
-from subprocess import CalledProcessError
 
 import dony
-from dony.shell import DonyShellError
 
 
 @dony.command()
@@ -10,6 +8,8 @@ def release(
     version: str = None,
     uv_publish_token: str = None,
 ):
+    """Bump version and publish to PyPI"""
+
     # - Select default arguments
 
     version = version or dony.select(
@@ -18,9 +18,7 @@ def release(
             "patch",
             "minor",
             "major",
-            "none",
         ],
-        default="none",
     )
 
     uv_publish_token = uv_publish_token or dony.input(
@@ -52,24 +50,25 @@ def release(
                 git pull
     """)
 
-    if version != "none":
-        dony.shell(
-            f"""
+    # - Bump
 
-                # - Bump
+    dony.shell(
+        f"""
 
-                VERSION=$(uv version --bump {version} --short)
-                echo $VERSION
+            # - Bump
 
-                # - Commit, tag and push
+            VERSION=$(uv version --bump {version} --short)
+            echo $VERSION
 
-                git add pyproject.toml
-                git commit --message "chore: release-$VERSION"
-                git tag --annotate "release-$VERSION" --message "chore: release-$VERSION" HEAD
-                git push
-                git push origin "release-$VERSION" # push tag to origin,
-                """
-        )
+            # - Commit, tag and push
+
+            git add pyproject.toml
+            git commit --message "chore: release-$VERSION"
+            git tag --annotate "release-$VERSION" --message "chore: release-$VERSION" HEAD
+            git push
+            git push origin "release-$VERSION" # push tag to origin,
+            """
+    )
 
     # - Build and publish
 

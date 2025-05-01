@@ -7,6 +7,7 @@ from typing import Any, get_origin, get_args
 
 from dotenv import load_dotenv
 
+from dony.prompts.error import error
 from dony.get_dony_path import get_dony_path
 
 
@@ -97,10 +98,10 @@ def command(path: str = None):
         if path is None:
             parts = file_path.parts
             try:
-                idx = parts.index("dony")
+                idx = parts.index("donyfiles")
             except ValueError:
                 raise RuntimeError(
-                    f"Cannot derive path: 'dony' not found in '{file_path}'"
+                    f"Cannot derive path: 'donyfiles' not found in '{file_path}'"
                 )
             relative = Path(*parts[idx:]).as_posix()
             func._path = relative
@@ -109,11 +110,13 @@ def command(path: str = None):
 
         # - Crop to last dony folder
 
-        func._path = re.sub(r"^.*/dony_for_dony/", "", func._path).replace(".py", "")
-        func._path = re.sub(r"^.*/dony/", "", func._path)
+        func._path = re.sub(r"^.*/donyfiles/", "", func._path).replace(".py", "")
 
-        if func._path.startswith("dony/commands/"):
-            func._path = func._path[len("dony/commands/") :]
+        # crop commands prefixes
+        if func._path.startswith("donyfiles/commands/"):
+            func._path = func._path[len("donyfiles/commands/") :]
+        if func._path.startswith("commands/"):
+            func._path = func._path[len("commands/") :]
 
         func._dony_command = True
 
@@ -170,7 +173,10 @@ def command(path: str = None):
 
             # - Call original function with resolved args
 
-            return func(**bound.arguments)
+            try:
+                return func(**bound.arguments)
+            except KeyboardInterrupt:
+                return error("Dony command interrupted")
 
         # - Attach metadata to wrapper
 

@@ -62,6 +62,7 @@ def select(
 
             cmd = [
                 "fzf",
+                "--read0",  # ← treat NUL as item separator
                 "--prompt",
                 f"{message} 👆",
                 "--with-nth",
@@ -81,7 +82,7 @@ def select(
                 stderr=subprocess.DEVNULL,
                 text=True,
             )
-            output, _ = proc.communicate(input="\n".join(lines))
+            output, _ = proc.communicate(input="\0".join(lines))
             if not output:
                 raise KeyboardInterrupt
 
@@ -158,7 +159,7 @@ def example():
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=True,
-        fuzzy=False,
+        fuzzy=True,
         default=["foo"],
         default_confirm=False,
     )

@@ -7,7 +7,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from dony import select
+from dony.prompts.error import error
+from dony.prompts.select import select
 from dony.run_dony.run_with_list_arguments import run_with_list_arguments
 
 
@@ -111,11 +112,21 @@ def run_dony(
     if len(args["positional"]) == 1:  # no command was passed directly
         # - Interactive mode
 
-        path = select(
-            "Select command",
-            choices=[command._path for command in commands.values()],
-            fuzzy=True,
-        )
+        try:
+            path = select(
+                "Select command",
+                choices=[
+                    (
+                        ("📝 " if command.__doc__ else "") + command._path,
+                        "",
+                        command.__doc__ or "",
+                    )
+                    for command in commands.values()
+                ],
+                fuzzy=True,
+            )
+        except KeyboardInterrupt:
+            return error("Dony command interrupted")
     else:
         # - Command line mode
 
@@ -147,7 +158,7 @@ def run_dony(
     # - Run command with passed arguments
 
     run_with_list_arguments(
-        func=commands[path],
+        func=commands[path.replace("📝 ", "")],
         list_kwargs=args["keyword"],
     )
 
@@ -155,7 +166,7 @@ def run_dony(
 if __name__ == "__main__":
     run_dony(
         dony_path=Path(
-            "/Users/marklidenberg/Documents/coding/repos/deeplay-io/OpenMetadata"
+            "/Users/marklidenberg/Documents/coding/repos/marklidenberg/dony"
         ),
         args=OrderedDict(positional=["hello_world"], keyword={}),
     )

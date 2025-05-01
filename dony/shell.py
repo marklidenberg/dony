@@ -130,7 +130,9 @@ def shell(
     # - Raise if exit code is non-zero
 
     if return_code != 0:
-        return error("Dony command failed")
+        if "KeyboardInterrupt" in output:
+            raise KeyboardInterrupt
+        raise DonyShellError("Dony command failed")
 
     # - Return output
 

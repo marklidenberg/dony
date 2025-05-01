@@ -12,16 +12,8 @@ def get_dony_path(path: Union[str, Path] = ".") -> Path:
     current_path = path
 
     while True:
-        candidates = [
-            (
-                current_path / "dony_for_dony"
-            ),  # for this exact project, since dony directory is already used
-            (current_path / "dony"),
-        ]
-
-        for candidate in candidates:
-            if candidate.exists():
-                return candidate
+        if (current_path / "donyfiles").exists():
+            return current_path / "donyfiles"
 
         current_path = current_path.parent
         if current_path == current_path.parent:
