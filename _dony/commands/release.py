@@ -20,16 +20,16 @@ def release(
 
             # - Exit if there are staged changes
 
-            git diff --cached --name-only | grep -q . && { echo "There are staged changes. Exiting."; exit 1; }
+            git diff --cached --name-only | grep -q . && { echo "There are staged changes. Exiting"; exit 1; }
 
             # - Exit if not on main branch
 
-            git branch --show-current | grep -q main || { echo "Not on main branch. Exiting."; exit 1; }
+            git branch --show-current | grep -q main || { echo "Not on main branch. Exiting"; exit 1; }
 
 
             # - Exit if there are unpulled commits
 
-            git fetch origin && git diff --quiet HEAD origin/main ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
+            git fetch origin && git diff --quiet HEAD origin/main ||  { echo "There are some unpulled commits. Exiting"; exit 1; }
 """)
     except CalledProcessError:
         return
