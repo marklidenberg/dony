@@ -1,9 +1,9 @@
 import questionary
 
 
-def path(mesdony: str):
+def path(message: str):
     return questionary.path(
-        mesdony=mesdony,
+        message=message,
         qmark="•",
     ).ask()
 

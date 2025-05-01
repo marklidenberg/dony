@@ -3,13 +3,13 @@ from prompt_toolkit.styles import Style
 
 
 def input(
-    mesdony: str,
+    message: str,
     default: str = "",
     allow_empty_string: bool = False,
 ):
     while True:
         result = questionary.text(
-            mesdony,
+            message,
             default=default,
             qmark="•",
             style=Style(
@@ -24,7 +24,7 @@ def input(
 
 
 def example():
-    print(input(mesdony="What is your name?"))
+    print(input(message="What is your name?"))
 
 
 if __name__ == "__main__":

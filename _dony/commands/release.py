@@ -13,6 +13,7 @@ def release(
             "minor",
             "patch",
         ],
+        fuzzy=False
     ),
 ):
     try:

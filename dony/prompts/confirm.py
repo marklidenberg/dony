@@ -2,11 +2,11 @@ import questionary
 
 
 def confirm(
-    mesdony: str,
+    message: str,
     default: bool = True,
 ):
     return questionary.confirm(
-        mesdony=mesdony,
+        message=message,
         default=default,
         qmark="",
     ).ask()

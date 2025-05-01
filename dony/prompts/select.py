@@ -15,7 +15,7 @@ from questionary import Choice
 
 
 def select(
-    mesdony: str,
+        message: str,
     choices: Sequence[Union[str, Tuple[str, str], Tuple[str, str, str]]],
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
@@ -59,7 +59,7 @@ def select(
             cmd = [
                 "fzf",
                 "--prompt",
-                f"{mesdony} 👆",
+                f"{message} 👆",
                 "--with-nth",
                 "1,2",
                 "--delimiter",
@@ -105,11 +105,16 @@ def select(
         else:
             title = value
 
-        q_choices.append(Choice(title=title, value=value, short=title))
+        q_choices.append(
+            Choice(
+                title=title,
+                value=value,
+            )
+        )
 
     if multi:
         return questionary.checkbox(
-            mesdony=mesdony,
+            message=message,
             choices=q_choices,
             default=default,
             qmark="•",
@@ -117,7 +122,7 @@ def select(
         ).ask()
 
     return questionary.select(
-        mesdony=mesdony,
+        message=message,
         choices=q_choices,
         default=default,
         qmark="•",

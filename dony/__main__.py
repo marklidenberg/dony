@@ -39,7 +39,7 @@ def main():
                 
                         Options:
                           --version       Show version information and exit
-                          --help          Show this help mesdony and exit
+                          --help          Show this help message and exit
                         
                         Commands:
                           my_command      Default operation
