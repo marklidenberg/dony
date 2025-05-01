@@ -26,7 +26,6 @@ def release(
 
             git branch --show-current | grep -q main || { echo "Not on main branch. Exiting"; exit 1; }
 
-
             # - Exit if there are unpulled commits
 
             git fetch origin && git diff --quiet HEAD origin/main ||  { echo "There are some unpulled commits. Exiting"; exit 1; }
