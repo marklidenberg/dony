@@ -5,12 +5,12 @@ from prompt_toolkit.styles import Style
 
 
 def autocomplete(
-    mesdony: str,
+    message: str,
     choices: List[str],
     default: Optional[str] = "",
 ):
     return questionary.autocomplete(
-        mesdony=mesdony,
+        message=message,
         choices=choices,
         default=default,
         qmark="•",

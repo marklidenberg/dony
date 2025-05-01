@@ -87,6 +87,12 @@ def run_dony(
         print(f"Duplicate commands: {duplicates}", file=sys.stderr)
         sys.exit(1)
 
+    # - Return if no commands found
+
+    if not commands:
+        print("No commands found. Exiting...")
+        sys.exit(0)
+
     # - Choose command and parse arguments
 
     if len(args["positional"]) == 1:  # no command was passed directly
@@ -113,7 +119,7 @@ def run_dony(
     if not path:
         return
 
-    print("🧙 Running", path + "...")
+    print("️🍥 Running", path + "...")
 
     # - Run command with passed arguments
 

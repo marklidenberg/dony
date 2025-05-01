@@ -6,6 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from dony import shell
+from dony.get_dony_dir import get_dony_path
 from dony.parse_unknown_args import parse_unknown_args
 
 
@@ -38,7 +39,7 @@ def main():
                 
                         Options:
                           --version       Show version information and exit
-                          --help          Show this help mesdony and exit
+                          --help          Show this help message and exit
                         
                         Commands:
                           my_command      Default operation
@@ -116,26 +117,7 @@ def main():
 
     root = Path.cwd()
     try:
-
-        def _get_dony_dir(root: Path) -> Path:
-            current_path = Path(root)
-
-            while True:
-                print(current_path)
-                candidates = [
-                    (current_path / "_dony"),  # for this exact project, since dony directory is already used
-                    (current_path / "dony"),
-                ]
-
-                for candidate in candidates:
-                    if candidate.exists():
-                        return candidate
-
-                current_path = current_path.parent
-                if current_path == current_path.parent:
-                    raise FileNotFoundError("Could not find 'dony' folder")
-
-        dony_dir = _get_dony_dir(root)
+        dony_path = get_dony_path(root)
 
     except FileNotFoundError as e:
         print(e, file=sys.stderr)
@@ -143,21 +125,23 @@ def main():
 
     # - Cd into dony dir
 
-    print("🧙‍Running dony from", dony_dir)
-    os.chdir(dony_dir)
+    print("🍥 dony called from ", dony_path)
 
-    # - Run run_dony in local uv environment
+    os.chdir(dony_path)
+
+    # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """
-    uv run python -c "import dony; import json; from pathlib import Path; import sys; dony.run_dony(dony_dir=Path({}), args={})"
+    uv run python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(dony_dir=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",
-            ('"' + str(dony_dir) + '"').replace('"', '\\"'),
+            ('"' + str(dony_path) + '"').replace('"', '\\"'),
             json.dumps(args).replace('"', '\\"'),
         ),
         echo_commands=False,
+        working_directory=os.path.dirname(dony_path),  # start from the root of the project
     )
 
 

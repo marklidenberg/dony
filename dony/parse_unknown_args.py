@@ -1,6 +1,6 @@
 import itertools
 
-from marklidenberg.dony.dony import shell
+from dony.shell import shell
 
 import itertools
 import sys
