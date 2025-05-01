@@ -9,9 +9,9 @@ def release(
     version: str = lambda: dony.select(
         "Choose version",
         choices=[
-            "major",
-            "minor",
             "patch",
+            "minor",
+            "major",
         ],
     ),
 ):
@@ -24,7 +24,7 @@ def release(
 
             # - Exit if there are unpulled commits
 
-            git fetch origin && git diff --quiet HEAD origin/master ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
+            git fetch origin && git diff --quiet HEAD origin/main ||  { echo "There are some unpulled commits. Exiting."; exit 1; }
 """)
     except CalledProcessError:
         return
