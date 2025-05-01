@@ -3,9 +3,9 @@ from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 
 
-def error(
-    text: str,
-    prefix: str = "❌ ",
+def success(
+    text: str = "Success!",
+    prefix: str = "✅ ",
 ):
     return print_formatted_text(
         FormattedText(
@@ -16,7 +16,7 @@ def error(
         ),
         style=questionary.Style(
             [
-                ("question", "fg:ansired"),  # the question text
+                ("question", "fg:ansigreen"),  # the question text
                 ("question", "bold"),  # the question text
             ]
         ),
@@ -24,7 +24,7 @@ def error(
 
 
 def example():
-    error("Failed to do something important")
+    success()
 
 
 if __name__ == "__main__":

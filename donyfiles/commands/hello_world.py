@@ -7,7 +7,7 @@ import dony
 @dony.command()
 def hello_world():
     """Hello, world!"""
-    dony.shell('echo "Hello, world!')
+    dony.shell('echo "Hello, world!"')
 
 
 if __name__ == "__main__":

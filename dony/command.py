@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from dony.prompts.error import error
 from dony.get_dony_path import get_dony_path
+from dony.prompts.success import success
 
 
 def lazy_dataclass(cls):
@@ -84,6 +85,12 @@ def command(path: str = None):
                 f"Could not locate source file for command '{func.__name__}'"
             )
         file_path = Path(source_file).resolve()
+
+        # - Validate file_path is in donyfiles
+
+        assert (
+            "donyfiles" in file_path.parts
+        ), f"Command '{func.__name__}' must be in 'donyfiles' directory"
 
         # - Validate filename matches function name
 
@@ -174,7 +181,9 @@ def command(path: str = None):
             # - Call original function with resolved args
 
             try:
-                return func(**bound.arguments)
+                result = func(**bound.arguments)
+                success(f"Command '{func.__name__}' succeeded")
+                return result
             except KeyboardInterrupt:
                 return error("Dony command interrupted")
 

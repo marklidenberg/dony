@@ -51,7 +51,7 @@ def greet(
 ```
 
 - Use convenient shell wrapper `dony.shell`
-- Use a bundle of useful user interaction functions, like `input`, `confirm`, `press_any_key_to_continue` and others
+- Use a bundle of useful user interaction functions, like `input`, `confirm` and `press_any_key_to_continue`
 - Run any command without any arguments - defaults are mandatory
 
 ## Example
@@ -154,7 +154,7 @@ Initialize your project:
 dony --init
 ```
 
-This creates a `donyfiles/` directory with sample command and a separate `uv` environment.
+Creates a `donyfiles/` folder with a sample command and a `uv` virtual environment.
 
 
 ## donyfiles/
@@ -163,10 +163,10 @@ This creates a `donyfiles/` directory with sample command and a separate `uv` en
 donyfiles/
 ... (uv environment) 
 ├── commands/
-│   ├── my_global_command.py # one command per file
+│   ├── my_command.py # one command per file
 │   ├── my-service/         
 │   │   ├── service_command.py  # will be displayed as `my-service/service_command`
-│   │   └── _helper.py       # private module (ignored)
+│   │   └── _helper.py       # non-command file
 ```
 
 ## License
