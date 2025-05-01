@@ -115,14 +115,17 @@ def run_dony(
         try:
             path = select(
                 "Select command",
-                choices=[
-                    (
-                        ("📝 " if command.__doc__ else "") + command._path,
-                        "",
-                        command.__doc__ or "",
-                    )
-                    for command in commands.values()
-                ],
+                choices=sorted(
+                    [
+                        (
+                            ("📝 " if command.__doc__ else "") + command._path,
+                            "",
+                            command.__doc__ or "",
+                        )
+                        for command in commands.values()
+                    ],
+                    key=lambda x: x[0],
+                ),
                 fuzzy=True,
             )
         except KeyboardInterrupt:
