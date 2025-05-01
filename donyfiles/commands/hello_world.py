@@ -6,7 +6,7 @@ import dony
 
 @dony.command()
 def hello_world():
-    """Hello world"""
+    """Hello, world!"""
     dony.shell('echo "Hello, world!')
 
 
