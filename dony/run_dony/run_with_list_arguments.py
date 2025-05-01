@@ -21,12 +21,14 @@ def run_with_list_arguments(func: Callable, list_kwargs: dict) -> Any:
     bound_args = {}
 
     for name, param in sig.parameters.items():
-        if name not in list_kwargs and param.default:
+        if name not in list_kwargs:
             continue
 
         values = list_kwargs[name]
         if not isinstance(values, list):
-            raise TypeError(f"Expected a list for argument '{name}', got {type(values).__name__}")
+            raise TypeError(
+                f"Expected a list for argument '{name}', got {type(values).__name__}"
+            )
 
         anno = param.annotation
 
@@ -47,7 +49,10 @@ def test():
     def f(a: str, b: List[str]) -> List[str]:
         return a, b
 
-    assert run_with_list_arguments(f, {"a": ["hello"], "b": ["world"]}) == ("hello", ["world"])
+    assert run_with_list_arguments(f, {"a": ["hello"], "b": ["world"]}) == (
+        "hello",
+        ["world"],
+    )
 
 
 if __name__ == "__main__":

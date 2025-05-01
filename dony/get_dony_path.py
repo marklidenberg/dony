@@ -1,12 +1,21 @@
+import os
 from pathlib import Path
+from typing import Union
 
 
-def get_dony_path(path: Path) -> Path:
-    current_path = Path(path)
+def get_dony_path(path: Union[str, Path] = ".") -> Path:
+    # - Convert path to Path object
+
+    if isinstance(path, str):
+        path = Path(os.path.abspath(path))
+
+    current_path = path
 
     while True:
         candidates = [
-            (current_path / "dony_twin"),  # for this exact project, since dony directory is already used
+            (
+                current_path / "dony_for_dony"
+            ),  # for this exact project, since dony directory is already used
             (current_path / "dony"),
         ]
 
@@ -16,7 +25,7 @@ def get_dony_path(path: Path) -> Path:
 
         current_path = current_path.parent
         if current_path == current_path.parent:
-            raise FileNotFoundError("Could not find 'dony' folder")
+            raise FileNotFoundError("Could not find 'dony' directory")
 
 
 def example():

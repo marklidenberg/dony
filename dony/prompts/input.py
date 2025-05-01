@@ -19,6 +19,9 @@ def input(
             ),
         ).ask()
 
+        if result is None:
+            raise KeyboardInterrupt
+
         if allow_empty_string or result:
             return result
 

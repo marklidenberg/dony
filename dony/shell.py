@@ -1,11 +1,19 @@
+from __future__ import annotations
+
 import os.path
 import subprocess
+import sys
 from inspect import currentframe
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional
 
-from dony.get_dony_path import get_dony_path
+from dony.prompts.error import error
+from dony.get_dony_root import get_dony_root
+
+
+class DonyShellError(Exception):
+    pass
 
 
 def shell(
@@ -16,7 +24,9 @@ def shell(
     exit_on_error: bool = True,
     error_on_unset: bool = True,
     echo_commands: bool = False,
-    working_directory: Optional[str] = "DONY_ROOT_PATH",
+    working_directory: Optional[str, Path] = "DONY_ROOT_PATH",
+    quiet: bool = False,
+    dry_run: bool = False,
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -31,6 +41,7 @@ def shell(
         error_on_unset: If True, prepend 'set -u' (error on unset variables).
         echo_commands: If True, prepend 'set -x' (echo commands before executing).
         working_directory: If provided, change the working directory before executing the command.
+        quiet: If True, suppresses output.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
@@ -39,16 +50,40 @@ def shell(
         subprocess.CalledProcessError: If the command exits with a non-zero status.
     """
 
+    # - Process dry_run
+
+    if dry_run:
+        print("Dry run enabled. Would run")
+        print(f"{command}")
+        return
+
+    # - Convert working_directory to string
+
+    working_directory = str(working_directory)
+
     # - Find dony root path
 
     if working_directory == "DONY_ROOT_PATH":
-        # - Get caller filename
+        # - Get origin path: different cases depending on how the command is called
 
-        caller_filename = currentframe().f_back.f_back.f_code.co_filename
+        if os.environ.get("_DONY_PATH"):
+            # running command from dony client. This is set right before running the command (run_with_list_arguments call)
+            origin_path = os.environ.get("_DONY_PATH")
+        elif sys.argv[0].endswith("dony"):
+            # run dony client
+            origin_path = currentframe().f_back.f_back.f_code.co_filename
+        else:
+            # run command directly in python file, decorator is present
+            origin_path = currentframe().f_back.f_back.f_back.f_code.co_filename
 
         # - Get dony root path
 
-        working_directory = os.path.dirname(get_dony_path(Path(caller_filename)))
+        working_directory = get_dony_root(origin_path)
+
+    # - If relative - concat working directory with dony root
+
+    if not os.path.isabs(working_directory):
+        working_directory = get_dony_root() / working_directory
 
     # - Build the `set` prefix from the enabled flags
 
@@ -83,7 +118,8 @@ def shell(
     buffer = []
     assert proc.stdout is not None
     for line in proc.stdout:
-        print(line, end="")
+        if not quiet:
+            print(line, end="")
         if capture_output:
             buffer.append(line)
     proc.stdout.close()
@@ -94,15 +130,11 @@ def shell(
     # - Raise if exit code is non-zero
 
     if return_code != 0:
-        raise subprocess.CalledProcessError(
-            returncode=return_code,
-            cmd=full_cmd[:30] + "..." if len(full_cmd) > 30 else full_cmd,
-            output="",
-        )
+        return error("Dony command failed")
 
     # - Return output
 
-    return output
+    return output.strip()
 
 
 def example():

@@ -1,17 +1,12 @@
 from typing import Sequence, Union, Optional, Tuple
 import subprocess
 import questionary
+from prompt_toolkit.formatted_text import to_formatted_text
 from questionary import Choice
 
-from typing import Sequence, Union, Optional, Tuple
-import subprocess
-import questionary
-from questionary import Choice
 
-from typing import Sequence, Union, Optional, Tuple
-import subprocess
-import questionary
-from questionary import Choice
+from dony import confirm
+from dony.prompts.print import print as _print
 
 
 def select(
@@ -20,6 +15,7 @@ def select(
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
     fuzzy: bool = False,
+    default_confirm: bool = False,
 ) -> Union[None, str, Sequence[str]]:
     """
     Prompt the user to select from a list of choices, each of which can have:
@@ -30,6 +26,14 @@ def select(
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
+
+    # - If default is present and default_confirm is True, then ask for confirmation to just use default
+
+    if default is not None and default_confirm:
+        # - Ask for confirmation
+
+        if confirm(message + f"\nUse default? [{default}]"):
+            return default
 
     # Helper to unpack a choice tuple or treat a plain string
     def unpack(c):
@@ -51,8 +55,8 @@ def select(
             # Map from the displayed first field back to the real value
             display_map: dict[str, str] = {}
 
-            for c in choices:
-                value, short_desc, long_desc = unpack(c)
+            for choice in choices:
+                value, short_desc, long_desc = unpack(choice)
                 display_map[value] = value
                 lines.append(f"{value}{delimiter}{short_desc}{delimiter}{long_desc}")
 
@@ -67,7 +71,7 @@ def select(
                 "--preview",
                 "echo {} | cut -f3",
                 "--preview-window",
-                "down:60%:wrap",
+                "down:30%:wrap",
             ]
 
             proc = subprocess.Popen(
@@ -79,10 +83,12 @@ def select(
             )
             output, _ = proc.communicate(input="\n".join(lines))
             if not output:
-                return None
+                raise KeyboardInterrupt
 
             # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-            picked_disp1 = [line.split(delimiter, 1)[0] for line in output.strip().splitlines()]
+            picked_disp1 = [
+                line.split(delimiter, 1)[0] for line in output.strip().splitlines()
+            ]
             results = [display_map[d] for d in picked_disp1]
             return results if multi else results[0]
 
@@ -91,8 +97,9 @@ def select(
 
     # Fallback to questionary
     q_choices = []
-    for c in choices:
-        value, short_desc, long_desc = unpack(c)
+
+    for choice in choices:
+        value, short_desc, long_desc = unpack(choice)
 
         if long_desc and short_desc:
             # suffix after the short description
@@ -109,24 +116,35 @@ def select(
             Choice(
                 title=title,
                 value=value,
+                checked=value in (default or []),
             )
         )
 
     if multi:
-        return questionary.checkbox(
+        result = questionary.checkbox(
             message=message,
             choices=q_choices,
-            default=default,
             qmark="•",
             instruction="",
         ).ask()
 
-    return questionary.select(
+        if result is None:
+            raise KeyboardInterrupt
+
+        return result
+
+    result = questionary.select(
         message=message,
         choices=q_choices,
         default=default,
         qmark="•",
+        instruction=" ",
     ).ask()
+
+    if result is None:
+        raise KeyboardInterrupt
+
+    return result
 
 
 def example():
@@ -140,7 +158,9 @@ def example():
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=True,
-        fuzzy=True,
+        fuzzy=False,
+        default=["foo"],
+        default_confirm=False,
     )
     print(selected)
 

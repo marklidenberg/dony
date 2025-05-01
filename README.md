@@ -23,26 +23,21 @@ generate documentation, run benchmarks, get useful links, create release notes a
 
 ## Defining Commands
 
-Create commands as Python functions. All parameters MUST have defaults to allow invocation without explicit arguments. Use prompts to get inputs from the user
+Create commands as Python functions
 ```python
 import dony
 
 @dony.command()
 def greet(
-	greeting: str = 'Hello', 
-	suffix: str = lambda: ',',
-	real_greeting: str = lambda kwargs: kwargs['greeting'] + kwargs['suffix'],
-	name: str = lambda: dony.input('What is your name?')
+	greeting: str = 'Hello',
+	name: str = None
 ):
-    dony.shell(f"echo {real_greeting}, {name}!")
+	name = name or dony.input('What is your name?')
+    dony.shell(f"echo {greeting}, {name}!")
 ```
 
-- All arguments should have to be `str` or `List[str]` for now. Support for other types may come later
-- Default values may be literals or callables:
-	- Simple defaults (`'Hello'`)
-	- Lazily-evaluated callables (`lambda: ...` or `lambda kwargs: ...`)
-	- Interactive prompts via `dony.input`, `dony.select`, `dony.confirm`, etc.
-	- `dony.shell(...)` runs shell commands from the directory, where `dony/` is located
+- All parameters must provide defaults to allow invocation with no arguments, and any missing values should be requested via user prompts
+- Currently, only str and List[str] parameter types are supported.
 
 ## Running commands
 
@@ -76,9 +71,9 @@ Initialize your project:
 dony --init
 ```
 
-This creates a `dony/` directory containing:
+This creates a `dony/` directory:
 - A `commands/` directory containing a sample command
-- A `uv` virtual environment
+- A dedicated `uv` virtual environment
 
 ## Dony directory structure
 

@@ -67,19 +67,28 @@ def main():
 
             # - Run uv init
 
-            shell('uv init  --description "dony environment"')
+            shell(
+                'uv init --name dony-commands --description "dony environment"',
+                working_directory=None,
+            )
 
             # - Create environment
 
-            shell("uv sync")
+            shell(
+                "uv sync",
+                working_directory=None,
+            )
 
             # - Add packages
 
-            shell("""uv add dony""")
+            shell(
+                """uv add dony""",
+                working_directory=None,
+            )
 
             # - Remove hello.py file
 
-            os.remove("hello.py")
+            os.remove("main.py")
 
             # - Create .gitignore file allowing uv files
 
@@ -92,7 +101,7 @@ def main():
                             !.python-version
                             !README.md
                             .venv
-                    """)
+                    """).strip()
                 )
 
             # - Create hello world example
@@ -111,6 +120,13 @@ def main():
                             """)
                 )
 
+            # - Add files to git
+
+            shell(
+                "git add .",
+                working_directory=None,
+            )
+
             sys.exit(0)
 
     # - Get dony dir
@@ -121,19 +137,24 @@ def main():
 
     except FileNotFoundError as e:
         print(e, file=sys.stderr)
+        if len(args["positional"]) > 1:
+            if args["positional"][1] == "help":
+                print("Did you mean `dony --help`?")
+            if args["positional"][1] == "init":
+                print("Did you mean `dony --init`?")
+            if args["positional"][1] == "version":
+                print("Did you mean `dony --version`?")
         sys.exit(1)
 
     # - Cd into dony dir
 
     print("🍥 dony called from ", dony_path)
 
-    os.chdir(dony_path)
-
     # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """
-    uv run python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(dony_dir=Path({}), args={})"
+    uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(dony_path=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",

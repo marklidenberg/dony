@@ -2,10 +2,13 @@ import questionary
 
 
 def path(message: str):
-    return questionary.path(
+    result = questionary.path(
         message=message,
         qmark="•",
     ).ask()
+
+    if result is None:
+        raise KeyboardInterrupt
 
 
 def example():

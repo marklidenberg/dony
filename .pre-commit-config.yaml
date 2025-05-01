@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      # - Run the linter.
+      - id: ruff
+        types_or: [ python, pyi, jupyter ]
+        args: [
+          "--extend-exclude", "**/*_pb2.py",
+          "--fix",
+          "--config", "pyproject.toml",
+          "--ignore", "E722", # "Do not use bare 'except'"
+          "--ignore", "E731", # "Do not assign a lambda expression, use a def"
+          "--ignore", "F401" # "Module imported but unused"
+        ]
+      # - Run the formatter.
+      - id: ruff-format
+        types_or: [ python, pyi, jupyter ]
+        args: [ "--config", "pyproject.toml" ]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+    -   id: detect-secrets
+        name: Detect secrets
+        language: python
+        entry: detect-secrets-hook
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: '\.(json|csv|txt|ipynb)$'

@@ -9,5 +9,10 @@
 !.python-version
 !pyproject.toml
 !uv.lock
+!*.template
+!.secrets.baseline
+!*.sh
+!*.yaml
+
 # forbid .venv
 .venv

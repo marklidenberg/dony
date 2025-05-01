@@ -20,7 +20,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "questionary>=2.1.0"
+    "load-dotenv>=0.1.0",
+    "questionary>=2.1.0",
 ]
 
 [project.optional-dependencies]

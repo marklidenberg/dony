@@ -5,6 +5,10 @@ from functools import wraps
 from dataclasses import make_dataclass, fields, field
 from typing import Any, get_origin, get_args
 
+from dotenv import load_dotenv
+
+from dony.get_dony_path import get_dony_path
+
 
 def lazy_dataclass(cls):
     """Lazy evaluation of dataclass attributes when they are accessed."""
@@ -22,12 +26,17 @@ def lazy_dataclass(cls):
                 evaluated = value()
                 setattr(self, item, evaluated)
                 return evaluated
-            elif len(inspect.signature(value).parameters) == 1 and "kwargs" in inspect.signature(value).parameters:
+            elif (
+                len(inspect.signature(value).parameters) == 1
+                and "kwargs" in inspect.signature(value).parameters
+            ):
                 evaluated = value(self.__dict__)
                 setattr(self, item, evaluated)
                 return evaluated
             else:
-                raise ValueError(f"Callable {value} can have 0 parameters of 1 parameter 'kwargs'")
+                raise ValueError(
+                    f"Callable {value} can have 0 parameters of 1 parameter 'kwargs'"
+                )
 
         return value
 
@@ -50,21 +59,29 @@ def command(path: str = None):
 
         for name, param in sig.parameters.items():
             if param.default is inspect._empty:
-                raise ValueError(f"Command '{func.__name__}': parameter '{name}' must have a default value")
+                raise ValueError(
+                    f"Command '{func.__name__}': parameter '{name}' must have a default value"
+                )
 
         # - Validate all parameters have string or List[str] types
 
         for name, param in sig.parameters.items():
             if not (
-                param.annotation is str or get_origin(param.annotation) is list and get_args(param.annotation)[0] is str
+                param.annotation is str
+                or get_origin(param.annotation) is list
+                and get_args(param.annotation)[0] is str
             ):
-                raise ValueError(f"Command '{func.__name__}': parameter '{name}' must have a string or List[str] type")
+                raise ValueError(
+                    f"Command '{func.__name__}': parameter '{name}' must have a string or List[str] type"
+                )
 
         # - Get file_path
 
         source_file = inspect.getsourcefile(func)
         if not source_file:
-            raise RuntimeError(f"Could not locate source file for command '{func.__name__}'")
+            raise RuntimeError(
+                f"Could not locate source file for command '{func.__name__}'"
+            )
         file_path = Path(source_file).resolve()
 
         # - Validate filename matches function name
@@ -82,7 +99,9 @@ def command(path: str = None):
             try:
                 idx = parts.index("dony")
             except ValueError:
-                raise RuntimeError(f"Cannot derive path: 'dony' not found in '{file_path}'")
+                raise RuntimeError(
+                    f"Cannot derive path: 'dony' not found in '{file_path}'"
+                )
             relative = Path(*parts[idx:]).as_posix()
             func._path = relative
         else:
@@ -90,48 +109,68 @@ def command(path: str = None):
 
         # - Crop to last dony folder
 
-        func._path = re.sub(r"^.*/dony_twin/", "", func._path).replace(".py", "")
+        func._path = re.sub(r"^.*/dony_for_dony/", "", func._path).replace(".py", "")
         func._path = re.sub(r"^.*/dony/", "", func._path)
 
-        if func._path.startswith("commands/"):
-            func._path = func._path[len("commands/") :]
+        if func._path.startswith("dony/commands/"):
+            func._path = func._path[len("dony/commands/") :]
 
         func._dony_command = True
 
-        # - Build a lazy dataclass for args
-
-        field_defs = []
-
-        for name, param in sorted(sig.parameters.items(), key=lambda pair: callable(pair[1].default)):
-            ann = param.annotation if param.annotation is not inspect._empty else Any
-
-            if callable(param.default):
-                # - Pass callables as is
-
-                field_defs.append((name, ann, param.default))
-            else:
-                # - Pass others as field with default value
-
-                field_defs.append((name, ann, field(default_factory=lambda: param.default)))
-
-        ArgsCls = lazy_dataclass(make_dataclass(f"{func.__name__.capitalize()}Args", field_defs))
+        # deprecate lazy-dataclass-arguments
+        # # - Build a lazy dataclass for args
+        #
+        # field_defs = []
+        #
+        # for name, param in sorted(
+        #     sig.parameters.items(), key=lambda pair: callable(pair[1].default)
+        # ):
+        #     ann = param.annotation if param.annotation is not inspect._empty else Any
+        #
+        #     if callable(param.default):
+        #         # - Pass callables as is
+        #
+        #         field_defs.append((name, ann, param.default))
+        #     else:
+        #         # - Pass others as field with default value
+        #
+        #         field_defs.append(
+        #             (name, ann, field(default_factory=lambda: param.default))
+        #         )
+        #
+        # ArgsCls = lazy_dataclass(
+        #     make_dataclass(f"{func.__name__.capitalize()}Args", field_defs)
+        # )
+        # end-deprecate
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Bind partial to allow positional or keyword
+            # - Load dotenv in dony path or its parent
+
+            dony_path = get_dony_path(__file__)
+            load_dotenv(dotenv_path=dony_path / ".env")
+            load_dotenv(dotenv_path=dony_path.parent / ".env")
+
+            # - Bind partial to allow positional or keyword
+
             bound = sig.bind_partial(*args, **kwargs)
             bound.apply_defaults()
 
-            # Instantiate args object; fields will evaluate lazily
-            args_obj = ArgsCls(**bound.arguments)
+            # deprecate lazy-dataclass-arguments
+            # # - Instantiate args object; fields will evaluate lazily
+            #
+            # args_obj = ArgsCls(**bound.arguments)
+            #
+            # #  -Force evaluation of all fields (cascading defaults)
+            # final_kwargs = {}
+            # for f in fields(ArgsCls):
+            #     final_kwargs[f.name] = getattr(args_obj, f.name)
+            # bounds.arguments = final_kwargs
+            # end-deprecate
 
-            # Force evaluation of all fields (cascading defaults)
-            final_kwargs = {}
-            for f in fields(ArgsCls):
-                final_kwargs[f.name] = getattr(args_obj, f.name)
+            # - Call original function with resolved args
 
-            # Call original function with resolved args
-            return func(**final_kwargs)
+            return func(**bound.arguments)
 
         # - Attach metadata to wrapper
 

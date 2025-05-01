@@ -5,18 +5,22 @@ import sys
 from collections import Counter, OrderedDict
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from dony import select
 from dony.run_dony.run_with_list_arguments import run_with_list_arguments
 
 
 def run_dony(
-    dony_dir: Path,
-    args: OrderedDict,
+    dony_path: Path,
+    args: OrderedDict = OrderedDict({}),
 ):
     # - Find all py files, extract all commands. If there is a file with filename not same as function name - rename it
 
     while True:
-        file_paths = [p for p in dony_dir.rglob("commands/*.py") if not p.name.startswith("_")]
+        file_paths = [
+            p for p in dony_path.rglob("commands/*.py") if not p.name.startswith("_")
+        ]
         commands = {}  # {path: command}
         should_repeat = False
 
@@ -44,14 +48,19 @@ def run_dony(
 
             cmds = [
                 member
-                for _, member in inspect.getmembers(_load_module(file_path), inspect.isfunction)
+                for _, member in inspect.getmembers(
+                    _load_module(file_path), inspect.isfunction
+                )
                 if getattr(member, "_dony_command", False)
             ]
 
             # - Validate exactly one command in a file
 
             if len(cmds) != 1:
-                print(f"{file_path}: expected exactly one @command, found {len(cmds)}", file=sys.stderr)
+                print(
+                    f"{file_path}: expected exactly one @command, found {len(cmds)}",
+                    file=sys.stderr,
+                )
                 sys.exit(1)
 
             # - Rename file if it's name not the same as the function
@@ -68,9 +77,13 @@ def run_dony(
                 # - Git add if possible
 
                 try:
-                    os.system(f"git add {file_path.with_name(cmds[0].__name__ + '.py')}")
+                    os.system(
+                        f"git add {file_path.with_name(cmds[0].__name__ + '.py')}"
+                    )
                 except:
-                    print(f"failed to add file to git: {file_path.with_name(cmds[0].__name__ + '.py')}")
+                    print(
+                        f"failed to add file to git: {file_path.with_name(cmds[0].__name__ + '.py')}"
+                    )
 
             # - Validate command has _path
 
@@ -101,6 +114,7 @@ def run_dony(
         path = select(
             "Select command",
             choices=[command._path for command in commands.values()],
+            fuzzy=True,
         )
     else:
         # - Command line mode
@@ -121,6 +135,15 @@ def run_dony(
 
     print("️🍥 Running", path + "...")
 
+    # - Load dotenv from dony path and parent
+
+    load_dotenv(dotenv_path=dony_path / ".env")
+    load_dotenv(dotenv_path=dony_path.parent / ".env")
+
+    # - Set dony path to env so that shell function can find it
+
+    os.environ["_DONY_PATH"] = str(dony_path)
+
     # - Run command with passed arguments
 
     run_with_list_arguments(
@@ -131,8 +154,10 @@ def run_dony(
 
 if __name__ == "__main__":
     run_dony(
-        dony_dir=Path("../../example/dony"),
-        args=OrderedDict(positional=["hello_world"], keyword={"name": ["Mark"]}),
+        dony_path=Path(
+            "/Users/marklidenberg/Documents/coding/repos/deeplay-io/OpenMetadata"
+        ),
+        args=OrderedDict(positional=["hello_world"], keyword={}),
     )
 
     # import json

@@ -9,7 +9,7 @@ def autocomplete(
     choices: List[str],
     default: Optional[str] = "",
 ):
-    return questionary.autocomplete(
+    result = questionary.autocomplete(
         message=message,
         choices=choices,
         default=default,
@@ -20,6 +20,9 @@ def autocomplete(
             ]
         ),
     )
+
+    if result is None:
+        raise KeyboardInterrupt
 
 
 def example():
