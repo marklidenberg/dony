@@ -199,7 +199,7 @@ donyfiles/
 
 ## License
 
-MIT License.
+MIT License
 
 ## Author
 
