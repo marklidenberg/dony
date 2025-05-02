@@ -1,6 +1,9 @@
 from importlib.metadata import version
 
-__version__ = version("dony")
+try:
+    __version__ = version("dony")
+except Exception:
+    __version__ = "unknown"
 
 from .command import command
 from .shell import shell
