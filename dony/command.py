@@ -160,9 +160,20 @@ def command(path: str = None):
             # - Load dotenv in dony path or its parent
 
             # todo next: process running from simple dony command
-            donyfiles_path = get_donyfiles_path(
-                inspect.currentframe().f_back.f_code.co_filename
-            )
+
+            if (
+                os.path.basename(inspect.currentframe().f_back.f_code.co_filename)
+                == "run_with_list_arguments.py"
+            ):
+                # running from command client
+                donyfiles_path = get_donyfiles_path(
+                    inspect.currentframe().f_back.f_back.f_back.f_code.co_filename
+                )
+            else:
+                donyfiles_path = get_donyfiles_path(
+                    inspect.currentframe().f_back.f_code.co_filename
+                )
+
             load_dotenv(dotenv_path=donyfiles_path / ".env")
             load_dotenv(dotenv_path=donyfiles_path.parent / ".env")
 
@@ -186,9 +197,6 @@ def command(path: str = None):
             # - Change directory to dony root
 
             os.chdir(donyfiles_path.parent)
-
-            print(os.getcwd())
-            shell("pwd")
 
             # - Call original function with resolved args
 

@@ -24,7 +24,7 @@ def shell(
     exit_on_error: bool = True,
     error_on_unset: bool = True,
     echo_commands: bool = False,
-    working_directory: Optional[str, Path] = "DONY_ROOT_PATH",
+    working_directory: Optional[str, Path] = None,
     quiet: bool = False,
     dry_run: bool = False,
 ) -> Optional[str]:
@@ -55,34 +55,16 @@ def shell(
     if dry_run:
         print("Dry run enabled. Would run")
         print(f"{command}")
-        return
+        return ""
 
     # - Convert working_directory to string
 
-    working_directory = str(working_directory)
-
-    # - Find dony root path
-
-    if working_directory == "DONY_ROOT_PATH":
-        # - Get origin path: different cases depending on how the command is called
-
-        if os.environ.get("_DONY_PATH"):
-            # running command from dony client. This is set right before running the command (run_with_list_arguments call)
-            origin_path = os.environ.get("_DONY_PATH")
-        elif sys.argv[0].endswith("dony"):
-            # run dony client
-            origin_path = currentframe().f_back.f_back.f_code.co_filename
-        else:
-            # run command directly in python file, decorator is present
-            origin_path = currentframe().f_back.f_back.f_back.f_code.co_filename
-
-        # - Get dony root path
-
-        working_directory = get_dony_root(origin_path)
+    if isinstance(working_directory, Path):
+        working_directory = str(working_directory)
 
     # - If relative - concat working directory with dony root
 
-    if not os.path.isabs(working_directory):
+    if isinstance(working_directory, str) and not os.path.isabs(working_directory):
         working_directory = get_dony_root() / working_directory
 
     # - Build the `set` prefix from the enabled flags
