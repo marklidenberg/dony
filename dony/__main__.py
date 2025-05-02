@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from dony import shell
-from dony.get_dony_path import get_dony_path
+from dony.get_dony_path import get_donyfiles_path
 from dony.parse_unknown_args import parse_unknown_args
 
 
@@ -133,7 +133,7 @@ def main():
 
     root = Path.cwd()
     try:
-        dony_path = get_dony_path(root)
+        dony_path = get_donyfiles_path(root)
 
     except FileNotFoundError as e:
         print(e, file=sys.stderr)

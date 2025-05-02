@@ -16,11 +16,17 @@ def run_dony(
     dony_path: Path,
     args: OrderedDict = OrderedDict({}),
 ):
+    # - Add dony root to path
+
+    sys.path.append(str(dony_path.parent))
+
+    print(dony_path.parent)
+
     # - Find all py files, extract all commands. If there is a file with filename not same as function name - rename it
 
     while True:
         file_paths = [
-            p for p in dony_path.rglob("commands/*.py") if not p.name.startswith("_")
+            p for p in dony_path.rglob("commands/**/*.py") if not p.name.startswith("_")
         ]
         commands = {}  # {path: command}
         should_repeat = False

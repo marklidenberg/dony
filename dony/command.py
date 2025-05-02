@@ -1,5 +1,7 @@
 import inspect
+import os
 import re
+import sys
 from pathlib import Path
 from functools import wraps
 from dataclasses import make_dataclass, fields, field
@@ -8,7 +10,7 @@ from typing import Any, get_origin, get_args
 from dotenv import load_dotenv
 
 from dony.prompts.error import error
-from dony.get_dony_path import get_dony_path
+from dony.get_dony_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
@@ -157,7 +159,12 @@ def command(path: str = None):
         def wrapper(*args, **kwargs):
             # - Load dotenv in dony path or its parent
 
-            dony_path = get_dony_path(__file__)
+            # todo next: process running from simple dony command
+            print(inspect.currentframe().f_back.f_code.co_filename)
+            dony_path = (
+                get_donyfiles_path(inspect.currentframe().f_back.f_code.co_filename)
+                / "donyfiles"
+            )
             load_dotenv(dotenv_path=dony_path / ".env")
             load_dotenv(dotenv_path=dony_path.parent / ".env")
 
@@ -177,6 +184,10 @@ def command(path: str = None):
             #     final_kwargs[f.name] = getattr(args_obj, f.name)
             # bounds.arguments = final_kwargs
             # end-deprecate
+
+            # - Change directory to dony root
+
+            os.chdir(dony_path.parent)
 
             # - Call original function with resolved args
 
