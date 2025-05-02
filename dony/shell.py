@@ -27,6 +27,7 @@ def shell(
     working_directory: Optional[str, Path] = None,
     quiet: bool = False,
     dry_run: bool = False,
+    raise_on_error: bool = True,
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -111,7 +112,7 @@ def shell(
 
     # - Raise if exit code is non-zero
 
-    if return_code != 0:
+    if return_code != 0 and raise_on_error:
         if "KeyboardInterrupt" in output:
             raise KeyboardInterrupt
         raise DonyShellError("Dony command failed")
