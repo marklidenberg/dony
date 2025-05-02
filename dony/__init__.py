@@ -13,3 +13,4 @@ from .prompts.select import select
 from .prompts.print import print
 from .prompts.error import error
 from .run_dony.run_dony import run_dony
+from .prompts.success import success
