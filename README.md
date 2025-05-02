@@ -1,8 +1,6 @@
 # 🍥️ dony
 
-A lightweight Python command runner with a simple, consistent workflow for managing project commands.
-
-A `Justfile` alternative.
+A lightweight Python command runner with a simple and consistent workflow. A `Justfile` alternative.
 
 ## How it works
 
@@ -96,7 +94,7 @@ import re
 import dony
 
 @dony.command()
-def squash_and_migrate(
+def squash_and_checkout_to_new_branch(
     new_branch: str = None,
     commit_message: str = None,
 ):
