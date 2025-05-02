@@ -19,7 +19,7 @@ Run `dony` to fuzzy-search your commands from anywhere in your project.
 
 ```
                                                                                                                                                                                                                    
-  📝 squash_and_migrate                                                                                                                                                                                             
+  📝 squash                                                                                                                                                                                             
   📝 release                                                                                                                                                                                                        
 ▌ 📝 hello_world                                                                                                                                                                                                    
   3/3 ─────────────────────────────────────────────────────────────────── 
@@ -94,7 +94,7 @@ import re
 import dony
 
 @dony.command()
-def squash_and_checkout_to_new_branch(
+def squash(
     new_branch: str = None,
     commit_message: str = None,
 ):
@@ -136,7 +136,7 @@ def squash_and_checkout_to_new_branch(
 
         # - Make up to date
 
-        git diff --cached --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
+        git diff --cached --name-only | grep -q . && git stash squash-{new_branch}
         git checkout main
         git pull
 
