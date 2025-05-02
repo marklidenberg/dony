@@ -43,6 +43,8 @@ def shell(
         echo_commands: If True, prepend 'set -x' (echo commands before executing).
         working_directory: If provided, change the working directory before executing the command.
         quiet: If True, suppresses output.
+        dry_run: If True, prints the command without executing it.
+        raise_on_error: If True, raises an exception if the command exits with a non-zero status.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
