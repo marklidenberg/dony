@@ -142,10 +142,9 @@ def example():
 
     try:
         shell('echo "this will fail" && false')
-    except subprocess.CalledProcessError as e:
-        print("Exited with code", e.returncode)
-        if e.output is not None:
-            print("Captured output:\n", e.output)
+        raise Exception("Should have failed")
+    except DonyShellError:
+        pass
 
 
 if __name__ == "__main__":
