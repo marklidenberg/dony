@@ -1,14 +1,16 @@
 import re
 import dony
 
-__NAME__ = "squash:0.1.0"
+__NAME__ = "squash:0.1.1"
 
 
 @dony.command()
 def squash(
     new_branch: str = None,
+    target_branch: str = None,
     commit_message: str = None,
     checkout_to_new_branch: str = None,
+    remove_merged_branch: str = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
@@ -20,17 +22,36 @@ def squash(
 
     # - Get current branch
 
-    original_branch = dony.shell(
+    merged_branch = dony.shell(
         "git branch --show-current",
         quiet=True,
     )
+
+    # - Get target branch
+
+    target_branch = target_branch or dony.input(
+        "Enter target branch:",
+        default="main",
+    )
+
+    # - Check if target branch exists
+
+    if (
+        dony.shell(
+            f"""
+        git branch --list {target_branch}
+    """
+        )
+        == ""
+    ):
+        return dony.error(f"Target branch {target_branch} does not exist")
 
     # - Get commit message from the user
 
     if not commit_message:
         while True:
             commit_message = dony.input(
-                f"Enter commit message for merging branch {original_branch} to main:"
+                f"Enter commit message for merging branch {merged_branch} to {target_branch}:"
             )
             if bool(
                 re.match(
@@ -48,6 +69,13 @@ def squash(
         provided_answer=checkout_to_new_branch,
     )
 
+    # - Check if user wants to remove merged branch
+
+    remove_merged_branch = dony.confirm(
+        f"Remove merged branch {merged_branch}?",
+        provided_answer=remove_merged_branch,
+    )
+
     # - Do the process
 
     dony.shell(
@@ -55,33 +83,40 @@ def squash(
 
         # - Make up to date
 
-        git diff --name-only | grep -q . && git stash squash-{new_branch}
-        git checkout main
+        git diff --name-only | grep -q . && git stash push -m "squash-{merged_branch}"
+        git checkout {target_branch}
+
+        # - Set upstream if needed
+
+        if ! git ls-remote --heads --exit-code origin "{target_branch}" >/dev/null; then
+            git push --set-upstream origin {target_branch} --force
+        fi
+
+        # - Pull target branch
+
         git pull
 
         # - Merge
 
-        git merge --squash {original_branch}
+        git merge --squash {merged_branch}
         git commit -m "{commit_message}"
         git push 
 
-        # - Remove current branch
+        # - Remove merged branch
 
-        git branch -D {original_branch}
-        git push origin --delete {original_branch}
-    """
-    )
+        if {str(remove_merged_branch).lower()}; then
+            git branch -D {merged_branch}
+            git push origin --delete {merged_branch}
+        fi
 
-    if checkout_to_new_branch:
-        dony.shell(
-            f"""
+        # - Create new branch
 
-            # - Create new branch
-
+        if {str(checkout_to_new_branch).lower()}; then
             git checkout -b {new_branch}
             git push --set-upstream origin {new_branch}
-        """,
-        )
+        fi
+    """,
+    )
 
 
 if __name__ == "__main__":
