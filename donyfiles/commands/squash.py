@@ -1,6 +1,8 @@
 import re
 import dony
 
+__VERSION__ = "0.1.0"
+
 
 @dony.command()
 def squash(
