@@ -186,14 +186,14 @@ donyfiles/
 
 - All commands run from the project root (where `donyfiles/` is located)
 - Available prompts based on `questionary`:
-  - `autocomplete`: suggestion-driven input
-  - `confirm`: yes/no ([Y/n] or [y/N])
-  - `error`: ❌ error message
   - `input`: free-text entry
-  - `path`: filesystem path entry
-  - `press_any_key_to_continue`: pause until keypress
-  - `print`: styled text output
+  - `confirm`: yes/no ([Y/n] or [y/N])
   - `select`: option picker (supports multi & fuzzy)
+  - `press_any_key_to_continue`: pause until keypress
+  - `path`: filesystem path entry
+  - `autocomplete`: suggestion-driven input
+  - `print`: styled text output
+  - `error`: ❌ error message
   - `success`: ✅ success message
 - `dony` enforces files to be named after functions and will rename them automatically when invoked
 
