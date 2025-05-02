@@ -11,7 +11,7 @@ def success(
         FormattedText(
             [
                 ("class:qmark", "• "),
-                ("class:question", prefix + text + "\n"),
+                ("class:question", prefix + text),
             ]
         ),
         style=questionary.Style(
