@@ -1,7 +1,7 @@
 import re
 import dony
 
-__VERSION__ = "0.1.0"
+__NAME__ = "squash:0.1.0"
 
 
 @dony.command()
