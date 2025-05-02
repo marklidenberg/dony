@@ -36,7 +36,7 @@ def confirm(
 
 
 def example():
-    print(confirm("Are you sure?"))
+    print(confirm("Are you sure?", provided_answer="y"))
 
 
 if __name__ == "__main__":

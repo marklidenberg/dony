@@ -6,6 +6,7 @@ import dony
 def squash(
     new_branch: str = None,
     commit_message: str = None,
+    checkout_to_new_branch: str = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
@@ -38,6 +39,13 @@ def squash(
                 break
             dony.print("Only conventional commits are allowed, try again")
 
+    # - Check if user wants to checkout to a new branch
+
+    checkout_to_new_branch = dony.confirm(
+        f"Checkout to new branch {new_branch}?",
+        provided_answer=checkout_to_new_branch,
+    )
+
     # - Do the process
 
     dony.shell(
@@ -59,13 +67,19 @@ def squash(
 
         git branch -D {original_branch}
         git push origin --delete {original_branch}
-
-        # - Create new branch
-
-        git checkout -b {new_branch}
-        git push --set-upstream origin {new_branch}
-    """,
+    """
     )
+
+    if checkout_to_new_branch:
+        dony.shell(
+            f"""
+
+            # - Create new branch
+
+            git checkout -b {new_branch}
+            git push --set-upstream origin {new_branch}
+        """,
+        )
 
 
 if __name__ == "__main__":
