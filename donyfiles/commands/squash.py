@@ -3,7 +3,7 @@ import dony
 
 
 @dony.command()
-def squash_and_migrate(
+def squash(
     new_branch: str = None,
     commit_message: str = None,
 ):
@@ -69,4 +69,4 @@ def squash_and_migrate(
 
 
 if __name__ == "__main__":
-    squash_and_migrate()
+    squash()
