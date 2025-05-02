@@ -45,7 +45,7 @@ def squash(
 
         # - Make up to date
 
-        git diff --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
+        git diff --name-only | grep -q . && git stash squash-{new_branch}
         git checkout main
         git pull
 
