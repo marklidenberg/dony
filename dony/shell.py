@@ -102,11 +102,17 @@ def shell(
 
     buffer = []
     assert proc.stdout is not None
-    for line in proc.stdout:
-        if not quiet:
-            print(line, end="")
-        if capture_output:
-            buffer.append(line)
+    while True:
+        try:
+            for line in proc.stdout:
+                if not quiet:
+                    print(line, end="")
+                if capture_output:
+                    buffer.append(line)
+            break
+        except UnicodeDecodeError:
+            error("Error decoding output. Skipping the line")
+
     proc.stdout.close()
     return_code = proc.wait()
 
