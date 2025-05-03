@@ -159,7 +159,7 @@ def example():
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=True,
-        fuzzy=True,
+        fuzzy=False,
         default=["foo"],
         default_confirm=False,
     )
