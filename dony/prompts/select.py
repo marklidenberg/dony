@@ -1,12 +1,10 @@
 from typing import Sequence, Union, Optional, Tuple
 import subprocess
 import questionary
-from prompt_toolkit.formatted_text import to_formatted_text
 from questionary import Choice
 
 
 from dony import confirm
-from dony.prompts.print import print as _print
 
 
 def select(
