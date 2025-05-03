@@ -35,7 +35,7 @@ Or call them directly: `dony <command_name> [--arg value]`.
 
 ## Quick Start
 
-1. **Install Prerequisites**: Python 3.8+, `pipx` for installation (or use any other tool you like), optional `fzf` for fuzzy-search and `shfmt` for pretty command outputs.
+1. **Install Prerequisites**: Python 3.8+, `pipx` (for installation only, yor may use any other tool you like), optional `fzf` for fuzzy-search and `shfmt` for pretty command outputs.
 
    For macOS, run 
 
