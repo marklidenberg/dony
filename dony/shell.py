@@ -65,9 +65,6 @@ def shell(
     # - Print command
 
     if print_command:
-        dony_print(
-            "• Running shell command:",
-        )
         try:
             command = shell(
                 f"""
@@ -81,7 +78,7 @@ def shell(
             pass
 
         dony_print(
-            "---\n" + command + "\n---",
+            "🐚\n" + command,
             color_style="ansipurple",
             # line_prefix="    ",
         )
@@ -150,6 +147,14 @@ def shell(
         if "KeyboardInterrupt" in output:
             raise KeyboardInterrupt
         raise DonyShellError("Dony command failed")
+
+    # - Print closing message
+
+    if print_command:
+        dony_print(
+            "---",
+            color_style="ansipurple",
+        )
 
     # - Return output
 
