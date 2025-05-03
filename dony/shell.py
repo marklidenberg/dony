@@ -68,6 +68,18 @@ def shell(
         dony_print(
             "• Running shell command:",
         )
+        try:
+            command = shell(
+                f"""
+                shfmt << 'EOF'
+                {command}
+            """,
+                quiet=True,
+                print_command=False,
+            )
+        except Exception:
+            pass
+
         dony_print(
             "---\n" + command + "\n---",
             color_style="ansipurple",
