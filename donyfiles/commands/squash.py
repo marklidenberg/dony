@@ -1,7 +1,9 @@
 import re
+
 import dony
 
-__NAME__ = "squash:0.1.1"
+
+__NAME__ = "squash:0.1.2"
 
 
 @dony.command()
@@ -27,11 +29,18 @@ def squash(
         quiet=True,
     )
 
+    # - Look for main/master branch
+
+    main_or_master_branch = dony.shell(
+        "git branch --list main | grep -q main && echo main || echo master",
+        quiet=True,
+    )
+
     # - Get target branch
 
     target_branch = target_branch or dony.input(
         "Enter target branch:",
-        default="main",
+        default=main_or_master_branch,
     )
 
     # - Check if target branch exists
