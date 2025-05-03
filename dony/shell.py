@@ -64,7 +64,7 @@ def shell(
 
     # - Print command
 
-    if print_command:
+    if print_command and not quiet:
         try:
             command = shell(
                 f"""
@@ -150,7 +150,7 @@ def shell(
 
     # - Print closing message
 
-    if print_command:
+    if print_command and not quiet:
         dony_print(
             "---",
             color_style="ansipurple",
