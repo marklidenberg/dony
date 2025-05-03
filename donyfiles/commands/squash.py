@@ -3,7 +3,7 @@ import re
 import dony
 
 
-__NAME__ = "squash:0.1.2"
+__NAME__ = "squash:0.1.3"
 
 
 @dony.command()
@@ -84,6 +84,27 @@ def squash(
         f"Remove merged branch {merged_branch}?",
         provided_answer=remove_merged_branch,
     )
+
+    # - Do git diff
+
+    dony.shell(
+        """
+        root=$(git rev-parse --show-toplevel)
+        
+        git diff master --name-only -z \
+        | while IFS= read -r -d '' file; do
+            full="$root/$file"
+            printf '\033[1;35m%s\033[0m\n' "$full"
+            git --no-pager diff --color=always master -- "$file" \
+              | sed $'s/^/\t/'
+            printf '\n'
+          done
+"""
+    )
+
+    # Ask user to confirm
+
+    dony.confirm("Start squashing?", default=False)
 
     # - Do the process
 
