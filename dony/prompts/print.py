@@ -7,6 +7,7 @@ from prompt_toolkit.formatted_text import FormattedText
 
 def print(
     text: str,
+    color_style: str = "ansiblue",  # take colors from prompt_toolkit
 ):
     return print_formatted_text(
         FormattedText(
@@ -16,7 +17,7 @@ def print(
         ),
         style=questionary.Style(
             [
-                ("question", "fg:ansiblue"),  # the question text
+                ("question", f"fg:{color_style}"),  # the question text
             ]
         ),
     )

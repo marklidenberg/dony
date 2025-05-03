@@ -9,6 +9,7 @@ from textwrap import dedent
 from typing import Optional
 
 from dony.prompts.error import error
+from dony.prompts.print import print as dony_print
 from dony.get_dony_root import get_dony_root
 
 
@@ -28,6 +29,7 @@ def shell(
     quiet: bool = False,
     dry_run: bool = False,
     raise_on_error: bool = True,
+    print_command: bool = True,
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -59,6 +61,12 @@ def shell(
         print("Dry run enabled. Would run")
         print(f"{command}")
         return ""
+
+    # - Print command
+
+    if print_command:
+        dony_print("Running command:")
+        dony_print(command, color_style="ansipurple")
 
     # - Convert working_directory to string
 
