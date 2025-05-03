@@ -65,8 +65,14 @@ def shell(
     # - Print command
 
     if print_command:
-        dony_print("Running command:")
-        dony_print(command, color_style="ansipurple")
+        dony_print(
+            "• Running shell command:",
+        )
+        dony_print(
+            "---\n" + command + "\n---",
+            color_style="ansipurple",
+            # line_prefix="    ",
+        )
 
     # - Convert working_directory to string
 

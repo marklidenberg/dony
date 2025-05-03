@@ -1,3 +1,4 @@
+from pprint import pprint
 from textwrap import dedent
 
 import questionary
@@ -7,12 +8,24 @@ from prompt_toolkit.formatted_text import FormattedText
 
 def print(
     text: str,
+    line_prefix: str = "",
     color_style: str = "ansiblue",  # take colors from prompt_toolkit
 ):
+    # - Dedent text
+
+    text = dedent(text).strip()
+
+    # - Add line prefix if needed
+
+    if line_prefix:
+        text = "\n".join([line_prefix + line for line in text.splitlines()])
+
+    # - Print
+
     return print_formatted_text(
         FormattedText(
             [
-                ("class:question", dedent(text).strip()),
+                ("class:question", text),
             ]
         ),
         style=questionary.Style(
@@ -24,7 +37,7 @@ def print(
 
 
 def example():
-    print("Are you sure?")
+    print("""echo "{"a": "b"}\nfoobar""", line_prefix="│ ")
 
 
 if __name__ == "__main__":
