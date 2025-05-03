@@ -17,7 +17,7 @@ def confirm(
                 f"Provided answer '{provided_answer}' is not a valid boolean value. Use one of 'y', 'yes', 'true', '1', 'n', 'no', 'false', '0'."
             )
 
-    # typing is worse than using arrows
+    # typing is worse than using arrows, use select instead for now
     # result = questionary.confirm(
     #     message=message,
     #     default=default,

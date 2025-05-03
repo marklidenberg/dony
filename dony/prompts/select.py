@@ -161,7 +161,7 @@ def example():
         multi=True,
         fuzzy=False,
         default=["foo"],
-        default_confirm=False,
+        default_confirm=True,
     )
     print(selected)
 
