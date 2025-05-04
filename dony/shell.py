@@ -152,7 +152,7 @@ def shell(
 
     if print_command and not quiet:
         dony_print(
-            "---",
+            "—" * 80,
             color_style="ansipurple",
         )
 
