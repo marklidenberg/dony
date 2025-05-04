@@ -1,0 +1,38 @@
+import questionary
+from prompt_toolkit.styles import Style
+
+from dony.prompts.select import select
+from dony.prompts.input import input
+
+
+def select_or_input(
+    message: str,
+    choices: list[str],
+    allow_empty_string: bool = False,
+    reject_choice: str = "✏️ Enter your own",
+):
+    result = select(
+        message=message,
+        choices=choices + [reject_choice],
+    )
+
+    if result != reject_choice:
+        return result
+
+    return input(
+        message=message,
+        allow_empty_string=allow_empty_string,
+    )
+
+
+def example():
+    print(
+        select_or_input(
+            message="What is your name?",
+            choices=["Alice", "Bob", "Charlie"],
+        )
+    )
+
+
+if __name__ == "__main__":
+    example()

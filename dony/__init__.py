@@ -17,3 +17,4 @@ from .prompts.print import print
 from .prompts.error import error
 from .run_dony.run_dony import run_dony
 from .prompts.success import success
+from .prompts.select_or_input import select_or_input
