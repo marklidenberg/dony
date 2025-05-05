@@ -84,6 +84,7 @@ def release(
     dony.shell(
         f"""
         git checkout {original_branch}
+        get merge {original_branch} && git push
         """
     )
 
