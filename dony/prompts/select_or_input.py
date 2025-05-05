@@ -1,5 +1,5 @@
-import questionary
-from prompt_toolkit.styles import Style
+from typing import List
+
 
 from dony.prompts.select import select
 from dony.prompts.input import input
@@ -7,7 +7,7 @@ from dony.prompts.input import input
 
 def select_or_input(
     message: str,
-    choices: list[str],
+    choices: List[str],
     allow_empty_string: bool = False,
     reject_choice: str = "✏️ Enter your own",
 ):
