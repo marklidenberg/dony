@@ -11,6 +11,7 @@ from typing import Optional
 from dony.prompts.error import error
 from dony.prompts.print import print as dony_print
 from dony.get_dony_root import get_dony_root
+import pyperclip
 
 
 class DonyShellError(Exception):
@@ -88,13 +89,9 @@ def shell(
 
         if copy_dry_run_to_clipboard:
             try:
-                import pyperclip
-
                 pyperclip.copy(formatted_command)
-            except ImportError:
-                error(
-                    'Failed to copy dry-run to clipboard. Install "pyperclip" with "uv add pyperclip"'
-                )
+            except:
+                error('Failed to copy dry-run to clipboard"')
 
         return ""
 
