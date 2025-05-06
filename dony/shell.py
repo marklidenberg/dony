@@ -55,30 +55,41 @@ def shell(
         subprocess.CalledProcessError: If the command exits with a non-zero status.
     """
 
+    # - Get formatted command if needed
+
+    if print_command or dry_run:
+        try:
+            formatted_command = shell(
+                f"""
+                    shfmt << 'EOF'
+                    {command}
+                """,
+                quiet=True,
+                print_command=False,
+            )
+        except Exception:
+            formatted_command = command
+    else:
+        formatted_command = command
+
     # - Process dry_run
 
     if dry_run:
         print("Dry run enabled. Would run")
-        print(f"{command}")
+
+        dony_print(
+            "🐚\n" + formatted_command,
+            color_style="ansipurple",
+            # line_prefix="    ",
+        )
+
         return ""
 
     # - Print command
 
     if print_command and not quiet:
-        try:
-            command = shell(
-                f"""
-                shfmt << 'EOF'
-                {command}
-            """,
-                quiet=True,
-                print_command=False,
-            )
-        except Exception:
-            pass
-
         dony_print(
-            "🐚\n" + command,
+            "🐚\n" + formatted_command,
             color_style="ansipurple",
             # line_prefix="    ",
         )
