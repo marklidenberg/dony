@@ -28,6 +28,7 @@ def shell(
     working_directory: Optional[str, Path] = None,
     quiet: bool = False,
     dry_run: bool = False,
+    copy_dry_run_to_clipboard: bool = True,
     raise_on_error: bool = True,
     print_command: bool = True,
 ) -> Optional[str]:
@@ -82,6 +83,18 @@ def shell(
             color_style="ansipurple",
             # line_prefix="    ",
         )
+
+        # - Copy to clipboard
+
+        if copy_dry_run_to_clipboard:
+            try:
+                import pyperclip
+
+                pyperclip.copy(formatted_command)
+            except ImportError:
+                error(
+                    'Failed to copy dry-run to clipboard. Install "pyperclip" with "uv add pyperclip"'
+                )
 
         return ""
 
