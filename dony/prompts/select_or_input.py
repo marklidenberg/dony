@@ -10,7 +10,11 @@ def select_or_input(
     choices: List[str],
     allow_empty_string: bool = False,
     reject_choice: str = "✏️ Enter your own",
+    provided_answer: str = None,
 ):
+    if provided_answer is not None:
+        return provided_answer
+
     result = select(
         message=message,
         choices=choices + [reject_choice],

@@ -14,6 +14,7 @@ def select(
     multi: bool = False,
     fuzzy: bool = False,
     default_confirm: bool = False,
+    provided_answer: str = None,
 ) -> Union[None, str, Sequence[str]]:
     """
     Prompt the user to select from a list of choices, each of which can have:
@@ -24,6 +25,13 @@ def select(
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
+
+    # - Check if provided answer is set
+
+    if provided_answer is not None:
+        if provided_answer not in choices:
+            raise ValueError(f"Provided answer '{provided_answer}' is not in choices.")
+        return provided_answer
 
     # - If default is present and default_confirm is True, then ask for confirmation to just use default
 
