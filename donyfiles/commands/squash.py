@@ -3,7 +3,7 @@ import re
 import dony
 
 
-__NAME__ = "squash:0.1.4"
+__NAME__ = "squash:0.1.5"
 
 
 @dony.command()
@@ -129,7 +129,9 @@ def squash(
         # - Merge
 
         git merge --squash {merged_branch}
-        git commit -m "{commit_message}"
+        
+        # try to commit twice, in case of formatting errors that are fixed by the first commit
+        git commit -m "{commit_message}" || git commit -m "{commit_message}"
         git push 
 
         # - Remove merged branch
