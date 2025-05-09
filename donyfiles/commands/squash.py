@@ -3,7 +3,7 @@ import re
 import dony
 
 
-__NAME__ = "squash:0.1.5"
+__NAME__ = "squash:0.1.6"
 
 
 @dony.command()
@@ -15,6 +15,16 @@ def squash(
     remove_merged_branch: str = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
+
+    # - Get target branch
+
+    target_branch = target_branch or dony.input(
+        "Enter target branch:",
+        default=dony.shell(
+            "git branch --list main | grep -q main && echo main || echo master",
+            quiet=True,
+        ),
+    )
 
     # - Get default branch if not set
 
@@ -29,19 +39,19 @@ def squash(
         quiet=True,
     )
 
-    # - Look for main/master branch
+    # - Check if merge would be possible without conflicts
 
-    main_or_master_branch = dony.shell(
-        "git branch --list main | grep -q main && echo main || echo master",
+    if "__CONFLICTS__" in dony.shell(
+        f"""
+        git fetch origin
+        git checkout {target_branch}
+        git pull
+        git merge-tree $(git merge-base {target_branch} {merged_branch}) {target_branch} {merged_branch} | grep -q '^<<<<<<<' && echo "__CONFLICTS__" || echo "__CLEAN_MERGE__"
+        git checkout {merged_branch}
+        """,
         quiet=True,
-    )
-
-    # - Get target branch
-
-    target_branch = target_branch or dony.input(
-        "Enter target branch:",
-        default=main_or_master_branch,
-    )
+    ):
+        return dony.error("Merge would be conflicting, please resolve conflicts first")
 
     # - Do git diff
 
