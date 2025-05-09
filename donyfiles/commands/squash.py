@@ -3,7 +3,7 @@ import re
 import dony
 
 
-__NAME__ = "squash:0.1.6"
+__NAME__ = "squash:0.1.7"
 
 
 @dony.command()
