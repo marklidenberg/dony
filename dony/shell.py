@@ -89,7 +89,7 @@ def shell(
             try:
                 pyperclip.copy(formatted_command)
             except:
-                error('Failed to copy dry-run to clipboard"')
+                error("Failed to copy dry-run to clipboard")
 
         return ""
 

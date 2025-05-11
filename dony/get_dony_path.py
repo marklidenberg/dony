@@ -17,7 +17,7 @@ def get_donyfiles_path(path: Union[str, Path] = ".") -> Path:
 
         current_path = current_path.parent
         if current_path == current_path.parent:
-            raise FileNotFoundError("Could not find 'dony' directory")
+            raise FileNotFoundError("Could not find 'donyfiles' directory")
 
 
 def example():
