@@ -7,6 +7,12 @@ def confirm(
     default: bool = True,
     provided_answer: str = None,
 ):
+    """
+    Prompt the user to confirm a decision.
+    """
+
+    # NOTE: typing is worse than using arrows, so we'll just use select instead of `questionary.confirm` with [Y/n]
+
     if provided_answer is not None:
         if provided_answer.lower() in ["y", "yes", "true", "1"]:
             return True
@@ -17,18 +23,6 @@ def confirm(
                 f"Provided answer '{provided_answer}' is not a valid boolean value. Use one of 'y', 'yes', 'true', '1', 'n', 'no', 'false', '0'."
             )
 
-    # typing is worse than using arrows, use select instead for now
-    # result = questionary.confirm(
-    #     message=message,
-    #     default=default,
-    #     qmark="",
-    #     auto_enter=False,
-    #     style=Style(
-    #         [
-    #             ("question", "fg:ansiblue"),  # the question text
-    #         ]
-    #     ),
-    # ).ask()
     from dony.prompts.select import select  # avoid circular import
 
     result = (
