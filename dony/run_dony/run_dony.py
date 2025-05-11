@@ -4,7 +4,6 @@ import os
 import sys
 from collections import Counter, OrderedDict
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 from dony.prompts.error import error
@@ -154,7 +153,7 @@ def run_dony(
     if not path:
         return
 
-    print("️🍥 Running", path + "...")
+    print(f"️🍥 Running {path} from {donyfiles_path}...")
 
     # - Load dotenv from dony path and parent
 
@@ -168,7 +167,9 @@ def run_dony(
     # - Run command with passed arguments
 
     run_with_list_arguments(
-        func=commands[path.replace("📝 ", "").strip()],
+        func=commands[
+            path.replace("📝 ", "").replace("\ufe0f", "").strip()
+        ],  # 0xfe0f is an invisible "display this preceding character in emoji (color) style" character. Not sure why it's sometimes there
         list_kwargs=args["keyword"],
     )
 

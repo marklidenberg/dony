@@ -146,10 +146,6 @@ def main():
                 print("Did you mean `dony --version`?")
         sys.exit(1)
 
-    # - Cd into dony dir
-
-    print("🍥 dony called from ", dony_path)
-
     # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
 
     shell(
@@ -161,6 +157,7 @@ def main():
             ('"' + str(dony_path) + '"').replace('"', '\\"'),
             json.dumps(args).replace('"', '\\"'),
         ),
+        print_command=False,
     )
 
 

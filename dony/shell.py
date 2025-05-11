@@ -49,6 +49,8 @@ def shell(
         quiet: If True, suppresses output.
         dry_run: If True, prints the command without executing it.
         raise_on_error: If True, raises an exception if the command exits with a non-zero status.
+        copy_dry_run_to_clipboard: If True, copies the dry run command to the clipboard.
+        print_command: If True, prints the command before executing it.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
