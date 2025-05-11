@@ -158,6 +158,7 @@ def main():
             json.dumps(args).replace('"', '\\"'),
         ),
         print_command=False,
+        working_directory=dony_path,
     )
 
 
@@ -168,7 +169,8 @@ def example():
 
     sys.argv = ["dony"]
 
-    os.chdir("../example/")
+    # os.chdir("../example/")
+    os.chdir("/Users/marklidenberg/Documents/coding/repos/marklidenberg/jprint2")
     main()
 
 

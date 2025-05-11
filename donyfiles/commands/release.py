@@ -2,6 +2,8 @@ import os
 
 import dony
 
+__NAME__ = "release:0.1.0"
+
 
 @dony.command()
 def release(
@@ -74,6 +76,7 @@ def release(
 
     dony.shell(
         f"""
+        rm -rf dist/* # remove old builds
         uv build
         UV_PUBLISH_TOKEN={uv_publish_token} uv publish
         """

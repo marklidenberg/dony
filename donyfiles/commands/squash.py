@@ -82,7 +82,7 @@ def squash(
 
     # Ask user to confirm
 
-    dony.confirm("Start squashing?", default=False)
+    dony.confirm("Start squashing?")
 
     # - Check if target branch exists
 
