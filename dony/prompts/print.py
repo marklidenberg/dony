@@ -9,9 +9,10 @@ from prompt_toolkit.formatted_text import FormattedText
 def print(
     text: str,
     line_prefix: str = "",
-    color_style: str = "ansiblue",  # take colors from prompt_toolkit
+    color_style: str = "ansiwhite",  # take colors from prompt_toolkit
     prefix: str = "",
     suffix: str = "",
+    bold: bool = True,
 ):
     # - Dedent text
 
@@ -38,12 +39,21 @@ def print(
             [
                 ("question", f"fg:{color_style}"),  # the question text
             ]
+            + [
+                ("question", "bold"),
+            ]
+            if bold
+            else [],
         ),
     )
 
 
 def example():
-    print("""echo "{"a": "b"}\nfoobar""", line_prefix="│ ")
+    print(
+        """echo "{"a": "b"}\nfoobar""",
+        line_prefix="│ ",
+        bold=True,
+    )
 
 
 if __name__ == "__main__":
