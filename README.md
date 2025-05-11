@@ -199,6 +199,7 @@ donyfiles/
   - `dony.input`: free-text entry
   - `dony.confirm`: yes/no ([Y/n] or [y/N])
   - `dony.select`: option picker (supports multi & fuzzy)
+  - `dony.select_or_input`: option picker (supports multi & fuzzy) with the ability to enter a custom value
   - `dony.press_any_key_to_continue`: pause until keypress
   - `dony.path`: filesystem path entry
   - `dony.autocomplete`: suggestion-driven input
