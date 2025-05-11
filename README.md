@@ -1,8 +1,6 @@
 # 🍥️ dony
 
-A lightweight Python command runner with a simple, consistent workflow for managing project commands.
-
-A `Justfile` alternative.
+A lightweight Python command runner with a simple and consistent workflow. A `Justfile` alternative.
 
 ## How it works
 
@@ -21,7 +19,7 @@ Run `dony` to fuzzy-search your commands from anywhere in your project.
 
 ```
                                                                                                                                                                                                                    
-  📝 squash_and_migrate                                                                                                                                                                                             
+  📝 squash                                                                                                                                                                                             
   📝 release                                                                                                                                                                                                        
 ▌ 📝 hello_world                                                                                                                                                                                                    
   3/3 ─────────────────────────────────────────────────────────────────── 
@@ -37,13 +35,14 @@ Or call them directly: `dony <command_name> [--arg value]`.
 
 ## Quick Start
 
-1. **Install Prerequisites**: Python 3.8+, `pipx`, `fzf`
+1. **Install Prerequisites**: Python 3.8+, `pipx` (for installation only, yor may use any other tool you like), optional `fzf` for fuzzy-search and `shfmt` for pretty command outputs.
 
    For macOS, run 
 
    ```bash
    brew install pipx
    brew install fzf 
+   brew install shfmt
    ```
 
 2. **Install** `dony`:
@@ -95,18 +94,18 @@ def greet(
 import re
 import dony
 
+
 @dony.command()
-def squash_and_migrate(
-    new_branch: str = None,
-    commit_message: str = None,
+def squash(
+        new_branch: str = None,
+        commit_message: str = None,
+        checkout_to_new_branch: str = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
     # - Get default branch if not set
 
-    new_branch = (
-            new_branch or f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
-    )
+    new_branch = new_branch or f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
 
     # - Get current branch
 
@@ -119,9 +118,7 @@ def squash_and_migrate(
 
     if not commit_message:
         while True:
-            commit_message = dony.input(
-                f"Enter commit message for merging branch {original_branch} to main:"
-            )
+            commit_message = dony.input(f"Enter commit message for merging branch {original_branch} to main:")
             if bool(
                     re.match(
                         r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
@@ -131,14 +128,21 @@ def squash_and_migrate(
                 break
             dony.print("Only conventional commits are allowed, try again")
 
-    # - Squash and migrate
+    # - Check if user wants to checkout to a new branch
+
+    checkout_to_new_branch = dony.confirm(
+        f"Checkout to new branch {new_branch}?",
+        provided_answer=checkout_to_new_branch,
+    )
+
+    # - Do the process
 
     dony.shell(
         f"""
 
         # - Make up to date
 
-        git diff --cached --name-only | grep -q . && git stash squash_and_migrate-{new_branch}
+        git diff --name-only | grep -q . && git stash squash-{new_branch}
         git checkout main
         git pull
 
@@ -152,14 +156,20 @@ def squash_and_migrate(
 
         git branch -D {original_branch}
         git push origin --delete {original_branch}
-
-        # - Create new branch
-
-        git checkout -b {new_branch}
-        git push --set-upstream origin {new_branch}
-    """,
+    """
     )
 
+    if checkout_to_new_branch:
+        dony.shell(
+            f"""
+            git checkout -b {new_branch}
+            git push --set-upstream origin {new_branch}
+        """,
+        )
+
+
+if __name__ == "__main__":
+    squash()
 ```
 
 ## Use cases
@@ -186,20 +196,21 @@ donyfiles/
 
 - All commands run from the project root (where `donyfiles/` is located)
 - Available prompts based on `questionary`:
-  - `autocomplete`: suggestion-driven input
-  - `confirm`: yes/no ([Y/n] or [y/N])
-  - `error`: ❌ error message
-  - `input`: free-text entry
-  - `path`: filesystem path entry
-  - `press_any_key_to_continue`: pause until keypress
-  - `print`: styled text output
-  - `select`: option picker (supports multi & fuzzy)
-  - `success`: ✅ success message
+  - `dony.input`: free-text entry
+  - `dony.confirm`: yes/no ([Y/n] or [y/N])
+  - `dony.select`: option picker (supports multi & fuzzy)
+  - `dony.select_or_input`: option picker (supports multi & fuzzy) with the ability to enter a custom value
+  - `dony.press_any_key_to_continue`: pause until keypress
+  - `dony.path`: filesystem path entry
+  - `dony.autocomplete`: suggestion-driven input
+  - `dony.print`: styled text output
+  - `dony.error`: ❌ error message
+  - `dony.success`: ✅ success message
 - `dony` enforces files to be named after functions and will rename them automatically when invoked
 
 ## License
 
-MIT License.
+MIT License
 
 ## Author
 

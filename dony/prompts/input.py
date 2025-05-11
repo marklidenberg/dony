@@ -6,7 +6,11 @@ def input(
     message: str,
     default: str = "",
     allow_empty_string: bool = False,
+    provided_answer: str = None,
 ):
+    if provided_answer is not None:
+        return provided_answer
+
     while True:
         result = questionary.text(
             message,

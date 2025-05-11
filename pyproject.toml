@@ -21,6 +21,7 @@ classifiers = [
 ]
 dependencies = [
     "load-dotenv>=0.1.0",
+    "pyperclip>=1.9.0",
     "questionary>=2.1.0",
 ]
 

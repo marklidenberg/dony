@@ -9,7 +9,9 @@ from textwrap import dedent
 from typing import Optional
 
 from dony.prompts.error import error
+from dony.prompts.print import print as dony_print
 from dony.get_dony_root import get_dony_root
+import pyperclip
 
 
 class DonyShellError(Exception):
@@ -24,9 +26,12 @@ def shell(
     exit_on_error: bool = True,
     error_on_unset: bool = True,
     echo_commands: bool = False,
-    working_directory: Optional[str, Path] = "DONY_ROOT_PATH",
+    working_directory: Optional[str, Path] = None,
     quiet: bool = False,
     dry_run: bool = False,
+    copy_dry_run_to_clipboard: bool = True,
+    raise_on_error: bool = True,
+    print_command: bool = True,
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -42,6 +47,10 @@ def shell(
         echo_commands: If True, prepend 'set -x' (echo commands before executing).
         working_directory: If provided, change the working directory before executing the command.
         quiet: If True, suppresses output.
+        dry_run: If True, prints the command without executing it.
+        raise_on_error: If True, raises an exception if the command exits with a non-zero status.
+        copy_dry_run_to_clipboard: If True, copies the dry run command to the clipboard.
+        print_command: If True, prints the command before executing it.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
@@ -50,39 +59,59 @@ def shell(
         subprocess.CalledProcessError: If the command exits with a non-zero status.
     """
 
+    # - Get formatted command if needed
+
+    if print_command or dry_run:
+        try:
+            formatted_command = shell(
+                f"""
+                    shfmt << 'EOF'
+                    {command}
+                """,
+                quiet=True,
+                print_command=False,
+            )
+        except Exception:
+            formatted_command = command
+    else:
+        formatted_command = command
+
     # - Process dry_run
 
     if dry_run:
-        print("Dry run enabled. Would run")
-        print(f"{command}")
-        return
+        dony_print(
+            "🐚 Dry run\n" + formatted_command,
+            color_style="ansipurple",
+            # line_prefix="    ",
+        )
+
+        # - Copy to clipboard
+
+        if copy_dry_run_to_clipboard:
+            try:
+                pyperclip.copy(formatted_command)
+            except:
+                error("Failed to copy dry-run to clipboard")
+
+        return ""
+
+    # - Print command
+
+    if print_command and not quiet:
+        dony_print(
+            "🐚\n" + formatted_command,
+            color_style="ansipurple",
+            # line_prefix="    ",
+        )
 
     # - Convert working_directory to string
 
-    working_directory = str(working_directory)
-
-    # - Find dony root path
-
-    if working_directory == "DONY_ROOT_PATH":
-        # - Get origin path: different cases depending on how the command is called
-
-        if os.environ.get("_DONY_PATH"):
-            # running command from dony client. This is set right before running the command (run_with_list_arguments call)
-            origin_path = os.environ.get("_DONY_PATH")
-        elif sys.argv[0].endswith("dony"):
-            # run dony client
-            origin_path = currentframe().f_back.f_back.f_code.co_filename
-        else:
-            # run command directly in python file, decorator is present
-            origin_path = currentframe().f_back.f_back.f_back.f_code.co_filename
-
-        # - Get dony root path
-
-        working_directory = get_dony_root(origin_path)
+    if isinstance(working_directory, Path):
+        working_directory = str(working_directory)
 
     # - If relative - concat working directory with dony root
 
-    if not os.path.isabs(working_directory):
+    if isinstance(working_directory, str) and not os.path.isabs(working_directory):
         working_directory = get_dony_root() / working_directory
 
     # - Build the `set` prefix from the enabled flags
@@ -117,11 +146,17 @@ def shell(
 
     buffer = []
     assert proc.stdout is not None
-    for line in proc.stdout:
-        if not quiet:
-            print(line, end="")
-        if capture_output:
-            buffer.append(line)
+    while True:
+        try:
+            for line in proc.stdout:
+                if not quiet:
+                    print(line, end="")
+                if capture_output:
+                    buffer.append(line)
+            break
+        except UnicodeDecodeError:
+            error("Error decoding output. Skipping the line")
+
     proc.stdout.close()
     return_code = proc.wait()
 
@@ -129,10 +164,18 @@ def shell(
 
     # - Raise if exit code is non-zero
 
-    if return_code != 0:
+    if return_code != 0 and raise_on_error:
         if "KeyboardInterrupt" in output:
             raise KeyboardInterrupt
         raise DonyShellError("Dony command failed")
+
+    # - Print closing message
+
+    if print_command and not quiet:
+        dony_print(
+            "—" * 80,
+            color_style="ansipurple",
+        )
 
     # - Return output
 
@@ -157,10 +200,9 @@ def example():
 
     try:
         shell('echo "this will fail" && false')
-    except subprocess.CalledProcessError as e:
-        print("Exited with code", e.returncode)
-        if e.output is not None:
-            print("Captured output:\n", e.output)
+        raise Exception("Should have failed")
+    except DonyShellError:
+        pass
 
 
 if __name__ == "__main__":

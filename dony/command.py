@@ -1,5 +1,7 @@
 import inspect
+import os
 import re
+import sys
 from pathlib import Path
 from functools import wraps
 from dataclasses import make_dataclass, fields, field
@@ -7,43 +9,43 @@ from typing import Any, get_origin, get_args
 
 from dotenv import load_dotenv
 
+from dony.shell import shell
 from dony.prompts.error import error
-from dony.get_dony_path import get_dony_path
+from dony.get_dony_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
-def lazy_dataclass(cls):
-    """Lazy evaluation of dataclass attributes when they are accessed."""
-    import inspect
-    from dataclasses import dataclass
+# deprecate lazy-dataclass-arguments
+# def lazy_dataclass(cls):
+#     """Lazy evaluation of dataclass attributes when they are accessed."""
+#     import inspect
+#     from dataclasses import dataclass
+#
+#     cls = dataclass(cls)
+#
+#     def __getattribute__(self, item):
+#         value = object.__getattribute__(self, item)
+#
+#         # Only evaluate callables that look like zero-arg methods (self only)
+#         if not item.startswith("_") and callable(value) and not inspect.ismethod(value):
+#             if len(inspect.signature(value).parameters) == 0:
+#                 evaluated = value()
+#                 setattr(self, item, evaluated)
+#                 return evaluated
+#             elif len(inspect.signature(value).parameters) == 1 and "kwargs" in inspect.signature(value).parameters:
+#                 evaluated = value(self.__dict__)
+#                 setattr(self, item, evaluated)
+#                 return evaluated
+#             else:
+#                 raise ValueError(f"Callable {value} can have 0 parameters of 1 parameter 'kwargs'")
+#
+#         return value
+#
+#     cls.__getattribute__ = __getattribute__
+#     return cls
 
-    cls = dataclass(cls)
 
-    def __getattribute__(self, item):
-        value = object.__getattribute__(self, item)
-
-        # Only evaluate callables that look like zero-arg methods (self only)
-        if not item.startswith("_") and callable(value) and not inspect.ismethod(value):
-            if len(inspect.signature(value).parameters) == 0:
-                evaluated = value()
-                setattr(self, item, evaluated)
-                return evaluated
-            elif (
-                len(inspect.signature(value).parameters) == 1
-                and "kwargs" in inspect.signature(value).parameters
-            ):
-                evaluated = value(self.__dict__)
-                setattr(self, item, evaluated)
-                return evaluated
-            else:
-                raise ValueError(
-                    f"Callable {value} can have 0 parameters of 1 parameter 'kwargs'"
-                )
-
-        return value
-
-    cls.__getattribute__ = __getattribute__
-    return cls
+# end-deprecate
 
 
 def command(path: str = None):
@@ -157,9 +159,21 @@ def command(path: str = None):
         def wrapper(*args, **kwargs):
             # - Load dotenv in dony path or its parent
 
-            dony_path = get_dony_path(__file__)
-            load_dotenv(dotenv_path=dony_path / ".env")
-            load_dotenv(dotenv_path=dony_path.parent / ".env")
+            if (
+                os.path.basename(inspect.currentframe().f_back.f_code.co_filename)
+                == "run_with_list_arguments.py"
+            ):
+                # running from command client
+                donyfiles_path = get_donyfiles_path(
+                    inspect.currentframe().f_back.f_back.f_back.f_code.co_filename
+                )
+            else:
+                donyfiles_path = get_donyfiles_path(
+                    inspect.currentframe().f_back.f_code.co_filename
+                )
+
+            load_dotenv(dotenv_path=donyfiles_path / ".env")
+            load_dotenv(dotenv_path=donyfiles_path.parent / ".env")
 
             # - Bind partial to allow positional or keyword
 
@@ -177,6 +191,10 @@ def command(path: str = None):
             #     final_kwargs[f.name] = getattr(args_obj, f.name)
             # bounds.arguments = final_kwargs
             # end-deprecate
+
+            # - Change directory to dony root
+
+            os.chdir(donyfiles_path.parent)
 
             # - Call original function with resolved args
 

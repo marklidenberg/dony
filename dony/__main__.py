@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from dony import shell
-from dony.get_dony_path import get_dony_path
+from dony.get_dony_path import get_donyfiles_path
 from dony.parse_unknown_args import parse_unknown_args
 
 
@@ -133,7 +133,7 @@ def main():
 
     root = Path.cwd()
     try:
-        dony_path = get_dony_path(root)
+        dony_path = get_donyfiles_path(root)
 
     except FileNotFoundError as e:
         print(e, file=sys.stderr)
@@ -146,21 +146,18 @@ def main():
                 print("Did you mean `dony --version`?")
         sys.exit(1)
 
-    # - Cd into dony dir
-
-    print("🍥 dony called from ", dony_path)
-
     # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """
-    uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(dony_path=Path({}), args={})"
+        uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(donyfiles_path=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",
             ('"' + str(dony_path) + '"').replace('"', '\\"'),
             json.dumps(args).replace('"', '\\"'),
         ),
+        print_command=False,
     )
 
 

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Union
 
 
-def get_dony_path(path: Union[str, Path] = ".") -> Path:
+def get_donyfiles_path(path: Union[str, Path] = ".") -> Path:
     # - Convert path to Path object
 
     if isinstance(path, str):
@@ -17,11 +17,11 @@ def get_dony_path(path: Union[str, Path] = ".") -> Path:
 
         current_path = current_path.parent
         if current_path == current_path.parent:
-            raise FileNotFoundError("Could not find 'dony' directory")
+            raise FileNotFoundError("Could not find 'donyfiles' directory")
 
 
 def example():
-    print(get_dony_path(Path.cwd()))
+    print(get_donyfiles_path(Path.cwd()))
 
 
 if __name__ == "__main__":

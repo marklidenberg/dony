@@ -8,7 +8,11 @@ def autocomplete(
     message: str,
     choices: List[str],
     default: Optional[str] = "",
+    provided_answer: str = None,
 ):
+    if provided_answer is not None:
+        return provided_answer
+
     result = questionary.autocomplete(
         message=message,
         choices=choices,
