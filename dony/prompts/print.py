@@ -10,6 +10,8 @@ def print(
     text: str,
     line_prefix: str = "",
     color_style: str = "ansiblue",  # take colors from prompt_toolkit
+    prefix: str = "",
+    suffix: str = "",
 ):
     # - Dedent text
 
@@ -19,6 +21,10 @@ def print(
 
     if line_prefix:
         text = "\n".join([line_prefix + line for line in text.splitlines()])
+
+    # - Add prefix and suffix
+
+    text = prefix + text + suffix
 
     # - Print
 
