@@ -15,6 +15,7 @@ def select(
     fuzzy: bool = False,
     default_confirm: bool = False,
     provided_answer: str = None,
+    require_any_choice: bool = True,
 ) -> Union[None, str, Sequence[str]]:
     """
     Prompt the user to select from a list of choices, each of which can have:
@@ -53,6 +54,12 @@ def select(
         else:
             return (c, "", "")
 
+    if fuzzy and multi:
+        # TODO LATER: fix this
+        raise Exception(
+            "Fuzzy multi search is not implemented, this is a bug. Will fix it later."
+        )
+
     if fuzzy:
         try:
             delimiter = "\t"
@@ -80,7 +87,6 @@ def select(
                 "--preview-window",
                 "down:30%:wrap",
             ]
-
             proc = subprocess.Popen(
                 cmd,
                 stdin=subprocess.PIPE,
@@ -128,17 +134,30 @@ def select(
         )
 
     if multi:
-        result = questionary.checkbox(
-            message=message,
-            choices=q_choices,
-            qmark="•",
-            instruction="",
-        ).ask()
+        while True:
+            # - Ask
 
-        if result is None:
-            raise KeyboardInterrupt
+            result = questionary.checkbox(
+                message=message,
+                choices=q_choices,
+                qmark="•",
+                instruction="",
+            ).ask()
 
-        return result
+            # - Raise if KeyboardInterrupt
+
+            if result is None:
+                raise KeyboardInterrupt
+
+            # - Repeat if require_any_choice and no result
+
+            if not result and require_any_choice:
+                # try again
+                continue
+
+            # - Return if all is good
+
+            return result
 
     result = questionary.select(
         message=message,
