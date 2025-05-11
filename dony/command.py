@@ -159,8 +159,6 @@ def command(path: str = None):
         def wrapper(*args, **kwargs):
             # - Load dotenv in dony path or its parent
 
-            # todo next: process running from simple dony command
-
             if (
                 os.path.basename(inspect.currentframe().f_back.f_code.co_filename)
                 == "run_with_list_arguments.py"
