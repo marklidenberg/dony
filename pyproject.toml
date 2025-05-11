@@ -1,6 +1,6 @@
 [project]
 name = "dony"
-version = "0.1.7"
+version = "0.1.8"
 description = "Lightweight Python task runner that just gets it"
 readme = "README.md"
 requires-python = ">=3.8"
