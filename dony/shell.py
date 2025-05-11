@@ -78,7 +78,7 @@ def shell(
 
     if dry_run:
         dony_print(
-            "🐚Dry run\n" + formatted_command,
+            "🐚 Dry run\n" + formatted_command,
             color_style="ansipurple",
             # line_prefix="    ",
         )
