@@ -12,7 +12,7 @@ def select(
     choices: Sequence[Union[str, Tuple[str, str], Tuple[str, str, str]]],
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
-    fuzzy: bool = False,
+    fuzzy: bool = True,
     default_confirm: bool = False,
     provided_answer: str = None,
     require_any_choice: bool = True,
@@ -54,59 +54,73 @@ def select(
         else:
             return (c, "", "")
 
-    if fuzzy and multi:
-        # TODO LATER: fix this
-        raise Exception(
-            "Fuzzy multi search is not implemented, this is a bug. Will fix it later."
-        )
-
     if fuzzy:
-        try:
-            delimiter = "\t"
-            lines = []
+        while True:
+            try:
+                # - Build command
 
-            # Map from the displayed first field back to the real value
-            display_map: dict[str, str] = {}
+                delimiter = "\t"
+                lines = []
 
-            for choice in choices:
-                value, short_desc, long_desc = unpack(choice)
-                display_map[value] = value
-                lines.append(f"{value}{delimiter}{short_desc}{delimiter}{long_desc}")
+                # Map from the displayed first field back to the real value
+                display_map: dict[str, str] = {}
 
-            cmd = [
-                "fzf",
-                "--read0",  # ← treat NUL as item separator
-                "--prompt",
-                f"{message} 👆",
-                "--with-nth",
-                "1,2",
-                "--delimiter",
-                delimiter,
-                "--preview",
-                "echo {} | cut -f3",
-                "--preview-window",
-                "down:30%:wrap",
-            ]
-            proc = subprocess.Popen(
-                cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True,
-            )
-            output, _ = proc.communicate(input="\0".join(lines))
-            if not output:
-                raise KeyboardInterrupt
+                for choice in choices:
+                    value, short_desc, long_desc = unpack(choice)
+                    display_map[value] = value
+                    lines.append(
+                        f"{value}{delimiter}{short_desc}{delimiter}{long_desc}"
+                    )
 
-            # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-            picked_disp1 = [
-                line.split(delimiter, 1)[0] for line in output.strip().splitlines()
-            ]
-            results = [display_map[d] for d in picked_disp1]
-            return results if multi else results[0]
+                cmd = [
+                    "fzf",
+                    "--read0",  # ← treat NUL as item separator
+                    "--prompt",
+                    f"{message} 👆",
+                    "--with-nth",
+                    "1,2",
+                    "--delimiter",
+                    delimiter,
+                    "--preview",
+                    "echo {} | cut -f3",
+                    "--preview-window",
+                    "down:30%:wrap",
+                ] + (["--multi"] if multi else [])
 
-        except FileNotFoundError:
-            pass
+                # - Run command
+
+                proc = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                )
+                output, _ = proc.communicate(input="\0".join(lines))
+
+                if output is None:
+                    raise KeyboardInterrupt
+
+                # - Parse output
+
+                # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
+                picked_disp1 = [
+                    line.split(delimiter, 1)[0] for line in output.strip().splitlines()
+                ]
+                results = [display_map[d] for d in picked_disp1]
+
+                # - Try again if no results
+
+                if not results and require_any_choice:
+                    # try again
+                    continue
+
+                # - Return if all is good
+
+                return results if multi else (results[0] if results else None)
+
+            except FileNotFoundError:
+                pass
 
     # Fallback to questionary
     q_choices = []
@@ -183,8 +197,8 @@ def example():
             ("qux", "", "Qux has no short description, only a long one."),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
-        multi=True,
-        fuzzy=False,
+        multi=False,
+        fuzzy=True,
         default=["foo"],
         default_confirm=True,
     )
