@@ -77,10 +77,8 @@ def shell(
     # - Process dry_run
 
     if dry_run:
-        print("Dry run enabled. Would run")
-
         dony_print(
-            "🐚\n" + formatted_command,
+            "🐚Dry run\n" + formatted_command,
             color_style="ansipurple",
             # line_prefix="    ",
         )
