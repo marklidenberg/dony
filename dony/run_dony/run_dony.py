@@ -19,6 +19,8 @@ def run_dony(
 ):
     """Dony entry point."""
 
+    exit(1)
+
     # - Create __init__.py in donyfiles_path.parent if it doesn't exist
 
     if not (donyfiles_path.parent / "__init__.py").exists():
@@ -98,6 +100,7 @@ def run_dony(
                     f"{file_path}: expected exactly one @command, found {len(cmds)}",
                     file=sys.stderr,
                 )
+                print("Not so sure about this")
                 sys.exit(1)
 
             # - Rename file if it's name not the same as the function
@@ -215,5 +218,8 @@ if __name__ == "__main__":
     run_dony(
         donyfiles_path=get_donyfiles_path(),
         # donyfiles_path=Path("/Users/marklidenberg/Documents/coding/repos/deeplay-io/category-store/donyfiles"),
-        args=OrderedDict(positional=["hello_world"], keyword={}),
+        args=OrderedDict(
+            positional=["hello_world"],
+            keyword={},
+        ),
     )
