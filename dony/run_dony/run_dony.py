@@ -10,6 +10,7 @@ from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.error import error
 from dony.prompts.select import select
 from dony.run_dony.run_with_list_arguments import run_with_list_arguments
+from jprint2 import jprint
 
 
 def run_dony(
@@ -18,9 +19,14 @@ def run_dony(
 ):
     """Dony entry point."""
 
+    # - Create __init__.py in donyfiles_path.parent if it doesn't exist
+
+    if not (donyfiles_path.parent / "__init__.py").exists():
+        (donyfiles_path.parent / "__init__.py").touch()
+
     # - Add dony root to path
 
-    sys.path = [str(donyfiles_path)] + sys.path
+    sys.path = [str(donyfiles_path.parent)] + sys.path
 
     # - Find all py files, extract all commands. If there is a file with filename not same as function name - rename it
 
@@ -60,7 +66,8 @@ def run_dony(
                 for _, member in inspect.getmembers(
                     _load_module(file_path), inspect.isfunction
                 )
-                if getattr(member, "_dony_command")
+                if getattr(member, "_dony_command", False)
+                and inspect.getsourcefile(inspect.unwrap(member)) == str(file_path)
             ]
 
             # - Validate exactly one command in a file or rename the file to _<filename>.py
@@ -81,6 +88,10 @@ def run_dony(
                     print(
                         f"failed to add file to git: {file_path.with_name(f'_{file_path.stem}.py')}"
                     )
+
+                # - Continue
+
+                continue
 
             elif len(cmds) > 1:
                 print(

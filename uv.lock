@@ -254,9 +254,10 @@ wheels = [
 
 [[package]]
 name = "dony"
-version = "0.1.6"
+version = "0.1.8"
 source = { editable = "." }
 dependencies = [
+    { name = "jprint2" },
     { name = "load-dotenv" },
     { name = "pyperclip" },
     { name = "questionary" },
@@ -271,6 +272,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2.2.post1" },
+    { name = "jprint2", specifier = ">=0.1.2" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
     { name = "pyperclip", specifier = ">=1.9.0" },
     { name = "questionary", specifier = ">=2.1.0" },
@@ -386,6 +388,31 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7b/6f/357efd7602486741aa73ffc0617fb310a29b588ed0fd69c2399acbb85b0c/jeepney-0.9.0.tar.gz", hash = "sha256:cf0e9e845622b81e4a28df94c40345400256ec608d0e55bb8a3feaa9163f5732", size = 106758, upload-time = "2025-02-27T18:51:01.684Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b2/a3/e137168c9c44d18eff0376253da9f1e9234d0239e0ee230d2fee6cea8e55/jeepney-0.9.0-py3-none-any.whl", hash = "sha256:97e5714520c16fc0a45695e5365a2e11b81ea79bba796e26f9f1d178cb182683", size = 49010, upload-time = "2025-02-27T18:51:00.104Z" },
+]
+
+[[package]]
+name = "jprint2"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jsons" },
+    { name = "pygments" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/ea/5df444a429cc8f268e06625f76919f8ff022cbd84dd23e0923339fe94d31/jprint2-0.1.2.tar.gz", hash = "sha256:8b6cf73f478e25f2cddeb5f0d3685371884f5202677c2c9f2dbae387a3ba0cf8", size = 42208, upload-time = "2025-06-22T15:44:38.015Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/12/65/fe799a425a16861aaf964761013ca10079a7d9422ac38fa5aa4d0b734482/jprint2-0.1.2-py3-none-any.whl", hash = "sha256:c38d1f6dd88df079ff07e11fb5cf9463a2c80561a3fb8391532269d61b6599c4", size = 4919, upload-time = "2025-06-22T15:44:37.095Z" },
+]
+
+[[package]]
+name = "jsons"
+version = "1.6.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typish" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ef/38/c1c4e06725568c21b2cdab96f95450caa257b73aac90f8041af18756f3bf/jsons-1.6.3.tar.gz", hash = "sha256:cd5815c7c6790ae11c70ad9978e0aa850d0d08a643a5105cc604eac8b29a30d7", size = 39884, upload-time = "2022-06-09T19:52:01.861Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/22/e18585ccbf9f8c42f8c26435df0e551a924aae33488227eb686876d0bffd/jsons-1.6.3-py3-none-any.whl", hash = "sha256:f07f8919316f72a3843c7ca6cc6c900513089f10092626934d1bfe4b5cf15401", size = 60701, upload-time = "2022-06-09T19:51:59.266Z" },
 ]
 
 [[package]]
@@ -788,6 +815,14 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f6/37/23083fcd6e35492953e8d2aaaa68b860eb422b34627b13f2ce3eb6106061/typing_extensions-4.13.2.tar.gz", hash = "sha256:e6c81219bd689f51865d9e372991c540bda33a0379d5573cddb9a3a23f7caaef", size = 106967, upload-time = "2025-04-10T14:19:05.416Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/54/b1ae86c0973cc6f0210b53d508ca3641fb6d0c56823f288d108bc7ab3cc8/typing_extensions-4.13.2-py3-none-any.whl", hash = "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c", size = 45806, upload-time = "2025-04-10T14:19:03.967Z" },
+]
+
+[[package]]
+name = "typish"
+version = "1.9.3"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/d6/3f56c9c0c12adf61dfcf4ed5c8ffd2c431db8dd85592067a57e8e1968565/typish-1.9.3-py3-none-any.whl", hash = "sha256:03cfee5e6eb856dbf90244e18f4e4c41044c8790d5779f4e775f63f982e2f896", size = 45063, upload-time = "2021-08-05T20:36:28.702Z" },
 ]
 
 [[package]]

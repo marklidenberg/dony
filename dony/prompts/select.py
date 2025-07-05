@@ -98,7 +98,7 @@ def select(
                 )
                 output, _ = proc.communicate(input="\0".join(lines))
 
-                if output is None:
+                if output == "":
                     raise KeyboardInterrupt
 
                 # - Parse output
@@ -198,7 +198,7 @@ def example():
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=False,
-        fuzzy=True,
+        fuzzy=False,
         default=["foo"],
         default_confirm=True,
     )
