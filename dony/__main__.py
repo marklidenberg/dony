@@ -153,7 +153,7 @@ def main():
 
     shell(
         """
-        uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(donyfiles_path=Path({}), args={})"
+        uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; print(dony.__file__); dony.run_dony(donyfiles_path=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",
