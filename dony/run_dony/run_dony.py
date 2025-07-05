@@ -19,8 +19,6 @@ def run_dony(
 ):
     """Dony entry point."""
 
-    exit(1)
-
     # - Create __init__.py in donyfiles_path.parent if it doesn't exist
 
     if not (donyfiles_path.parent / "__init__.py").exists():
