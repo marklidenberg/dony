@@ -30,7 +30,6 @@ def shell(
     working_directory: Optional[Union[str, Path]] = None,
     quiet: bool = False,
     dry_run: bool = False,
-    copy_dry_run_to_clipboard: bool = True,
     raise_on_error: bool = True,
     print_command: bool = True,
     confirm: bool = False,
@@ -51,7 +50,6 @@ def shell(
         quiet: If True, suppresses output.
         dry_run: If True, prints the command without executing it.
         raise_on_error: If True, raises an exception if the command exits with a non-zero status.
-        copy_dry_run_to_clipboard: If True, copies the dry run command to the clipboard.
         print_command: If True, prints the command before executing it.
         confirm: If True, asks for confirmation before executing the command.
 
@@ -89,13 +87,12 @@ def shell(
             # line_prefix="    ",
         )
 
-        # - Copy to clipboard
+        # - Copy to clipboard if possible
 
-        if copy_dry_run_to_clipboard:
-            try:
-                pyperclip.copy(formatted_command)
-            except:
-                dony_error("Failed to copy dry-run to clipboard")
+        try:
+            pyperclip.copy(formatted_command)
+        except:
+            pass
 
         return ""
 

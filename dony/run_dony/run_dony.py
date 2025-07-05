@@ -214,5 +214,6 @@ def run_dony(
 if __name__ == "__main__":
     run_dony(
         donyfiles_path=get_donyfiles_path(),
+        # donyfiles_path=Path("/Users/marklidenberg/Documents/coding/repos/deeplay-io/category-store/donyfiles"),
         args=OrderedDict(positional=["hello_world"], keyword={}),
     )
