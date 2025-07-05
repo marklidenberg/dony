@@ -3,11 +3,17 @@ from pathlib import Path
 from typing import Union
 
 
-def get_donyfiles_path(path: Union[str, Path] = ".") -> Path:
+def get_donyfiles_path(
+    path: Union[str, Path] = ".",
+) -> Path:
+    """Find the nearest donyfiles directory in the path hierarchy."""
+
     # - Convert path to Path object
 
     if isinstance(path, str):
         path = Path(os.path.abspath(path))
+
+    # - Find the donyfiles directory
 
     current_path = path
 

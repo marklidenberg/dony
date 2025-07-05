@@ -1,2 +1,0 @@
-# Dony example
-

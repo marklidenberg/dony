@@ -6,7 +6,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from dony import shell
-from dony.get_dony_path import get_donyfiles_path
+from dony.get_donyfiles_path import get_donyfiles_path
 from dony.parse_unknown_args import parse_unknown_args
 
 
@@ -15,7 +15,7 @@ def main():
 
     args = parse_unknown_args(sys.argv)
 
-    # - Run version command
+    # - Run special commands if they are present
 
     if args["keyword"]:
         first_key, first_value = next(iter(args["keyword"].items()))
@@ -95,18 +95,21 @@ def main():
             with open(".gitignore", "w") as f:
                 f.write(
                     dedent("""
-                            !.gitignore
+                            .venv
+                            !README.md
                             !uv.lock
                             !pyproject.toml
+                            !.gitignore
                             !.python-version
-                            !README.md
-                            .venv
                     """).strip()
                 )
 
             # - Create hello world example
 
-            os.makedirs("commands/", exist_ok=True)
+            os.makedirs(
+                "commands/",
+                exist_ok=True,
+            )
 
             with open("commands/hello_world.py", "w") as f:
                 f.write(
@@ -168,9 +171,7 @@ def example():
     import sys
 
     sys.argv = ["dony"]
-
-    # os.chdir("../example/")
-    os.chdir("/Users/marklidenberg/Documents/coding/repos/marklidenberg/jprint2")
+    os.chdir("../example/")
     main()
 
 

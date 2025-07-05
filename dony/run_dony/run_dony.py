@@ -6,6 +6,7 @@ from collections import Counter, OrderedDict
 from pathlib import Path
 from dotenv import load_dotenv
 
+from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.error import error
 from dony.prompts.select import select
 from dony.run_dony.run_with_list_arguments import run_with_list_arguments
@@ -15,9 +16,11 @@ def run_dony(
     donyfiles_path: Path,
     args: OrderedDict = OrderedDict({}),
 ):
+    """Dony entry point."""
+
     # - Add dony root to path
 
-    sys.path.append(str(donyfiles_path))
+    sys.path = [str(donyfiles_path)] + sys.path
 
     # - Find all py files, extract all commands. If there is a file with filename not same as function name - rename it
 
@@ -31,7 +34,7 @@ def run_dony(
         should_repeat = False
 
         for file_path in file_paths:
-            # - Skip file if starts with _
+            # - Skip file if starts with _ or .venv
 
             def _is_skipped(part):
                 if part.startswith("_"):
@@ -43,7 +46,7 @@ def run_dony(
             if any(_is_skipped(part) for part in str(file_path.absolute()).split("/")):
                 continue
 
-            # - Collect callables with attribute _dony_command == True
+            # - Collect callables with attribute _dony_command == True (decorated with @command)
 
             def _load_module(path: Path):
                 spec = importlib.util.spec_from_file_location(path.stem, path)
@@ -57,12 +60,29 @@ def run_dony(
                 for _, member in inspect.getmembers(
                     _load_module(file_path), inspect.isfunction
                 )
-                if getattr(member, "_dony_command", False)
+                if getattr(member, "_dony_command")
             ]
 
-            # - Validate exactly one command in a file
+            # - Validate exactly one command in a file or rename the file to _<filename>.py
 
-            if len(cmds) != 1:
+            if len(cmds) == 0:
+                # - Rename file
+
+                os.rename(
+                    file_path,
+                    file_path.with_name(f"_{file_path.stem}.py"),
+                )
+
+                # - Git add if possible
+
+                try:
+                    os.system(f"git add {file_path.with_name(f'_{file_path.stem}.py')}")
+                except:
+                    print(
+                        f"failed to add file to git: {file_path.with_name(f'_{file_path.stem}.py')}"
+                    )
+
+            elif len(cmds) > 1:
                 print(
                     f"{file_path}: expected exactly one @command, found {len(cmds)}",
                     file=sys.stderr,
@@ -72,13 +92,12 @@ def run_dony(
             # - Rename file if it's name not the same as the function
 
             if file_path.stem != cmds[0].__name__:
-                # - Repeat the cycle again since we will rename some files
-
-                should_repeat = True
-
                 # - Rename file
 
-                os.rename(file_path, file_path.with_name(cmds[0].__name__ + ".py"))
+                os.rename(
+                    file_path,
+                    file_path.with_name(cmds[0].__name__ + ".py"),
+                )
 
                 # - Git add if possible
 
@@ -90,6 +109,10 @@ def run_dony(
                     print(
                         f"failed to add file to git: {file_path.with_name(cmds[0].__name__ + '.py')}"
                     )
+
+                # - Repeat the cycle again since we rename some files
+
+                should_repeat = True
 
             # - Validate command has _path
 
@@ -103,7 +126,10 @@ def run_dony(
     counter = Counter(cmd._path for cmd in commands.values())
     duplicates = [path for path, count in counter.items() if count > 1]
     if duplicates:
-        print(f"Duplicate commands: {duplicates}", file=sys.stderr)
+        print(
+            f"Duplicate commands: {duplicates}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     # - Return if no commands found
@@ -176,15 +202,6 @@ def run_dony(
 
 if __name__ == "__main__":
     run_dony(
-        donyfiles_path=Path(
-            "/Users/marklidenberg/Documents/coding/repos/marklidenberg/dony"
-        ),
+        donyfiles_path=get_donyfiles_path(),
         args=OrderedDict(positional=["hello_world"], keyword={}),
     )
-
-    # import json
-    #
-    # run_dony(
-    #     dony_dir=Path("../../example/dony"),
-    #     args=json.loads('{"positional": ["hello_world"], "keyword": {"name": ["Mark"]}}'),
-    # )

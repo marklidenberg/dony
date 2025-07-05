@@ -26,11 +26,13 @@ def squash(
         ),
     )
 
+    # - Get github username
+
+    github_username = dony.shell("git config --get user.name", quiet=True)
+
     # - Get default branch if not set
 
-    new_branch = (
-        new_branch or f"workflow_{dony.shell('date +%Y%m%d_%H%M%S', quiet=True)}"
-    )
+    new_branch = new_branch or f"{github_username}-flow"
 
     # - Get current branch
 
@@ -43,6 +45,7 @@ def squash(
 
     dony.shell(
         f"""
+
         # push if there are unpushed commits
         git diff --name-only | grep -q . && git push
         
@@ -54,6 +57,7 @@ def squash(
         git merge {target_branch}
         
         if ! git diff-index --quiet HEAD --; then
+
           # try to commit twice, in case of formatting errors that are fixed by the first commit
           git commit -m "Merge with target branch" || git commit -m "Merge with target branch"
           git push

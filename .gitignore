@@ -1,18 +1,27 @@
-# forbid all
+
+# - Forbid all
 
 **/*.*
 
-# allow subdirectories with a dot
+# - Allow subdirectories with a dot
+
 !**/*.*/
-!*.py
-!.gitignore
-!.python-version
-!pyproject.toml
-!uv.lock
-!*.template
-!.secrets.baseline
-!*.sh
-!*.yaml
 
 # forbid .venv
 .venv
+
+# - Allow dot files
+
+!.gitignore
+!.python-version
+!.secrets.baseline
+
+# - Allow file extensions
+
+!*.lock
+!*.py
+!*.toml
+!*.template
+!*.sh
+!*.yaml
+

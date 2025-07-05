@@ -6,11 +6,12 @@ import sys
 from inspect import currentframe
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional
+from typing import Optional, Union
 
-from dony.prompts.error import error
+from dony.prompts.error import error as dony_error
 from dony.prompts.print import print as dony_print
-from dony.get_dony_root import get_dony_root
+from dony.prompts.confirm import confirm as dony_confirm
+from dony.get_donyfiles_root import get_donyfiles_root
 import pyperclip
 
 
@@ -26,12 +27,13 @@ def shell(
     exit_on_error: bool = True,
     error_on_unset: bool = True,
     echo_commands: bool = False,
-    working_directory: Optional[str, Path] = None,
+    working_directory: Optional[Union[str, Path]] = None,
     quiet: bool = False,
     dry_run: bool = False,
     copy_dry_run_to_clipboard: bool = True,
     raise_on_error: bool = True,
     print_command: bool = True,
+    confirm: bool = False,
 ) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
@@ -51,6 +53,7 @@ def shell(
         raise_on_error: If True, raises an exception if the command exits with a non-zero status.
         copy_dry_run_to_clipboard: If True, copies the dry run command to the clipboard.
         print_command: If True, prints the command before executing it.
+        confirm: If True, asks for confirmation before executing the command.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
@@ -62,6 +65,7 @@ def shell(
     # - Get formatted command if needed
 
     if print_command or dry_run:
+        # if is required to avoid recursion
         try:
             formatted_command = shell(
                 f"""
@@ -91,18 +95,24 @@ def shell(
             try:
                 pyperclip.copy(formatted_command)
             except:
-                error("Failed to copy dry-run to clipboard")
+                dony_error("Failed to copy dry-run to clipboard")
 
         return ""
 
     # - Print command
 
-    if print_command and not quiet:
+    if print_command and not quiet or confirm:
         dony_print(
             "🐚\n" + formatted_command,
             color_style="ansipurple",
             # line_prefix="    ",
         )
+
+    if confirm:
+        if not dony_confirm(
+            "Are you sure you want to run the above command?",
+        ):
+            return dony_error("Aborted")
 
     # - Convert working_directory to string
 
@@ -112,7 +122,7 @@ def shell(
     # - If relative - concat working directory with dony root
 
     if isinstance(working_directory, str) and not os.path.isabs(working_directory):
-        working_directory = get_dony_root() / working_directory
+        working_directory = get_donyfiles_root() / working_directory
 
     # - Build the `set` prefix from the enabled flags
 
@@ -155,7 +165,7 @@ def shell(
                     buffer.append(line)
             break
         except UnicodeDecodeError:
-            error("Error decoding output. Skipping the line")
+            dony_error("Error decoding output. Skipping the line")
 
     proc.stdout.close()
     return_code = proc.wait()

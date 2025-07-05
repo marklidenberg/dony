@@ -2,7 +2,6 @@ import itertools
 
 from dony.shell import shell
 
-import itertools
 import sys
 from collections import OrderedDict
 
@@ -83,9 +82,28 @@ def parse_unknown_args(arg_list: list) -> dict:
 
 
 def example():
-    import os
-
-    shell("uv run python parse_unknown_args_example.py positional1 positional2 --simple simple --list1 a b --list2 c --list2 d")
+    assert parse_unknown_args(
+        [
+            "positional1",
+            "positional2",
+            "--simple",
+            "simple",
+            "--list1",
+            "a",
+            "b",
+            "--list2",
+            "c",
+            "--list2",
+            "d",
+        ]
+    ) == {
+        "positional": ["positional1", "positional2"],
+        "keyword": {
+            "simple": ["simple"],
+            "list1": ["a", "b"],
+            "list2": ["c", "d"],
+        },
+    }
 
 
 if __name__ == "__main__":

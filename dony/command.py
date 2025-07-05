@@ -11,41 +11,8 @@ from dotenv import load_dotenv
 
 from dony.shell import shell
 from dony.prompts.error import error
-from dony.get_dony_path import get_donyfiles_path
+from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.success import success
-
-
-# deprecate lazy-dataclass-arguments
-# def lazy_dataclass(cls):
-#     """Lazy evaluation of dataclass attributes when they are accessed."""
-#     import inspect
-#     from dataclasses import dataclass
-#
-#     cls = dataclass(cls)
-#
-#     def __getattribute__(self, item):
-#         value = object.__getattribute__(self, item)
-#
-#         # Only evaluate callables that look like zero-arg methods (self only)
-#         if not item.startswith("_") and callable(value) and not inspect.ismethod(value):
-#             if len(inspect.signature(value).parameters) == 0:
-#                 evaluated = value()
-#                 setattr(self, item, evaluated)
-#                 return evaluated
-#             elif len(inspect.signature(value).parameters) == 1 and "kwargs" in inspect.signature(value).parameters:
-#                 evaluated = value(self.__dict__)
-#                 setattr(self, item, evaluated)
-#                 return evaluated
-#             else:
-#                 raise ValueError(f"Callable {value} can have 0 parameters of 1 parameter 'kwargs'")
-#
-#         return value
-#
-#     cls.__getattribute__ = __getattribute__
-#     return cls
-
-
-# end-deprecate
 
 
 def command(path: str = None):
@@ -94,14 +61,6 @@ def command(path: str = None):
             "donyfiles" in file_path.parts
         ), f"Command '{func.__name__}' must be in 'donyfiles' directory"
 
-        # - Validate filename matches function name
-
-        # disabled for now, we rename file with running dony command
-
-        # stem = file_path.stem
-        # if func.__name__ != stem:
-        #     raise ValueError(f"Command name '{func.__name__}' does not match filename '{stem}.py'")
-
         # - Compute or use provided path
 
         if path is None:
@@ -121,39 +80,10 @@ def command(path: str = None):
 
         func._path = re.sub(r"^.*/donyfiles/", "", func._path).replace(".py", "")
 
-        # crop commands prefixes
         if func._path.startswith("donyfiles/commands/"):
             func._path = func._path[len("donyfiles/commands/") :]
-        if func._path.startswith("commands/"):
-            func._path = func._path[len("commands/") :]
 
         func._dony_command = True
-
-        # deprecate lazy-dataclass-arguments
-        # # - Build a lazy dataclass for args
-        #
-        # field_defs = []
-        #
-        # for name, param in sorted(
-        #     sig.parameters.items(), key=lambda pair: callable(pair[1].default)
-        # ):
-        #     ann = param.annotation if param.annotation is not inspect._empty else Any
-        #
-        #     if callable(param.default):
-        #         # - Pass callables as is
-        #
-        #         field_defs.append((name, ann, param.default))
-        #     else:
-        #         # - Pass others as field with default value
-        #
-        #         field_defs.append(
-        #             (name, ann, field(default_factory=lambda: param.default))
-        #         )
-        #
-        # ArgsCls = lazy_dataclass(
-        #     make_dataclass(f"{func.__name__.capitalize()}Args", field_defs)
-        # )
-        # end-deprecate
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -179,18 +109,6 @@ def command(path: str = None):
 
             bound = sig.bind_partial(*args, **kwargs)
             bound.apply_defaults()
-
-            # deprecate lazy-dataclass-arguments
-            # # - Instantiate args object; fields will evaluate lazily
-            #
-            # args_obj = ArgsCls(**bound.arguments)
-            #
-            # #  -Force evaluation of all fields (cascading defaults)
-            # final_kwargs = {}
-            # for f in fields(ArgsCls):
-            #     final_kwargs[f.name] = getattr(args_obj, f.name)
-            # bounds.arguments = final_kwargs
-            # end-deprecate
 
             # - Change directory to dony root
 

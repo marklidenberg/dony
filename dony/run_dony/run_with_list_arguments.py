@@ -2,7 +2,10 @@ from typing import Callable, Any, get_origin, List
 import inspect
 
 
-def run_with_list_arguments(func: Callable, list_kwargs: dict) -> Any:
+def run_with_list_arguments(
+    func: Callable,
+    list_kwargs: dict,
+) -> Any:
     """
     Calls `func` by unpacking `list_kwargs`, where each value in `list_kwargs` is a list.
     - If the corresponding parameter annotation is a list (e.g. list[str]),
@@ -16,6 +19,8 @@ def run_with_list_arguments(func: Callable, list_kwargs: dict) -> Any:
         run_with_list_arguments(f, {"a": ["hello"], "b": ["world"]})
 
         # calls f(a="hello", b=["world"])
+
+    Useful for running functions from command line arguments.
     """
     sig = inspect.signature(func)
     bound_args = {}
