@@ -5,17 +5,18 @@ import sys
 from pathlib import Path
 from functools import wraps
 from dataclasses import make_dataclass, fields, field
-from typing import Any, get_origin, get_args
+from typing import Any, get_origin, get_args, Optional
 
 from dotenv import load_dotenv
 
+from dony.get_donyfiles_root import get_donyfiles_root
 from dony.shell import shell
 from dony.prompts.error import error
 from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
-def command(path: str = None):
+def command(path: Optional[str] = None):
     """
     Decorator to mark a function as a dony command.
     - Builds a lazy dataclass of all parameters, allowing cascading defaults.
@@ -55,33 +56,36 @@ def command(path: str = None):
             )
         file_path = Path(source_file).resolve()
 
-        # - Validate file_path is in donyfiles
-
-        assert (
-            "donyfiles" in file_path.parts
-        ), f"Command '{func.__name__}' must be in 'donyfiles' directory"
-
         # - Compute or use provided path
 
         if path is None:
-            parts = file_path.parts
-            try:
-                idx = parts.index("donyfiles")
-            except ValueError:
-                raise RuntimeError(
-                    f"Cannot derive path: 'donyfiles' not found in '{file_path}'"
-                )
-            relative = Path(*parts[idx:]).as_posix()
-            func._path = relative
+            # - Init path
+
+            func._path = str(file_path)
+
+            # - Get paths
+
+            donyfiles_path = str(get_donyfiles_path(file_path))
+            project_path = str(get_donyfiles_root(file_path))
+
+            # - Remove donyfiles prefix if present
+
+            func._path = func._path.replace(donyfiles_path, "")
+
+            # - Remove project prefix if present
+
+            func._path = func._path.replace(project_path, "")
+
+            # - Remove leading /
+
+            if func._path.startswith("/"):
+                func._path = func._path[1:]
+
+            # - Remove .py extension
+
+            func._path = func._path.replace(".py", "")
         else:
             func._path = path
-
-        # - Crop to last dony folder
-
-        func._path = re.sub(r"^.*/donyfiles/", "", func._path).replace(".py", "")
-
-        if func._path.startswith("donyfiles/commands/"):
-            func._path = func._path[len("donyfiles/commands/") :]
 
         func._dony_command = True
 
@@ -146,17 +150,13 @@ def test():
     except ValueError as e:
         assert str(e) == "Command 'foo': parameter 'a' must have a default value"
 
-    try:
-
-        @command()
-        def bar(
-            a: str = "0",
-            b: str = "1",
-            c: str = "2",
-        ):
-            return a + b + c
-    except ValueError as e:
-        assert str(e) == "Command name 'bar' does not match filename 'command.py'"
+    @command()
+    def bar(
+        a: str = "0",
+        b: str = "1",
+        c: str = "2",
+    ):
+        return a + b + c
 
 
 if __name__ == "__main__":

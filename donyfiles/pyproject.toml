@@ -1,9 +1,0 @@
-[project]
-name = "dony-tool"
-version = "0.1.0"
-description = "dony environment"
-readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
-    "dony>=0.1.7",
-]

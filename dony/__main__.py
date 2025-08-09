@@ -65,53 +65,9 @@ def main():
 
             os.chdir(Path.cwd() / "donyfiles")
 
-            # - Run uv init
-
-            shell(
-                'uv init --name dony-commands --description "dony environment"',
-                working_directory=None,
-            )
-
-            # - Create environment
-
-            shell(
-                "uv sync",
-                working_directory=None,
-            )
-
-            # - Add packages
-
-            shell(
-                """uv add dony""",
-                working_directory=None,
-            )
-
-            # - Remove hello.py file
-
-            os.remove("main.py")
-
-            # - Create .gitignore file allowing uv files
-
-            with open(".gitignore", "w") as f:
-                f.write(
-                    dedent("""
-                            .venv
-                            !README.md
-                            !uv.lock
-                            !pyproject.toml
-                            !.gitignore
-                            !.python-version
-                    """).strip()
-                )
-
             # - Create hello world example
 
-            os.makedirs(
-                "commands/",
-                exist_ok=True,
-            )
-
-            with open("commands/hello_world.py", "w") as f:
+            with open("hello_world.py", "w") as f:
                 f.write(
                     dedent("""
                             import dony
@@ -149,11 +105,11 @@ def main():
                 print("Did you mean `dony --version`?")
         sys.exit(1)
 
-    # - Run run_dony in local uv environment. Remove dony from the local directory as it shadows the dony module
+    # - Run run_dony in uv. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """
-        uv run --no-active python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; dony.run_dony(donyfiles_path=Path({}), args={})"
+        python -c "import sys; sys.path.pop(0); import dony; from pathlib import Path; import sys; print(dony.__file__); dony.run_dony(donyfiles_path=Path({}), args={})"
 
         """.format(
             # dony_dir / ".venv/bin/python",
@@ -171,10 +127,10 @@ def example():
     import sys
 
     sys.argv = ["dony"]
-    os.chdir("../example/")
+    os.chdir("donyfiles/")
     main()
 
 
 if __name__ == "__main__":
-    # main()
-    example()
+    main()
+    # example()

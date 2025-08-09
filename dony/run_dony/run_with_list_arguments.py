@@ -22,10 +22,10 @@ def run_with_list_arguments(
 
     Useful for running functions from command line arguments.
     """
-    sig = inspect.signature(func)
+
     bound_args = {}
 
-    for name, param in sig.parameters.items():
+    for name, param in inspect.signature(func).parameters.items():
         if name not in list_kwargs:
             continue
 
@@ -35,10 +35,8 @@ def run_with_list_arguments(
                 f"Expected a list for argument '{name}', got {type(values).__name__}"
             )
 
-        anno = param.annotation
-
         # Detect if the annotation is a list type
-        if get_origin(anno) is list:
+        if get_origin(param.annotation) is list:
             # pass the full list
             bound_args[name] = values
         else:
