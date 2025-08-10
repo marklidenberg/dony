@@ -4,7 +4,7 @@ from typing import Optional
 import dony
 
 
-__NAME__ = "squash:0.1.9"
+__NAME__ = "squash:0.1.10"
 
 
 @dony.command()
@@ -30,7 +30,10 @@ def squash(
 
     # - Get github username
 
-    github_username = dony.shell("git config --get user.name", quiet=True)
+    github_username = dony.shell(
+        "git config --get user.name",
+        quiet=True,
+    )
 
     # - Get default branch if not set
 
@@ -83,7 +86,7 @@ def squash(
               | sed $'s/^/\t/'
             printf '\n'
           done
-"""
+""",
     )
 
     # - Ask user to confirm
@@ -93,14 +96,7 @@ def squash(
 
     # - Check if target branch exists
 
-    if (
-        dony.shell(
-            f"""
-        git branch --list {target_branch}
-    """
-        )
-        == ""
-    ):
+    if not dony.shell(f"git branch --list {target_branch}"):
         return dony.error(f"Target branch {target_branch} does not exist")
 
     # - Get commit message from the user
