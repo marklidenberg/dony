@@ -17,6 +17,12 @@ from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
+if sys.version_info >= (3, 10):
+    _union_type = types.UnionType
+else:
+    _union_type = None  # or skip using it
+
+
 def command(path: Optional[str] = None):
     """Decorator to mark a function as a dony command."""
 
@@ -54,7 +60,7 @@ def command(path: Optional[str] = None):
                     origin
                     in (
                         Union,
-                        types.UnionType,
+                        _union_type,
                     )  # Check for typing.Union or Python 3.10+ X | None
                     and len(non_none) == 1  # Only one non-None type in the union
                     and (
