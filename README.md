@@ -24,8 +24,7 @@ if __name__ == "__main__":
 
 Run commands directly 
 - with python: `python donyfiles/<command_name>.py`
-- with dony cli: `dony 
-<command_name> [--arg value]`
+- with dony cli: `dony <command_name> [--arg value]`
 
 or just run `dony` command to select from all available commands:
 
@@ -38,8 +37,6 @@ or just run `dony` command to select from all available commands:
 Select command 👆                                                                                                                                                                                                   
 ╭───────────────────────────────────────────────────────────────────────╮
 │ Prints "Hello, World!"                                                │
-│                                                                       │
-│                                                                       │
 ╰───────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -63,8 +60,6 @@ dony --init
 # - Run dony
 
 dony
-
-# or run specific command directly with `python hello_world.py` or `dony hello-world`
 ```
 
 ## Commands
@@ -98,10 +93,10 @@ def greet(
 
 - All commands run from the project root (where `donyfiles/` is located)
 - Available prompts based on `questionary`:
-  - `dony.input`: free-text entry
+  - `dony.input`: text entry
   - `dony.confirm`: yes/no ([Y/n] or [y/N])
   - `dony.select`: option picker (supports multi & fuzzy)
-  - `dony.select_or_input`: option picker with the ability to enter a custom value
+  - `dony.select_or_input`: option picker + custom input
   - `dony.press_any_key_to_continue`: pause until keypress
   - `dony.path`: filesystem path entry
   - `dony.autocomplete`: suggestion-driven input
