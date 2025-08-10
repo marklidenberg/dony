@@ -1,14 +1,15 @@
 import os
+from typing import Optional
 
 import dony
 
-__NAME__ = "release:0.1.0"
+__NAME__ = "release:0.1.1"
 
 
 @dony.command()
 def release(
-    version: str = None,
-    uv_publish_token: str = None,
+    version: Optional[str] = None,
+    uv_publish_token: Optional[str] = None,
 ):
     """Bump version and publish to PyPI"""
 
@@ -21,18 +22,20 @@ def release(
 
     # - Select default arguments
 
-    version = version or dony.select(
+    version = dony.select(
         "Choose version",
         choices=[
             "patch",
             "minor",
             "major",
         ],
+        provided=version,
     )
 
-    uv_publish_token = uv_publish_token or dony.input(
+    uv_publish_token = dony.input(
         "Enter UV publish token (usually a PyPI token)",
         default=os.getenv("UV_PUBLISH_TOKEN", ""),
+        provided=uv_publish_token,
     )
 
     # - Get current branch

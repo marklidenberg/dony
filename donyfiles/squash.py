@@ -1,29 +1,31 @@
 import re
+from typing import Optional
 
 import dony
 
 
-__NAME__ = "squash:0.1.8"
+__NAME__ = "squash:0.1.9"
 
 
 @dony.command()
 def squash(
-    new_branch: str = None,
-    target_branch: str = None,
-    commit_message: str = None,
-    checkout_to_new_branch: str = None,
-    remove_merged_branch: str = None,
+    new_branch: Optional[str] = None,
+    target_branch: Optional[str] = None,
+    commit_message: Optional[str] = None,
+    checkout_to_new_branch: Optional[str] = None,
+    remove_merged_branch: Optional[str] = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
     # - Get target branch
 
-    target_branch = target_branch or dony.input(
+    target_branch = dony.input(
         "Enter target branch:",
         default=dony.shell(
             "git branch --list main | grep -q main && echo main || echo master",
             quiet=True,
         ),
+        provided=target_branch,
     )
 
     # - Get github username
@@ -84,9 +86,10 @@ def squash(
 """
     )
 
-    # Ask user to confirm
+    # - Ask user to confirm
 
-    dony.confirm("Start squashing?")
+    if not dony.confirm("Start squashing?"):
+        return
 
     # - Check if target branch exists
 
@@ -120,14 +123,14 @@ def squash(
 
     checkout_to_new_branch = dony.confirm(
         f"Checkout to new branch {new_branch}?",
-        provided_answer=checkout_to_new_branch,
+        provided=checkout_to_new_branch,
     )
 
     # - Check if user wants to remove merged branch
 
     remove_merged_branch = dony.confirm(
         f"Remove merged branch {merged_branch}?",
-        provided_answer=remove_merged_branch,
+        provided=remove_merged_branch,
     )
 
     # - Do the process

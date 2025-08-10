@@ -1,6 +1,3 @@
-import os
-from subprocess import CalledProcessError
-
 import dony
 
 

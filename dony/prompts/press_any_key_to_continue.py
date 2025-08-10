@@ -2,7 +2,11 @@ import questionary
 from prompt_toolkit.styles import Style
 
 
-def press_any_key_to_continue(message: str = "Press any key to continue..."):
+def press_any_key_to_continue(
+    message: str = "Press any key to continue...",
+):
+    # - Press any key to continue
+
     result = questionary.press_any_key_to_continue(
         message=message,
         style=Style(
@@ -11,6 +15,8 @@ def press_any_key_to_continue(message: str = "Press any key to continue..."):
             ]
         ),
     ).ask()
+
+    # - Raise KeyboardInterrupt if no result
 
     if result is None:
         raise KeyboardInterrupt

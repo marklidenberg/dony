@@ -1,3 +1,4 @@
+from typing import Optional
 import questionary
 from prompt_toolkit.styles import Style
 
@@ -6,12 +7,18 @@ def input(
     message: str,
     default: str = "",
     allow_empty_string: bool = False,
-    provided_answer: str = None,
+    provided: Optional[str] = None,
 ):
-    if provided_answer is not None:
-        return provided_answer
+    # - Return provided answer
+
+    if provided is not None:
+        return provided
+
+    # - Run input prompt
 
     while True:
+        # - Ask
+
         result = questionary.text(
             message,
             default=default,
@@ -23,8 +30,12 @@ def input(
             ),
         ).ask()
 
+        # - Raise KeyboardInterrupt if no result
+
         if result is None:
             raise KeyboardInterrupt
+
+        # - Return result
 
         if allow_empty_string or result:
             return result

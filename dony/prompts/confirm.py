@@ -1,11 +1,10 @@
-import questionary
-from prompt_toolkit.styles import Style
+from typing import Optional
 
 
 def confirm(
     message: str,
     default: bool = True,
-    provided_answer: str = None,
+    provided: Optional[str] = None,
 ):
     """
     Prompt the user to confirm a decision.
@@ -13,32 +12,37 @@ def confirm(
 
     # NOTE: typing is worse than using arrows, so we'll just use select instead of `questionary.confirm` with [Y/n]
 
-    if provided_answer is not None:
-        if provided_answer.lower() in ["y", "yes", "true", "1"]:
+    # - Return provided answer
+
+    if provided is not None:
+        if provided.lower() in ["y", "yes", "true", "1"]:
             return True
-        elif provided_answer.lower() in ["n", "no", "false", "0"]:
+        elif provided.lower() in ["n", "no", "false", "0"]:
             return False
         else:
             raise ValueError(
-                f"Provided answer '{provided_answer}' is not a valid boolean value. Use one of 'y', 'yes', 'true', '1', 'n', 'no', 'false', '0'."
+                f"Provided answer '{provided}' is not a valid boolean value. Use one of 'y', 'yes', 'true', '1', 'n', 'no', 'false', '0'."
             )
+
+    # - Run select prompt
 
     from dony.prompts.select import select  # avoid circular import
 
-    result = (
-        select(
-            message=message,
-            choices=["Yes", "No"] if default else ["No", "Yes"],
-            multi=False,
-            fuzzy=False,
-        )
-        == "Yes"
+    answer = select(
+        message=message,
+        choices=["Yes", "No"] if default else ["No", "Yes"],
+        multi=False,
+        fuzzy=False,
     )
 
-    if result is None:
+    # - Raise KeyboardInterrupt if no result
+
+    if answer is None:
         raise KeyboardInterrupt
 
-    return result
+    # - Return result
+
+    return answer == "Yes"
 
 
 def example():

@@ -1,6 +1,6 @@
 # 🍥️ dony
 
-A lightweight Python command runner with a simple and consistent workflow. A `Justfile` alternative.
+A lightweight Python command runner. A [just](https://github.com/casey/just) alternative.
 
 ## How it works
 
@@ -9,13 +9,20 @@ Define your commands in `donyfiles/` in the root of your project.
 ```python
 import dony
 
+
 @dony.command()
 def hello_world():
-    """Prints "Hello, World!" """
-    dony.shell('echo "Hello, World!"')
+    """Hello, world!"""
+    dony.shell('echo "Hello, world!"')
+
+
+if __name__ == "__main__":
+    hello_world()
 ```
 
-Run `dony` to select and run a command:
+Run commands directly as python scripts (`python my_command.py`) or with dony cli interface (`dony <command_name> [--arg value]`)
+
+Or run `dony` to select from all available commands:
 
 ```
                                                                                                                                                                                                                    
@@ -31,31 +38,29 @@ Select command 👆
 ╰───────────────────────────────────────────────────────────────────────╯
 ```
 
-Or call them directly: `dony <command_name> [--arg value]`.
-
 ## Quick Start
 
-1. **Install Prerequisites**: Python 3.8+, `pipx` (for installation only, yor may use any other tool you like), optional `fzf` for fuzzy-search and `shfmt` for pretty command outputs.
+For MacOS:
+```bash
 
-   For macOS, run 
+# - Install prerequisites (pipx for global install, fzf and shfmt are optional)
 
-   ```bash
-   brew install pipx
-   brew install fzf 
-   brew install shfmt
-   ```
+brew install pipx, fzf, shfmt
 
-2. **Install** `dony`:
+# - Install dony
 
-    ```bash
-    pipx install dony
-    ```
-3. **Add your own commands** under `<your_project>/donyfiles/`, or run `dony --init` to bootstrap a `hello_world` example.
-4. **Use from anywhere in your project**:
+pipx install dony
 
-    ```bash
-    dony
-    ```
+# - Init dony (bootstraps hello-world example)
+
+dony --init
+
+# - Run dony
+
+dony
+
+# or run specific command directly with `python hello_world.py` or `dony hello-world`
+```
 
 ## Commands
 
@@ -65,7 +70,7 @@ import dony
 @dony.command()
 def greet(
     greeting: str = 'Hello',
-    name: str = None
+    name: Optional[str] = None
 ):
     name = name or dony.input('What is your name?')
     dony.shell(f"echo {greeting}, {name}!")
@@ -77,12 +82,11 @@ def greet(
 
 
 ## Use cases
-- Build & Configuration
-- Quality & Testing
-- Release Management
-- Deployment & Operations
-- Documentation & Resources
+- Build, deploy, release
+- DevOps operations
+- Testing
 - Git management
+- Repo chores
 
 ## Things to know
 
@@ -91,7 +95,7 @@ def greet(
   - `dony.input`: free-text entry
   - `dony.confirm`: yes/no ([Y/n] or [y/N])
   - `dony.select`: option picker (supports multi & fuzzy)
-  - `dony.select_or_input`: option picker (supports multi & fuzzy) with the ability to enter a custom value
+  - `dony.select_or_input`: option picker with the ability to enter a custom value
   - `dony.press_any_key_to_continue`: pause until keypress
   - `dony.path`: filesystem path entry
   - `dony.autocomplete`: suggestion-driven input
@@ -104,26 +108,29 @@ def greet(
 
 ```python
 import re
+from typing import Optional
+
 import dony
 
 @dony.command()
 def squash(
-    new_branch: str = None,
-    target_branch: str = None,
-    commit_message: str = None,
-    checkout_to_new_branch: str = None,
-    remove_merged_branch: str = None,
+    new_branch: Optional[str] = None,
+    target_branch: Optional[str] = None,
+    commit_message: Optional[str] = None,
+    checkout_to_new_branch: Optional[str] = None,
+    remove_merged_branch: Optional[str] = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
     # - Get target branch
 
-    target_branch = target_branch or dony.input(
+    target_branch = dony.input(
         "Enter target branch:",
         default=dony.shell(
             "git branch --list main | grep -q main && echo main || echo master",
             quiet=True,
         ),
+        provided=target_branch,
     )
 
     # - Get github username
@@ -184,19 +191,20 @@ def squash(
 """
     )
 
-    # Ask user to confirm
+    # - Ask user to confirm
 
-    dony.confirm("Start squashing?")
+    if not dony.confirm("Start squashing?"):
+        return
 
     # - Check if target branch exists
 
     if (
-        dony.shell(
-            f"""
+            dony.shell(
+                f"""
         git branch --list {target_branch}
     """
-        )
-        == ""
+            )
+            == ""
     ):
         return dony.error(f"Target branch {target_branch} does not exist")
 
@@ -208,10 +216,10 @@ def squash(
                 f"Enter commit message for merging branch {merged_branch} to {target_branch}:"
             )
             if bool(
-                re.match(
-                    r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
-                    commit_message.splitlines()[0],
-                )
+                    re.match(
+                        r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
+                        commit_message.splitlines()[0],
+                    )
             ):
                 break
             dony.print("Only conventional commits are allowed, try again")
@@ -220,14 +228,14 @@ def squash(
 
     checkout_to_new_branch = dony.confirm(
         f"Checkout to new branch {new_branch}?",
-        provided_answer=checkout_to_new_branch,
+        provided=checkout_to_new_branch,
     )
 
     # - Check if user wants to remove merged branch
 
     remove_merged_branch = dony.confirm(
         f"Remove merged branch {merged_branch}?",
-        provided_answer=remove_merged_branch,
+        provided=remove_merged_branch,
     )
 
     # - Do the process
@@ -277,6 +285,7 @@ def squash(
 
 if __name__ == "__main__":
     squash()
+
 ```
 
 ## License

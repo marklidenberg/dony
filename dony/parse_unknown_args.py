@@ -81,7 +81,7 @@ def parse_unknown_args(arg_list: list) -> dict:
     return result
 
 
-def example():
+def test():
     assert parse_unknown_args(
         [
             "positional1",
@@ -107,4 +107,4 @@ def example():
 
 
 if __name__ == "__main__":
-    example()
+    test()

@@ -40,18 +40,18 @@ def shell(
 
     Args:
         command: The command line string to execute.
-        capture_output: If True, captures and returns the full combined stdout+stderr;
+        capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
-        text: If True, treats stdout/stderr as text (str); if False, returns bytes.
-        exit_on_error: If True, prepend 'set -e' (exit on any error).
-        error_on_unset: If True, prepend 'set -u' (error on unset variables).
-        echo_commands: If True, prepend 'set -x' (echo commands before executing).
-        working_directory: If provided, change the working directory before executing the command.
-        quiet: If True, suppresses output.
-        dry_run: If True, prints the command without executing it.
-        raise_on_error: If True, raises an exception if the command exits with a non-zero status.
-        print_command: If True, prints the command before executing it.
-        confirm: If True, asks for confirmation before executing the command.
+        text: Treats stdout/stderr as text (str); if False, returns bytes.
+        exit_on_error: Prepends 'set -e' (exit on any error).
+        error_on_unset: Prepends 'set -u' (error on unset variables).
+        echo_commands: Prepends 'set -x' (echo commands before executing).
+        working_directory: Changes the working directory before executing the command.
+        quiet: Suppresses output.
+        dry_run: Prints the command without executing it.
+        raise_on_error: Raises an exception if the command exits with a non-zero status.
+        print_command: Prints the command before executing it.
+        confirm: Asks for confirmation before executing the command.
 
     Returns:
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
@@ -84,7 +84,6 @@ def shell(
         dony_print(
             "🐚 Dry run\n" + formatted_command,
             color_style="ansipurple",
-            # line_prefix="    ",
         )
 
         # - Copy to clipboard if possible
@@ -92,6 +91,7 @@ def shell(
         try:
             pyperclip.copy(formatted_command)
         except:
+            # todo later: specify exception types
             pass
 
         return ""
@@ -102,7 +102,6 @@ def shell(
         dony_print(
             "🐚\n" + formatted_command,
             color_style="ansipurple",
-            # line_prefix="    ",
         )
 
     if confirm:
@@ -191,9 +190,13 @@ def shell(
 
 def example():
     # Default: set -eux is applied
+
+    # - Run echo command
+
     print(shell('echo "{"a": "b"}"'))
 
-    # Disable only echoing of commands
+    # - Disable only echoing of commands
+
     print(
         shell(
             'echo "no x prefix here"',
@@ -201,7 +204,8 @@ def example():
         )
     )
 
-    # Run in a different directory
+    # - Run in a different directory
+
     output = shell("ls", working_directory="/tmp")
     print("Contents of /tmp:", output)
 

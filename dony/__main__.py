@@ -105,7 +105,7 @@ def main():
                 print("Did you mean `dony --version`?")
         sys.exit(1)
 
-    # - Run run_dony in uv. Remove dony from the local directory as it shadows the dony module
+    # - Run dony. Remove dony from the local directory as it shadows the dony module
 
     shell(
         """

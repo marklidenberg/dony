@@ -14,7 +14,7 @@ def select(
     multi: bool = False,
     fuzzy: bool = True,
     default_confirm: bool = False,
-    provided_answer: str = None,
+    provided: Optional[str] = None,
     require_any_choice: bool = True,
 ) -> Union[None, str, Sequence[str]]:
     """
@@ -29,10 +29,10 @@ def select(
 
     # - Check if provided answer is set
 
-    if provided_answer is not None:
-        if provided_answer not in choices:
-            raise ValueError(f"Provided answer '{provided_answer}' is not in choices.")
-        return provided_answer
+    if provided is not None:
+        if provided not in choices:
+            raise ValueError(f"Provided answer '{provided}' is not in choices.")
+        return provided
 
     # - If default is present and default_confirm is True, then ask for confirmation to just use default
 
@@ -42,7 +42,8 @@ def select(
         if confirm(message + f"\nUse default? [{default}]"):
             return default
 
-    # Helper to unpack a choice tuple or treat a plain string
+    # - Helper to unpack a choice tuple or treat a plain string
+
     def unpack(c):
         if isinstance(c, tuple):
             if len(c) == 3:
@@ -53,6 +54,8 @@ def select(
                 return (c[0], "", "")
         else:
             return (c, "", "")
+
+    # - Run fuzzy select prompt
 
     if fuzzy:
         while True:
@@ -122,7 +125,8 @@ def select(
             except FileNotFoundError:
                 pass
 
-    # Fallback to questionary
+    # - Fallback to questionary
+
     q_choices = []
 
     for choice in choices:
@@ -146,6 +150,8 @@ def select(
                 checked=value in (default or []),
             )
         )
+
+    # - Run checkbox select prompt
 
     if multi:
         while True:
@@ -173,6 +179,8 @@ def select(
 
             return result
 
+    # - Run select prompt
+
     result = questionary.select(
         message=message,
         choices=q_choices,
@@ -181,8 +189,12 @@ def select(
         instruction=" ",
     ).ask()
 
+    # - Raise KeyboardInterrupt if no result
+
     if result is None:
         raise KeyboardInterrupt
+
+    # - Return
 
     return result
 

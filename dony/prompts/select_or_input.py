@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 
 from dony.prompts.select import select
@@ -10,18 +10,26 @@ def select_or_input(
     choices: List[str],
     allow_empty_string: bool = False,
     reject_choice: str = "✏️ Enter your own",
-    provided_answer: str = None,
+    provided: Optional[str] = None,
 ):
-    if provided_answer is not None:
-        return provided_answer
+    # - Return provided answer
+
+    if provided is not None:
+        return provided
+
+    # - Run select prompt
 
     result = select(
         message=message,
         choices=choices + [reject_choice],
     )
 
+    # - Return if not rejected
+
     if result != reject_choice:
         return result
+
+    # - Run input prompt otherwise
 
     return input(
         message=message,

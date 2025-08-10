@@ -1,4 +1,4 @@
-from typing import Sequence, Union, Optional, List
+from typing import Optional, List
 
 import questionary
 from prompt_toolkit.styles import Style
@@ -8,10 +8,14 @@ def autocomplete(
     message: str,
     choices: List[str],
     default: Optional[str] = "",
-    provided_answer: str = None,
+    provided: Optional[str] = None,
 ):
-    if provided_answer is not None:
-        return provided_answer
+    # - Return provided answer
+
+    if provided is not None:
+        return provided
+
+    # - Ask
 
     result = questionary.autocomplete(
         message=message,
@@ -24,6 +28,8 @@ def autocomplete(
             ]
         ),
     )
+
+    # - Raise KeyboardInterrupt if no result
 
     if result is None:
         raise KeyboardInterrupt

@@ -23,11 +23,17 @@ def run_with_list_arguments(
     Useful for running functions from command line arguments.
     """
 
-    bound_args = {}
+    # - Build kwargs
+
+    kwargs = {}
 
     for name, param in inspect.signature(func).parameters.items():
+        # - Skip non-keyword arguments
+
         if name not in list_kwargs:
             continue
+
+        # - Unpack kwargs list
 
         values = list_kwargs[name]
         if not isinstance(values, list):
@@ -35,17 +41,22 @@ def run_with_list_arguments(
                 f"Expected a list for argument '{name}', got {type(values).__name__}"
             )
 
-        # Detect if the annotation is a list type
+        # - Detect if the annotation is a list type
+
         if get_origin(param.annotation) is list:
-            # pass the full list
-            bound_args[name] = values
+            # - Pass the full list
+
+            kwargs[name] = values
         else:
-            # pass only the first element
+            # - Pass only the first element
+
             if not values:
                 raise ValueError(f"No values provided for argument '{name}'")
-            bound_args[name] = values[0]
+            kwargs[name] = values[0]
 
-    return func(**bound_args)
+    # - Run function with kwargs
+
+    return func(**kwargs)
 
 
 def test():

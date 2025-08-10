@@ -2,10 +2,11 @@ import inspect
 import os
 import re
 import sys
+import types
 from pathlib import Path
 from functools import wraps
 from dataclasses import make_dataclass, fields, field
-from typing import Any, get_origin, get_args, Optional
+from typing import Any, get_origin, get_args, Optional, Union
 
 from dotenv import load_dotenv
 
@@ -17,12 +18,7 @@ from dony.prompts.success import success
 
 
 def command(path: Optional[str] = None):
-    """
-    Decorator to mark a function as a dony command.
-    - Builds a lazy dataclass of all parameters, allowing cascading defaults.
-    - Executes callable defaults when their fields are accessed.
-    - Ensures every parameter has a default value and the function name matches its filename.
-    """
+    """Decorator to mark a function as a dony command."""
 
     def decorator(func):
         sig = inspect.signature(func)
@@ -38,13 +34,41 @@ def command(path: Optional[str] = None):
         # - Validate all parameters have string or List[str] types
 
         for name, param in sig.parameters.items():
+            # - Extract annotation
+
+            annotation = param.annotation
+
+            # - Extract top-level origin and args for type inspection
+
+            origin = get_origin(annotation)
+            args = get_args(annotation)
+
+            # - Remove NoneType from type arguments (to handle Optional[...] which is Union[..., None])
+
+            non_none = tuple(a for a in args if a is not type(None))
+
             if not (
-                param.annotation is str
-                or get_origin(param.annotation) is list
-                and get_args(param.annotation)[0] is str
+                (annotation is str)  # str
+                or (origin is list and args and args[0] is str)  # List[str]
+                or (  # Optional[str] or Optional[List[str]]
+                    origin
+                    in (
+                        Union,
+                        types.UnionType,
+                    )  # Check for typing.Union or Python 3.10+ X | None
+                    and len(non_none) == 1  # Only one non-None type in the union
+                    and (
+                        non_none[0] is str
+                        or (
+                            get_origin(non_none[0]) is list
+                            and get_args(non_none[0])
+                            and get_args(non_none[0])[0] is str
+                        )
+                    )
+                )
             ):
                 raise ValueError(
-                    f"Command '{func.__name__}': parameter '{name}' must have a string or List[str] type"
+                    f"Command '{func.__name__}': parameter '{name}' must be str, List[str], Optional[str], or Optional[List[str]]"
                 )
 
         # - Get file_path

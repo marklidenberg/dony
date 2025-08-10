@@ -1,17 +1,24 @@
+from typing import Optional
 import questionary
 
 
 def path(
     message: str,
-    provided_answer: str = None,
+    provided: Optional[str] = None,
 ):
-    if provided_answer is not None:
-        return provided_answer
+    # - Return provided answer
+
+    if provided is not None:
+        return provided
+
+    # - Run path prompt
 
     result = questionary.path(
         message=message,
         qmark="•",
     ).ask()
+
+    # - Raise KeyboardInterrupt if no result
 
     if result is None:
         raise KeyboardInterrupt

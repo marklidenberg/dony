@@ -1,7 +1,7 @@
 [project]
 name = "dony"
 version = "0.1.10"
-description = "A lightweight Python command runner with a simple and consistent workflow. A `Justfile` alternative"
+description = "A lightweight Python command runner"
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
@@ -38,6 +38,3 @@ dony = "dony.__main__:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.uv.workspace]
-members = ["example/dony"]
