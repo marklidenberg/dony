@@ -20,15 +20,16 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "jprint2>=0.1.2",
     "load-dotenv>=0.1.0",
-    "pyperclip>=1.9.0",
     "questionary>=2.1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "build>=1.2.2.post1",
+    "dony",
+    "jprint2>=0.2.0",
+    "pyperclip>=1.9.0",
     "twine>=6.1.0",
 ]
 
@@ -38,3 +39,6 @@ dony = "dony.__main__:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv.sources]
+dony = { workspace = true }

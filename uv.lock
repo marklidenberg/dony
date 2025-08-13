@@ -254,27 +254,28 @@ wheels = [
 
 [[package]]
 name = "dony"
-version = "0.1.10"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
-    { name = "jprint2" },
     { name = "load-dotenv" },
-    { name = "pyperclip" },
     { name = "questionary" },
 ]
 
 [package.optional-dependencies]
 dev = [
     { name = "build" },
+    { name = "jprint2" },
+    { name = "pyperclip" },
     { name = "twine" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2.2.post1" },
-    { name = "jprint2", specifier = ">=0.1.2" },
+    { name = "dony", marker = "extra == 'dev'", editable = "." },
+    { name = "jprint2", marker = "extra == 'dev'", specifier = ">=0.2.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
-    { name = "pyperclip", specifier = ">=1.9.0" },
+    { name = "pyperclip", marker = "extra == 'dev'", specifier = ">=1.9.0" },
     { name = "questionary", specifier = ">=2.1.0" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=6.1.0" },
 ]
@@ -392,15 +393,16 @@ wheels = [
 
 [[package]]
 name = "jprint2"
-version = "0.1.2"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "dony" },
     { name = "jsons" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/ea/5df444a429cc8f268e06625f76919f8ff022cbd84dd23e0923339fe94d31/jprint2-0.1.2.tar.gz", hash = "sha256:8b6cf73f478e25f2cddeb5f0d3685371884f5202677c2c9f2dbae387a3ba0cf8", size = 42208, upload-time = "2025-06-22T15:44:38.015Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/a3/1bf854b38185d062f451de8e8c0569592c5bc59711f076d4c8fa31c58c87/jprint2-0.2.0.tar.gz", hash = "sha256:2a1eb3abd89f2add4be36b5032a6c3cb4148a07147187954b0cab7245b473e92", size = 41419, upload-time = "2025-08-10T10:21:07.966Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/65/fe799a425a16861aaf964761013ca10079a7d9422ac38fa5aa4d0b734482/jprint2-0.1.2-py3-none-any.whl", hash = "sha256:c38d1f6dd88df079ff07e11fb5cf9463a2c80561a3fb8391532269d61b6599c4", size = 4919, upload-time = "2025-06-22T15:44:37.095Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/b1/1992f6425301c6882b5baa1d5719a1f898ca22f094db05419b7d9cd514ba/jprint2-0.2.0-py3-none-any.whl", hash = "sha256:1f465ae8a059dada02a0cb91630e187c3c8ed84a0b93178faa242b2bc9492670", size = 6298, upload-time = "2025-08-10T10:21:06.678Z" },
 ]
 
 [[package]]
