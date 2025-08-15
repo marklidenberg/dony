@@ -30,7 +30,7 @@ def confirm(
 
     answer = select(
         message=message,
-        choices=["Yes", "No"] if default else ["No", "Yes"],
+        choices=["[Yes]", "No"] if default else ["[No]", "Yes"],
         multi=False,
         fuzzy=False,
     )
@@ -42,7 +42,7 @@ def confirm(
 
     # - Return result
 
-    return answer == "Yes"
+    return "Yes" in answer
 
 
 def example():
