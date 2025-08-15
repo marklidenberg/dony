@@ -8,6 +8,7 @@ def input(
     default: str = "",
     allow_empty_string: bool = False,
     provided: Optional[str] = None,
+    multiline: bool = False,
 ):
     # - Return provided answer
 
@@ -28,6 +29,7 @@ def input(
                     ("question", "fg:ansiblue"),  # the question text
                 ]
             ),
+            multiline=multiline,
         ).ask()
 
         # - Raise KeyboardInterrupt if no result
