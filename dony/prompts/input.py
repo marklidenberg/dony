@@ -9,7 +9,7 @@ def input(
     allow_empty: bool = False,
     provided: Optional[str] = None,
     multiline: bool = False,
-):
+) -> str:
     # - Return provided answer
 
     if provided is not None:

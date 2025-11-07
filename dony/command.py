@@ -41,46 +41,6 @@ def command(
                     f"Command '{func.__name__}': parameter '{name}' must have a default value"
                 )
 
-        # - Validate all parameters have string or List[str] types
-
-        for name, param in sig.parameters.items():
-            # - Extract annotation
-
-            annotation = param.annotation
-
-            # - Extract top-level origin and args for type inspection
-
-            origin = get_origin(annotation)
-            args = get_args(annotation)
-
-            # - Remove NoneType from type arguments (to handle Optional[...] which is Union[..., None])
-
-            non_none = tuple(a for a in args if a is not type(None))
-
-            if not (
-                (annotation is str)  # str
-                or (origin is list and args and args[0] is str)  # List[str]
-                or (  # Optional[str] or Optional[List[str]]
-                    origin
-                    in (
-                        Union,
-                        _union_type,
-                    )  # Check for typing.Union or Python 3.10+ X | None
-                    and len(non_none) == 1  # Only one non-None type in the union
-                    and (
-                        non_none[0] is str
-                        or (
-                            get_origin(non_none[0]) is list
-                            and get_args(non_none[0])
-                            and get_args(non_none[0])[0] is str
-                        )
-                    )
-                )
-            ):
-                raise ValueError(
-                    f"Command '{func.__name__}': parameter '{name}' must be str, List[str], Optional[str], or Optional[List[str]]"
-                )
-
         # - Wrap function
 
         @wraps(func)

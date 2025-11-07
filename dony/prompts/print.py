@@ -13,7 +13,7 @@ def print(
     prefix: str = "",
     suffix: str = "",
     bold: bool = False,
-):
+) -> None:
     # - Dedent text
 
     text = dedent(text).strip()

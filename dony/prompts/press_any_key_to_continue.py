@@ -4,7 +4,7 @@ from prompt_toolkit.styles import Style
 
 def press_any_key_to_continue(
     message: str = "Press any key to continue...",
-):
+) -> None:
     # - Press any key to continue
 
     result = questionary.press_any_key_to_continue(

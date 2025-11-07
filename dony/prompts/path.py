@@ -6,7 +6,7 @@ from prompt_toolkit.styles import Style
 def path(
     message: str,
     provided: Optional[str] = None,
-):
+) -> str:
     # - Return provided answer
 
     if provided is not None:

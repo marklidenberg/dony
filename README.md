@@ -93,17 +93,53 @@ def greet(
 
 - All commands run from the project root (where `donyfiles/` is located)
 - Available prompts based on `questionary`:
-  - `dony.input`: text entry
+  - `dony.input`: text entry with optional autocompletions
   - `dony.confirm`: yes/no ([Y/n] or [y/N])
-  - `dony.select`: option picker (supports multi & fuzzy)
-  - `dony.select_or_input`: option picker + custom input
+  - `dony.select`: option picker (supports fuzzy matching with fzf)
+  - `dony.select_many`: multi-option picker (supports fuzzy matching with fzf)
+  - `dony.select_or_input`: option picker + custom input fallback
   - `dony.press_any_key_to_continue`: pause until keypress
   - `dony.path`: filesystem path entry
-  - `dony.autocomplete`: suggestion-driven input
   - `dony.print`: styled text output
   - `dony.error`: ❌ error message
   - `dony.success`: ✅ success message
 
+### Rich Choice Objects
+
+Selection prompts (`select`, `select_many`, `select_or_input`) support rich `Choice` objects with descriptions:
+
+```python
+from dony.prompts.choice import Choice
+
+framework = dony.select(
+    "Select a framework",
+    choices=[
+        Choice("react", "React", "A JavaScript library for building user interfaces"),
+        Choice("vue", "Vue.js", "The Progressive JavaScript Framework"),
+        Choice("angular", "Angular", "Platform for building mobile and desktop web applications"),
+    ],
+    fuzzy=True  # Uses fzf with preview pane for long descriptions
+)
+```
+
+### Shell Command API
+
+The `dony.shell()` function executes shell commands with enhanced features:
+
+```python
+dony.shell(
+    command: str,
+    working_dir: Optional[Union[str, Path]] = None,
+    dry_run: bool = False,
+    quiet: bool = False,
+    capture_output: bool = True,
+    abort_on_failure: bool = True,        # Prepends 'set -e'
+    abort_on_unset_variable: bool = True, # Prepends 'set -u'
+    trace_execution: bool = False,        # Prepends 'set -x'
+    show_command: bool = True,
+    confirm: bool = False,
+) -> Optional[str]
+```
 
 ## Example
 

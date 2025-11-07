@@ -1,14 +1,14 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 
-def get_git_root(start_path: Optional[Path] = None) -> Path:
+def get_git_root(start_path: Optional[Union[str, Path]] = None) -> Path:
     """Get the git root directory.
 
     Args:
         start_path: Where to start searching. Defaults to current working directory.
     """
-    current_dir = start_path.resolve() if start_path else Path.cwd()
+    current_dir = Path(start_path or Path.cwd()).resolve()
     while not (current_dir / ".git").exists():
         if current_dir.parent == current_dir:
             raise ValueError(

@@ -29,7 +29,7 @@ def shell(
     trace_execution: bool = False,
     show_command: bool = True,
     confirm: bool = False,
-) -> Optional[str]:
+) -> str:
     """
     Execute a shell command, streaming its output to stdout as it runs,
     and automatically applying 'set -e', 'set -u' and/or 'set -x' as requested.
@@ -158,7 +158,7 @@ def shell(
     proc.stdout.close()
     return_code = proc.wait()
 
-    output = "".join(buffer) if capture_output else None
+    output = "".join(buffer) if capture_output else ""
 
     # - Raise if exit code is non-zero
 
