@@ -9,7 +9,7 @@ from textwrap import dedent
 from typing import Optional, Union
 
 from dony.prompts.error import error as dony_error
-from dony.prompts.print import print as dony_print
+from dony.prompts.echo import echo as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
 
 

@@ -15,7 +15,7 @@ from .prompts.press_any_key_to_continue import press_any_key_to_continue
 from .prompts.choice import Choice
 from .prompts.select import select
 from .prompts.select_many import select_many
-from .prompts.print import print
+from .prompts.echo import echo
 from .prompts.error import error
 from .prompts.success import success
 from .prompts.select_or_input import select_or_input
@@ -32,7 +32,7 @@ __all__ = [
     "Choice",
     "select",
     "select_many",
-    "print",
+    "echo",
     "error",
     "success",
     "select_or_input",

@@ -11,7 +11,7 @@ def select_or_input(
     default: Optional[str] = None,
     fuzzy: bool = True,
     allow_empty: bool = False,
-    reject_choice: str = "✏️ Enter your own",
+    reject_choice: str = "Custom",
 ) -> str:
     """
     Prompt the user to select from a list of choices or enter their own value.

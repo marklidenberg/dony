@@ -6,7 +6,7 @@ from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 
 
-def print(
+def echo(
     text: str,
     line_prefix: str = "",
     color_style: str = "ansiwhite",  # take colors from prompt_toolkit
@@ -49,7 +49,7 @@ def print(
 
 
 def example():
-    print(
+    echo(
         """echo "{"a": "b"}\nfoobar""",
         line_prefix="│ ",
         bold=False,
