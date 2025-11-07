@@ -14,9 +14,8 @@ def select(
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
     fuzzy: bool = True,
-    default_confirm: bool = False,
     provided: Optional[str] = None,
-    require_any_choice: bool = True,
+    allow_empty_selection: bool = False,
 ) -> Union[None, str, Sequence[str]]:
     """
     Prompt the user to select from a list of choices, each of which can have:
@@ -34,14 +33,6 @@ def select(
         if provided not in choices:
             raise ValueError(f"Provided answer '{provided}' is not in choices.")
         return provided
-
-    # - If default is present and default_confirm is True, then ask for confirmation to just use default
-
-    if default is not None and default_confirm:
-        # - Ask for confirmation
-
-        if confirm(message + f"\nUse default? [{default}]"):
-            return default
 
     # - Helper to unpack a choice tuple or treat a plain string
 
@@ -115,7 +106,7 @@ def select(
 
                 # - Try again if no results
 
-                if not results and require_any_choice:
+                if not results and not allow_empty_selection:
                     # try again
                     continue
 
@@ -175,9 +166,9 @@ def select(
             if result is None:
                 raise KeyboardInterrupt
 
-            # - Repeat if require_any_choice and no result
+            # - Repeat if not allow_empty_selection and no result
 
-            if not result and require_any_choice:
+            if not result and not allow_empty_selection:
                 # try again
                 continue
 
@@ -216,14 +207,13 @@ def example():
         choices=[
             ("foo", "", "This is the long description for foo."),
             ("bar", "second option", "Detailed info about bar goes here."),
-            ("baz", "third one", "Here’s a more in-depth explanation of baz."),
+            ("baz", "third one", "Here's a more in-depth explanation of baz."),
             ("qux", "", "Qux has no short description, only a long one."),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=False,
         fuzzy=False,
         default="foo",
-        default_confirm=True,
     )
     print(selected)
 

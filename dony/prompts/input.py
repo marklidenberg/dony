@@ -6,7 +6,7 @@ from prompt_toolkit.styles import Style
 def input(
     message: str,
     default: str = "",
-    allow_empty_string: bool = False,
+    allow_empty: bool = False,
     provided: Optional[str] = None,
     multiline: bool = False,
 ):
@@ -39,7 +39,7 @@ def input(
 
         # - Return result
 
-        if allow_empty_string or result:
+        if allow_empty or result:
             return result
 
 
