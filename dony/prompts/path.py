@@ -29,6 +29,10 @@ def path(
     if result is None:
         raise KeyboardInterrupt
 
+    # - Return result
+
+    return result
+
 
 def example():
     print(

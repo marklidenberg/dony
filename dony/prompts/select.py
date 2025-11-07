@@ -1,16 +1,26 @@
 from typing import Sequence, Union, Optional, Tuple
+from dataclasses import dataclass
 import subprocess
 import questionary
-from questionary import Choice
+from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
 
 
 from dony import confirm
 
 
+@dataclass
+class Choice:
+    """A choice with optional descriptions for the select prompt."""
+
+    value: str
+    short_desc: str = ""
+    long_desc: str = ""
+
+
 def select(
     message: str,
-    choices: Sequence[Union[str, Tuple[str, str], Tuple[str, str, str]]],
+    choices: Sequence[Union[str, Choice]],
     default: Optional[Union[str, Sequence[str]]] = None,
     multi: bool = False,
     fuzzy: bool = True,
@@ -34,16 +44,11 @@ def select(
             raise ValueError(f"Provided answer '{provided}' is not in choices.")
         return provided
 
-    # - Helper to unpack a choice tuple or treat a plain string
+    # - Helper to unpack a choice to (value, short_desc, long_desc)
 
     def unpack(c):
-        if isinstance(c, tuple):
-            if len(c) == 3:
-                return c  # (value, short_desc, long_desc)
-            elif len(c) == 2:
-                return (c[0], c[1], "")
-            elif len(c) == 1:
-                return (c[0], "", "")
+        if isinstance(c, Choice):
+            return (c.value, c.short_desc, c.long_desc)
         else:
             return (c, "", "")
 
@@ -136,7 +141,7 @@ def select(
             title = value
 
         q_choices.append(
-            Choice(
+            QuestionaryChoice(
                 title=title,
                 value=value,
                 checked=value in (default or []),
@@ -205,10 +210,10 @@ def example():
     selected = select(
         "Give me that path",
         choices=[
-            ("foo", "", "This is the long description for foo."),
-            ("bar", "second option", "Detailed info about bar goes here."),
-            ("baz", "third one", "Here's a more in-depth explanation of baz."),
-            ("qux", "", "Qux has no short description, only a long one."),
+            Choice("foo", long_desc="This is the long description for foo."),
+            Choice("bar", "second option", "Detailed info about bar goes here."),
+            Choice("baz", "third one", "Here's a more in-depth explanation of baz."),
+            Choice("qux", long_desc="Qux has no short description, only a long one."),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=False,

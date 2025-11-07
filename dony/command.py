@@ -85,10 +85,12 @@ def command(
             # - Change directory to working_dir
 
             if working_dir:
+                command_dir = Path(inspect.getfile(func)).parent
+
                 if working_dir == "git_root":
-                    os.chdir(get_git_root())
+                    os.chdir(get_git_root(start_path=command_dir))
                 elif working_dir == "command_dir":
-                    os.chdir(Path(__file__).parent)
+                    os.chdir(command_dir)
 
             # - Run command
 

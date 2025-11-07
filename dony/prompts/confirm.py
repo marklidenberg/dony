@@ -6,7 +6,7 @@ from prompt_toolkit.styles import Style
 def confirm(
     message: str,
     default: bool = True,
-    provided: Optional[str] = None,
+    provided: Optional[bool] = None,
 ):
     """
     Prompt the user to confirm a decision.
@@ -17,14 +17,7 @@ def confirm(
     # - Return provided answer
 
     if provided is not None:
-        if provided.lower() in ["y", "yes", "true", "1"]:
-            return True
-        elif provided.lower() in ["n", "no", "false", "0"]:
-            return False
-        else:
-            raise ValueError(
-                f"Provided answer '{provided}' is not a valid boolean value. Use one of 'y', 'yes', 'true', '1', 'n', 'no', 'false', '0'."
-            )
+        return provided
 
     # - Run select prompt
 

@@ -20,13 +20,13 @@ class DonyShellError(Exception):
 def shell(
     command: str,
     *,
+    working_dir: Optional[Union[str, Path]] = None,
+    dry_run: bool = False,
+    quiet: bool = False,
     capture_output: bool = True,
     exit_on_error: bool = True,
     error_on_unset_variables: bool = True,
     trace_execution: bool = False,
-    working_dir: Optional[Union[str, Path]] = None,
-    quiet: bool = False,
-    dry_run: bool = False,
     show_command: bool = True,
     confirm: bool = False,
 ) -> Optional[str]:
@@ -36,14 +36,14 @@ def shell(
 
     Args:
         command: The command line string to execute.
+        working_dir: Changes the working directory before executing the command.
+        dry_run: Prints the command without executing it.
+        quiet: Suppresses output.
         capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
         exit_on_error: Prepends 'set -e' (exit on any error).
         error_on_unset_variables: Prepends 'set -u' (error on unset variables).
         trace_execution: Prepends 'set -x' (traces command execution at shell level).
-        working_dir: Changes the working directory before executing the command.
-        quiet: Suppresses output.
-        dry_run: Prints the command without executing it.
         show_command: Shows the formatted command before executing it.
         confirm: Asks for confirmation before executing the command.
 

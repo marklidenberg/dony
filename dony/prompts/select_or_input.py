@@ -8,7 +8,7 @@ from dony.prompts.input import input
 def select_or_input(
     message: str,
     choices: List[str],
-    allow_empty_string: bool = False,
+    allow_empty: bool = False,
     reject_choice: str = "✏️ Enter your own",
     provided: Optional[str] = None,
 ):
@@ -33,7 +33,7 @@ def select_or_input(
 
     return input(
         message=message,
-        allow_empty_string=allow_empty_string,
+        allow_empty=allow_empty,
     )
 
 

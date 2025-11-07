@@ -1,8 +1,14 @@
 from pathlib import Path
+from typing import Optional
 
 
-def get_git_root():
-    current_dir = Path(__file__).resolve().parent
+def get_git_root(start_path: Optional[Path] = None):
+    """Get the git root directory.
+
+    Args:
+        start_path: Where to start searching. Defaults to current working directory.
+    """
+    current_dir = start_path.resolve() if start_path else Path.cwd()
     while not (current_dir / ".git").exists():
         if current_dir.parent == current_dir:
             raise ValueError("Git root not found - no .git directory found")
