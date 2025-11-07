@@ -24,7 +24,7 @@ def shell(
     dry_run: bool = False,
     quiet: bool = False,
     capture_output: bool = True,
-    exit_on_error: bool = True,
+    abort_on_failure: bool = True,
     error_on_unset_variables: bool = True,
     trace_execution: bool = False,
     show_command: bool = True,
@@ -41,7 +41,7 @@ def shell(
         quiet: Suppresses output.
         capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
-        exit_on_error: Prepends 'set -e' (exit on any error).
+        abort_on_failure: Prepends 'set -e' (abort script if any command fails).
         error_on_unset_variables: Prepends 'set -u' (error on unset variables).
         trace_execution: Prepends 'set -x' (traces command execution at shell level).
         show_command: Shows the formatted command before executing it.
@@ -116,7 +116,7 @@ def shell(
     flags = "".join(
         flag
         for flag, enabled in (
-            ("e", exit_on_error),
+            ("e", abort_on_failure),
             ("u", error_on_unset_variables),
             ("x", trace_execution),
         )
