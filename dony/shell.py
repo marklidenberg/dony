@@ -24,8 +24,8 @@ def shell(
     dry_run: bool = False,
     quiet: bool = False,
     capture_output: bool = True,
-    raise_on_first_error: bool = True,
-    raise_on_unset_variable: bool = True,
+    abort_on_failure: bool = True,
+    abort_on_unset_variable: bool = True,
     trace_execution: bool = False,
     show_command: bool = True,
     confirm: bool = False,
@@ -41,8 +41,8 @@ def shell(
         quiet: Suppresses output.
         capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
-        raise_on_first_error: Prepends 'set -e' (raises exception on first command error).
-        raise_on_unset_variable: Prepends 'set -u' (raises exception on unset variable).
+        abort_on_failure: Prepends 'set -e' (aborts on first command error).
+        abort_on_unset_variable: Prepends 'set -u' (aborts on unset variable).
         trace_execution: Prepends 'set -x' (traces command execution at shell level).
         show_command: Shows the formatted command before executing it.
         confirm: Asks for confirmation before executing the command.
@@ -116,8 +116,8 @@ def shell(
     flags = "".join(
         flag
         for flag, enabled in (
-            ("e", raise_on_first_error),
-            ("u", raise_on_unset_variable),
+            ("e", abort_on_failure),
+            ("u", abort_on_unset_variable),
             ("x", trace_execution),
         )
         if enabled
@@ -142,7 +142,8 @@ def shell(
     # - Capture output
 
     buffer = []
-    assert proc.stdout is not None
+    if proc.stdout is None:
+        raise DonyShellError("Process stdout is unexpectedly None")
     while True:
         try:
             for line in proc.stdout:

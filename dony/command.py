@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import types
 from functools import wraps
-from typing import get_origin, get_args, Union, Literal
+from typing import get_origin, get_args, Union, Literal, Callable, TypeVar, Any
 
 from dony.get_git_root import get_git_root
 from dony.prompts.error import error
@@ -17,9 +17,12 @@ else:
     _union_type = None  # or skip using it
 
 
+F = TypeVar("F", bound=Callable[..., Any])
+
+
 def command(
     working_dir: Union[str, Literal["git_root", "command_dir"], None] = "command_dir",
-):
+) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
 
     Args:
@@ -91,6 +94,8 @@ def command(
                     os.chdir(get_git_root(start_path=command_dir))
                 elif working_dir == "command_dir":
                     os.chdir(command_dir)
+                else:
+                    os.chdir(Path(working_dir))
 
             # - Run command
 

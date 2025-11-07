@@ -1,4 +1,4 @@
-from typing import Sequence, Union, Optional
+from typing import Sequence, Union, Optional, Dict
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
@@ -28,8 +28,9 @@ def select_many(
     # - Check if provided answer is set
 
     if provided is not None:
+        choice_values = [c.value if isinstance(c, Choice) else c for c in choices]
         for p in provided:
-            if p not in choices:
+            if p not in choice_values:
                 raise ValueError(f"Provided answer '{p}' is not in choices.")
         return provided
 
@@ -52,7 +53,7 @@ def select_many(
                 lines = []
 
                 # Map from the displayed first field back to the real value
-                display_map: dict[str, str] = {}
+                display_map: Dict[str, str] = {}
 
                 for choice in choices:
                     value, short_desc, long_desc = unpack(choice)
@@ -110,7 +111,6 @@ def select_many(
                 return results
 
             except FileNotFoundError:
-                pass
                 break
 
     # - Fallback to questionary

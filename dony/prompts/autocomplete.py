@@ -7,9 +7,9 @@ from prompt_toolkit.styles import Style
 def autocomplete(
     message: str,
     choices: List[str],
-    default: Optional[str] = "",
+    default: str = "",
     provided: Optional[str] = None,
-):
+) -> str:
     # - Return provided answer
 
     if provided is not None:

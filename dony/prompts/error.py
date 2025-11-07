@@ -6,7 +6,7 @@ from prompt_toolkit.formatted_text import FormattedText
 def error(
     text: str,
     prefix: str = "❌ ",
-):
+) -> None:
     return print_formatted_text(
         FormattedText(
             [

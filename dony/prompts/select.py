@@ -1,4 +1,4 @@
-from typing import Sequence, Union, Optional
+from typing import Sequence, Union, Optional, Dict
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
@@ -13,7 +13,7 @@ def select(
     default: Optional[str] = None,
     fuzzy: bool = True,
     provided: Optional[str] = None,
-) -> Optional[str]:
+) -> str:
     """
     Prompt the user to select from a list of choices, each of which can have:
       - a display value
@@ -27,7 +27,8 @@ def select(
     # - Check if provided answer is set
 
     if provided is not None:
-        if provided not in choices:
+        choice_values = [c.value if isinstance(c, Choice) else c for c in choices]
+        if provided not in choice_values:
             raise ValueError(f"Provided answer '{provided}' is not in choices.")
         return provided
 
@@ -49,7 +50,7 @@ def select(
             lines = []
 
             # Map from the displayed first field back to the real value
-            display_map: dict[str, str] = {}
+            display_map: Dict[str, str] = {}
 
             for choice in choices:
                 value, short_desc, long_desc = unpack(choice)

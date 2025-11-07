@@ -7,7 +7,7 @@ def confirm(
     message: str,
     default: bool = True,
     provided: Optional[bool] = None,
-):
+) -> bool:
     """
     Prompt the user to confirm a decision.
     """
@@ -26,7 +26,6 @@ def confirm(
     answer = select(
         message=message,
         choices=["[Yes]", "No"] if default else ["[No]", "Yes"],
-        multi=False,
         fuzzy=False,
     )
 
