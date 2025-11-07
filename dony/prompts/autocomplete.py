@@ -34,13 +34,17 @@ def autocomplete(
     if result is None:
         raise KeyboardInterrupt
 
+    # - Return result
+
+    return result.ask()
+
 
 def example():
     print(
         autocomplete(
             "Give me that path",
             choices=["foo", "bar"],
-        ).ask()
+        )
     )
 
 
