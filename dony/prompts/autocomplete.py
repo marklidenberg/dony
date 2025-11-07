@@ -21,13 +21,14 @@ def autocomplete(
         message=message,
         choices=choices,
         default=default,
-        qmark="•",
+        qmark="",
         style=Style(
             [
                 ("question", "fg:ansiblue"),  # the question text
             ]
         ),
     )
+    result = result.ask()
 
     # - Raise KeyboardInterrupt if no result
 
@@ -36,7 +37,7 @@ def autocomplete(
 
     # - Return result
 
-    return result.ask()
+    return result
 
 
 def example():

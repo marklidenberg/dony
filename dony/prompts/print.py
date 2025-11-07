@@ -12,7 +12,7 @@ def print(
     color_style: str = "ansiwhite",  # take colors from prompt_toolkit
     prefix: str = "",
     suffix: str = "",
-    bold: bool = True,
+    bold: bool = False,
 ):
     # - Dedent text
 
@@ -52,7 +52,7 @@ def example():
     print(
         """echo "{"a": "b"}\nfoobar""",
         line_prefix="│ ",
-        bold=True,
+        bold=False,
     )
 
 

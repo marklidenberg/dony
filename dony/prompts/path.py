@@ -1,5 +1,6 @@
 from typing import Optional
 import questionary
+from prompt_toolkit.styles import Style
 
 
 def path(
@@ -16,6 +17,11 @@ def path(
     result = questionary.path(
         message=message,
         qmark="•",
+        style=Style(
+            [
+                ("question", "fg:ansiblue"),  # the question text
+            ]
+        ),
     ).ask()
 
     # - Raise KeyboardInterrupt if no result

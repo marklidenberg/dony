@@ -2,6 +2,7 @@ from typing import Sequence, Union, Optional, Tuple
 import subprocess
 import questionary
 from questionary import Choice
+from prompt_toolkit.styles import Style
 
 
 from dony import confirm
@@ -134,10 +135,10 @@ def select(
 
         if long_desc and short_desc:
             # suffix after the short description
-            title = f"{value} - {short_desc} (description available)"
+            title = f"{value} - {short_desc} ({long_desc})"
         elif long_desc and not short_desc:
             # no short_desc, suffix after the value
-            title = f"{value} (description available)"
+            title = f"{value} ({long_desc})"
         elif short_desc:
             title = f"{value} - {short_desc}"
         else:
@@ -162,6 +163,11 @@ def select(
                 choices=q_choices,
                 qmark="•",
                 instruction="",
+                style=Style(
+                    [
+                        ("question", "fg:ansiblue"),  # the question text
+                    ]
+                ),
             ).ask()
 
             # - Raise if KeyboardInterrupt
@@ -187,6 +193,11 @@ def select(
         default=default,
         qmark="•",
         instruction=" ",
+        style=Style(
+            [
+                ("question", "fg:ansiblue"),  # the question text
+            ]
+        ),
     ).ask()
 
     # - Raise KeyboardInterrupt if no result
@@ -211,7 +222,7 @@ def example():
         # choices=['foo', 'bar', 'baz', 'qux'],
         multi=False,
         fuzzy=False,
-        default=["foo"],
+        default="foo",
         default_confirm=True,
     )
     print(selected)

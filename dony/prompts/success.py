@@ -10,7 +10,7 @@ def success(
     return print_formatted_text(
         FormattedText(
             [
-                ("class:qmark", "• "),
+                ("class:qmark", ""),
                 ("class:question", prefix + text),
             ]
         ),

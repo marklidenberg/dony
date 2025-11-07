@@ -12,7 +12,6 @@ from dony.prompts.error import error as dony_error
 from dony.prompts.print import print as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
 from dony.get_donyfiles_root import get_donyfiles_root
-import pyperclip
 
 
 class DonyShellError(Exception):
@@ -89,6 +88,8 @@ def shell(
         # - Copy to clipboard if possible
 
         try:
+            import pyperclip
+
             pyperclip.copy(formatted_command)
         except:
             # todo later: specify exception types

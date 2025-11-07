@@ -10,7 +10,6 @@ def error(
     return print_formatted_text(
         FormattedText(
             [
-                ("class:qmark", "• "),
                 ("class:question", prefix + text),
             ]
         ),

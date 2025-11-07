@@ -257,6 +257,7 @@ name = "dony"
 version = "0.2.1"
 source = { editable = "." }
 dependencies = [
+    { name = "jprint2" },
     { name = "load-dotenv" },
     { name = "questionary" },
 ]
@@ -273,6 +274,7 @@ dev = [
 requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2.2.post1" },
     { name = "dony", marker = "extra == 'dev'", editable = "." },
+    { name = "jprint2", specifier = ">=0.2.0" },
     { name = "jprint2", marker = "extra == 'dev'", specifier = ">=0.2.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
     { name = "pyperclip", marker = "extra == 'dev'", specifier = ">=1.9.0" },

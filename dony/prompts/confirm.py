@@ -1,5 +1,7 @@
 from typing import Optional
 
+from prompt_toolkit.styles import Style
+
 
 def confirm(
     message: str,
