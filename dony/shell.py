@@ -13,10 +13,6 @@ from dony.prompts.print import print as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
 
 
-class DonyShellError(Exception):
-    pass
-
-
 def shell(
     command: str,
     *,
@@ -51,7 +47,8 @@ def shell(
         The full command output as a string (or bytes if text=False), or None if capture_output=False.
 
     Raises:
-        subprocess.CalledProcessError: If the command exits with a non-zero status.
+        RuntimeError: If the command exits with a non-zero status.
+        KeyboardInterrupt: If the command is interrupted by the user.
     """
 
     # - Get formatted command if needed
@@ -143,7 +140,7 @@ def shell(
 
     buffer = []
     if proc.stdout is None:
-        raise DonyShellError("Process stdout is unexpectedly None")
+        raise RuntimeError("Process stdout is unexpectedly None")
     while True:
         try:
             for line in proc.stdout:
@@ -165,7 +162,7 @@ def shell(
     if return_code != 0:
         if output and "KeyboardInterrupt" in output:
             raise KeyboardInterrupt
-        raise DonyShellError("Dony command failed")
+        raise RuntimeError("Dony command failed")
 
     # - Print closing message
 
@@ -204,7 +201,7 @@ def example():
     try:
         shell('echo "this will fail" && false')
         raise Exception("Should have failed")
-    except DonyShellError:
+    except RuntimeError:
         pass
 
 
