@@ -1,19 +1,10 @@
 import inspect
-import os
-import re
 import sys
 import types
-from pathlib import Path
 from functools import wraps
-from dataclasses import make_dataclass, fields, field
-from typing import Any, get_origin, get_args, Optional, Union
+from typing import get_origin, get_args, Union
 
-from dotenv import load_dotenv
-
-from dony.get_donyfiles_root import get_donyfiles_root
-from dony.shell import shell
 from dony.prompts.error import error
-from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
@@ -23,7 +14,7 @@ else:
     _union_type = None  # or skip using it
 
 
-def command(path: Optional[str] = None):
+def command():
     """Decorator to mark a function as a dony command."""
 
     def decorator(func):
@@ -77,90 +68,17 @@ def command(path: Optional[str] = None):
                     f"Command '{func.__name__}': parameter '{name}' must be str, List[str], Optional[str], or Optional[List[str]]"
                 )
 
-        # - Get file_path
-
-        source_file = inspect.getsourcefile(func)
-        if not source_file:
-            raise RuntimeError(
-                f"Could not locate source file for command '{func.__name__}'"
-            )
-        file_path = Path(source_file).resolve()
-
-        # - Compute or use provided path
-
-        if path is None:
-            # - Init path
-
-            func._path = str(file_path)
-
-            # - Get paths
-
-            donyfiles_path = str(get_donyfiles_path(file_path))
-            project_path = str(get_donyfiles_root(file_path))
-
-            # - Remove donyfiles prefix if present
-
-            func._path = func._path.replace(donyfiles_path, "")
-
-            # - Remove project prefix if present
-
-            func._path = func._path.replace(project_path, "")
-
-            # - Remove leading /
-
-            if func._path.startswith("/"):
-                func._path = func._path[1:]
-
-            # - Remove .py extension
-
-            func._path = func._path.replace(".py", "")
-        else:
-            func._path = path
-
-        func._dony_command = True
+        # - Wrap function
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # - Load dotenv in dony path or its parent
-
-            if (
-                os.path.basename(inspect.currentframe().f_back.f_code.co_filename)
-                == "run_with_list_arguments.py"
-            ):
-                # running from command client
-                donyfiles_path = get_donyfiles_path(
-                    inspect.currentframe().f_back.f_back.f_back.f_code.co_filename
-                )
-            else:
-                donyfiles_path = get_donyfiles_path(
-                    inspect.currentframe().f_back.f_code.co_filename
-                )
-
-            load_dotenv(dotenv_path=donyfiles_path / ".env")
-            load_dotenv(dotenv_path=donyfiles_path.parent / ".env")
-
-            # - Bind partial to allow positional or keyword
-
-            bound = sig.bind_partial(*args, **kwargs)
-            bound.apply_defaults()
-
-            # - Change directory to dony root
-
-            os.chdir(donyfiles_path.parent)
-
-            # - Call original function with resolved args
-
             try:
-                result = func(**bound.arguments)
+                result = func(*args, **kwargs)
                 success(f"Command '{func.__name__}' succeeded")
                 return result
             except KeyboardInterrupt:
                 return error("Dony command interrupted")
 
-        # - Attach metadata to wrapper
-
-        wrapper._dony_command = True
-        wrapper._path = func._path
         return wrapper
 
     return decorator
