@@ -21,15 +21,14 @@ def shell(
     command: str,
     *,
     capture_output: bool = True,
-    text: bool = True,
     exit_on_error: bool = True,
     error_on_unset: bool = True,
-    echo_commands: bool = False,
+    trace_execution: bool = False,
     working_dir: Optional[Union[str, Path]] = None,
     quiet: bool = False,
     dry_run: bool = False,
     raise_on_error: bool = True,
-    print_command: bool = True,
+    show_command: bool = True,
     confirm: bool = False,
 ) -> Optional[str]:
     """
@@ -40,15 +39,14 @@ def shell(
         command: The command line string to execute.
         capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
-        text: Treats stdout/stderr as text (str); if False, returns bytes.
         exit_on_error: Prepends 'set -e' (exit on any error).
         error_on_unset: Prepends 'set -u' (error on unset variables).
-        echo_commands: Prepends 'set -x' (echo commands before executing).
+        trace_execution: Prepends 'set -x' (traces command execution at shell level).
         working_dir: Changes the working directory before executing the command.
         quiet: Suppresses output.
         dry_run: Prints the command without executing it.
         raise_on_error: Raises an exception if the command exits with a non-zero status.
-        print_command: Prints the command before executing it.
+        show_command: Shows the formatted command before executing it.
         confirm: Asks for confirmation before executing the command.
 
     Returns:
@@ -60,7 +58,7 @@ def shell(
 
     # - Get formatted command if needed
 
-    if print_command or dry_run:
+    if show_command or dry_run:
         # if is required to avoid recursion
         try:
             formatted_command = shell(
@@ -69,7 +67,7 @@ def shell(
                     {command}
                 """,
                 quiet=True,
-                print_command=False,
+                show_command=False,
             )
         except Exception:
             formatted_command = command
@@ -98,7 +96,7 @@ def shell(
 
     # - Print command
 
-    if print_command and not quiet or confirm:
+    if (show_command and not quiet) or confirm:
         dony_print(
             "🐚\n" + formatted_command,
             color_style="ansipurple",
@@ -122,7 +120,7 @@ def shell(
         for flag, enabled in (
             ("e", exit_on_error),
             ("u", error_on_unset),
-            ("x", echo_commands),
+            ("x", trace_execution),
         )
         if enabled
     )
@@ -139,7 +137,7 @@ def shell(
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=text,
+        text=True,
         cwd=working_dir,
     )
 
@@ -172,7 +170,7 @@ def shell(
 
     # - Print closing message
 
-    if print_command and not quiet:
+    if show_command and not quiet:
         dony_print(
             "—" * 80,
             color_style="ansipurple",
@@ -190,12 +188,12 @@ def example():
 
     print(shell('echo "{"a": "b"}"'))
 
-    # - Disable only echoing of commands
+    # - Disable only tracing of commands
 
     print(
         shell(
             'echo "no x prefix here"',
-            echo_commands=False,
+            trace_execution=False,
         )
     )
 
