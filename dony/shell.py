@@ -86,7 +86,7 @@ def shell(
             import pyperclip
 
             pyperclip.copy(formatted_command)
-        except:
+        except Exception:
             # todo later: specify exception types
             pass
 
