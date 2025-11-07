@@ -1,32 +1,19 @@
-from typing import Sequence, Union, Optional, Tuple
-from dataclasses import dataclass
+from typing import Sequence, Union, Optional
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
 
-
-from dony import confirm
-
-
-@dataclass
-class Choice:
-    """A choice with optional descriptions for the select prompt."""
-
-    value: str
-    short_desc: str = ""
-    long_desc: str = ""
+from dony.prompts.choice import Choice
 
 
 def select(
     message: str,
     choices: Sequence[Union[str, Choice]],
-    default: Optional[Union[str, Sequence[str]]] = None,
-    multi: bool = False,
+    default: Optional[str] = None,
     fuzzy: bool = True,
     provided: Optional[str] = None,
-    allow_empty_selection: bool = False,
-) -> Union[None, str, Sequence[str]]:
+) -> Optional[str]:
     """
     Prompt the user to select from a list of choices, each of which can have:
       - a display value
@@ -55,72 +42,61 @@ def select(
     # - Run fuzzy select prompt
 
     if fuzzy:
-        while True:
-            try:
-                # - Build command
+        try:
+            # - Build command
 
-                delimiter = "\t"
-                lines = []
+            delimiter = "\t"
+            lines = []
 
-                # Map from the displayed first field back to the real value
-                display_map: dict[str, str] = {}
+            # Map from the displayed first field back to the real value
+            display_map: dict[str, str] = {}
 
-                for choice in choices:
-                    value, short_desc, long_desc = unpack(choice)
-                    display_map[value] = value
-                    lines.append(
-                        f"{value}{delimiter}{short_desc}{delimiter}{long_desc}"
-                    )
+            for choice in choices:
+                value, short_desc, long_desc = unpack(choice)
+                display_map[value] = value
+                lines.append(f"{value}{delimiter}{short_desc}{delimiter}{long_desc}")
 
-                cmd = [
-                    "fzf",
-                    "--read0",  # ← treat NUL as item separator
-                    "--prompt",
-                    f"{message} 👆",
-                    "--with-nth",
-                    "1,2",
-                    "--delimiter",
-                    delimiter,
-                    "--preview",
-                    "echo {} | cut -f3",
-                    "--preview-window",
-                    "down:30%:wrap",
-                ] + (["--multi"] if multi else [])
+            cmd = [
+                "fzf",
+                "--read0",  # ← treat NUL as item separator
+                "--prompt",
+                f"{message} 👆",
+                "--with-nth",
+                "1,2",
+                "--delimiter",
+                delimiter,
+                "--preview",
+                "echo {} | cut -f3",
+                "--preview-window",
+                "down:30%:wrap",
+            ]
 
-                # - Run command
+            # - Run command
 
-                proc = subprocess.Popen(
-                    cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
-                )
-                output, _ = proc.communicate(input="\0".join(lines))
+            proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+            output, _ = proc.communicate(input="\0".join(lines))
 
-                if output == "":
-                    raise KeyboardInterrupt
+            if output == "":
+                raise KeyboardInterrupt
 
-                # - Parse output
+            # - Parse output
 
-                # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-                picked_disp1 = [
-                    line.split(delimiter, 1)[0] for line in output.strip().splitlines()
-                ]
-                results = [display_map[d] for d in picked_disp1]
+            # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
+            picked_disp1 = output.strip().split(delimiter, 1)[0]
+            result = display_map[picked_disp1]
 
-                # - Try again if no results
+            # - Return if all is good
 
-                if not results and not allow_empty_selection:
-                    # try again
-                    continue
+            return result
 
-                # - Return if all is good
-
-                return results if multi else (results[0] if results else None)
-
-            except FileNotFoundError:
-                pass
+        except FileNotFoundError:
+            pass
 
     # - Fallback to questionary
 
@@ -144,42 +120,9 @@ def select(
             QuestionaryChoice(
                 title=title,
                 value=value,
-                checked=value in (default or []),
+                checked=value == default,
             )
         )
-
-    # - Run checkbox select prompt
-
-    if multi:
-        while True:
-            # - Ask
-
-            result = questionary.checkbox(
-                message=message,
-                choices=q_choices,
-                qmark="•",
-                instruction="",
-                style=Style(
-                    [
-                        ("question", "fg:ansiblue"),  # the question text
-                    ]
-                ),
-            ).ask()
-
-            # - Raise if KeyboardInterrupt
-
-            if result is None:
-                raise KeyboardInterrupt
-
-            # - Repeat if not allow_empty_selection and no result
-
-            if not result and not allow_empty_selection:
-                # try again
-                continue
-
-            # - Return if all is good
-
-            return result
 
     # - Run select prompt
 
@@ -216,7 +159,6 @@ def example():
             Choice("qux", long_desc="Qux has no short description, only a long one."),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
-        multi=False,
         fuzzy=False,
         default="foo",
     )

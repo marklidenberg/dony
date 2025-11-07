@@ -13,7 +13,9 @@ from .prompts.confirm import confirm
 from .prompts.input import input
 from .prompts.path import path
 from .prompts.press_any_key_to_continue import press_any_key_to_continue
-from .prompts.select import select, Choice
+from .prompts.choice import Choice
+from .prompts.select import select
+from .prompts.select_many import select_many
 from .prompts.print import print
 from .prompts.error import error
 from .prompts.success import success
