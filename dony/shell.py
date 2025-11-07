@@ -25,7 +25,7 @@ def shell(
     trace_execution: bool = False,
     show_command: bool = True,
     confirm: bool = False,
-) -> str:
+) -> Optional[str]:
     """
     Execute a shell command, streaming its output to stdout as it runs,
     and automatically applying 'set -e', 'set -u' and/or 'set -x' as requested.
@@ -101,7 +101,8 @@ def shell(
         if not dony_confirm(
             "Are you sure you want to run the above command?",
         ):
-            return dony_error("Aborted")
+            dony_error("Aborted")
+            return None
 
     # - Convert working_dir to string
 
@@ -155,7 +156,7 @@ def shell(
     proc.stdout.close()
     return_code = proc.wait()
 
-    output = "".join(buffer) if capture_output else ""
+    output = "".join(buffer) if capture_output else None
 
     # - Raise if exit code is non-zero
 
@@ -174,7 +175,7 @@ def shell(
 
     # - Return output
 
-    return output.strip()
+    return output.strip() if output else None
 
 
 def example():

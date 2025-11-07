@@ -37,10 +37,9 @@ def release(
         ],
     )
 
-    uv_publish_token = dony.input(
+    uv_publish_token = uv_publish_token or dony.enter(
         "Enter UV publish token (usually a PyPI token)",
         default=os.getenv("UV_PUBLISH_TOKEN", ""),
-        provided=uv_publish_token,
     )
 
     # - Get current branch

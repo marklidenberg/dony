@@ -54,27 +54,34 @@ def command(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # - Change directory to run_from
-
-            if run_from:
-                command_dir = Path(inspect.getfile(func)).parent
-
-                if run_from in (RunFrom.GIT_ROOT, "git_root"):
-                    os.chdir(get_git_root(start_path=command_dir))
-                elif run_from in (RunFrom.COMMAND_DIR, "command_dir"):
-                    os.chdir(command_dir)
-                else:
-                    os.chdir(Path(run_from))
-
-            # - Run command
+            # - Save original directory
+            original_dir = Path.cwd()
 
             try:
-                result = func(*args, **kwargs)
-                if show_success:
-                    success(f"Command '{func.__name__}' succeeded")
-                return result
-            except KeyboardInterrupt:
-                return error("Dony command interrupted")
+                # - Change directory to run_from
+
+                if run_from:
+                    command_dir = Path(inspect.getfile(func)).parent
+
+                    if run_from in (RunFrom.GIT_ROOT, "git_root"):
+                        os.chdir(get_git_root(start_path=command_dir))
+                    elif run_from in (RunFrom.COMMAND_DIR, "command_dir"):
+                        os.chdir(command_dir)
+                    else:
+                        os.chdir(Path(run_from))
+
+                # - Run command
+
+                try:
+                    result = func(*args, **kwargs)
+                    if show_success:
+                        success(f"Command '{func.__name__}' succeeded")
+                    return result
+                except KeyboardInterrupt:
+                    return error("Dony command interrupted")
+            finally:
+                # - Restore original directory
+                os.chdir(original_dir)
 
         return wrapper
 

@@ -12,24 +12,36 @@ def select(
     choices: Sequence[Union[str, Choice]],
     default: Optional[str] = None,
     fuzzy: bool = True,
+    allow_custom: bool = False,
+    custom_choice_text: str = "Custom",
+    allow_empty: bool = False,
 ) -> str:
     """
     Prompt the user to select from a list of choices, each of which can have:
-      - a display value
-      - a short description (shown after the value)
+      - a value (the actual value returned)
+      - a display value (shown in the list)
+      - a short description (shown after the display value)
       - a long description (shown in a right-hand sidebar in fuzzy mode)
 
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
+
+    If allow_custom is True, adds a custom option that prompts for text entry.
     """
 
-    # - Helper to unpack a choice to (value, short_desc, long_desc)
+    # - Helper to unpack a choice to (value, display_value, short_desc, long_desc)
 
     def unpack(c):
         if isinstance(c, Choice):
-            return (c.value, c.short_desc, c.long_desc)
+            return (c.value, c.display_value, c.short_desc, c.long_desc)
         else:
-            return (c, "", "")
+            return (c, str(c), "", "")
+
+    # - Add custom choice if requested
+
+    actual_choices = list(choices)
+    if allow_custom:
+        actual_choices.append(custom_choice_text)
 
     # - Run fuzzy select prompt
 
@@ -43,10 +55,12 @@ def select(
             # Map from the displayed first field back to the real value
             display_map: Dict[str, str] = {}
 
-            for choice in choices:
-                value, short_desc, long_desc = unpack(choice)
-                display_map[value] = value
-                lines.append(f"{value}{delimiter}{short_desc}{delimiter}{long_desc}")
+            for choice in actual_choices:
+                value, display_value, short_desc, long_desc = unpack(choice)
+                display_map[display_value] = value
+                lines.append(
+                    f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
+                )
 
             cmd = [
                 "fzf",
@@ -80,8 +94,18 @@ def select(
             # - Parse output
 
             # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-            picked_disp1 = output.strip().split(delimiter, 1)[0]
-            result = display_map[picked_disp1]
+            picked_display = output.strip().split(delimiter, 1)[0]
+            result = display_map[picked_display]
+
+            # - Handle custom input if selected
+
+            if allow_custom and result == custom_choice_text:
+                from dony.prompts.enter import enter
+
+                return enter(
+                    message=message,
+                    allow_empty=allow_empty,
+                )
 
             # - Return if all is good
 
@@ -94,19 +118,19 @@ def select(
 
     q_choices = []
 
-    for choice in choices:
-        value, short_desc, long_desc = unpack(choice)
+    for choice in actual_choices:
+        value, display_value, short_desc, long_desc = unpack(choice)
 
         if long_desc and short_desc:
             # suffix after the short description
-            title = f"{value} - {short_desc} ({long_desc})"
+            title = f"{display_value} - {short_desc} ({long_desc})"
         elif long_desc and not short_desc:
-            # no short_desc, suffix after the value
-            title = f"{value} ({long_desc})"
+            # no short_desc, suffix after the display_value
+            title = f"{display_value} ({long_desc})"
         elif short_desc:
-            title = f"{value} - {short_desc}"
+            title = f"{display_value} - {short_desc}"
         else:
-            title = value
+            title = display_value
 
         q_choices.append(
             QuestionaryChoice(
@@ -135,6 +159,16 @@ def select(
 
     if result is None:
         raise KeyboardInterrupt
+
+    # - Handle custom input if selected
+
+    if allow_custom and result == custom_choice_text:
+        from dony.prompts.enter import enter
+
+        return enter(
+            message=message,
+            allow_empty=allow_empty,
+        )
 
     # - Return
 

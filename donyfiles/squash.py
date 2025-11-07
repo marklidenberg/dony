@@ -20,13 +20,13 @@ def squash(
 
     # - Get target branch
 
-    target_branch = dony.input(
+    target_branch = target_branch or dony.enter(
         "Enter target branch:",
         default=dony.shell(
             "git branch --list main | grep -q main && echo main || echo master",
             quiet=True,
-        ),
-        provided=target_branch,
+        )
+        or "",
     )
 
     # - Get github username
@@ -104,7 +104,7 @@ def squash(
 
     if not commit_message:
         while True:
-            commit_message = dony.input(
+            commit_message = dony.enter(
                 f"Enter commit message for merging branch {merged_branch} to {target_branch}:"
             )
             if bool(
@@ -114,21 +114,21 @@ def squash(
                 )
             ):
                 break
-            dony.print("Only conventional commits are allowed, try again")
+            dony.echo("Only conventional commits are allowed, try again")
 
     # - Check if user wants to checkout to a new branch
 
-    checkout_to_new_branch = dony.confirm(
-        f"Checkout to new branch {new_branch}?",
-        provided=checkout_to_new_branch,
-    )
+    if checkout_to_new_branch is None:
+        checkout_to_new_branch = dony.confirm(
+            f"Checkout to new branch {new_branch}?",
+        )
 
     # - Check if user wants to remove merged branch
 
-    remove_merged_branch = dony.confirm(
-        f"Remove merged branch {merged_branch}?",
-        provided=remove_merged_branch,
-    )
+    if remove_merged_branch is None:
+        remove_merged_branch = dony.confirm(
+            f"Remove merged branch {merged_branch}?",
+        )
 
     # - Do the process
 

@@ -24,13 +24,13 @@ def select_many(
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
 
-    # - Helper to unpack a choice to (value, short_desc, long_desc)
+    # - Helper to unpack a choice to (value, display_value, short_desc, long_desc)
 
     def unpack(c):
         if isinstance(c, Choice):
-            return (c.value, c.short_desc, c.long_desc)
+            return (c.value, c.display_value, c.short_desc, c.long_desc)
         else:
-            return (c, "", "")
+            return (c, str(c), "", "")
 
     # - Run fuzzy select prompt
 
@@ -46,10 +46,10 @@ def select_many(
                 display_map: Dict[str, str] = {}
 
                 for choice in choices:
-                    value, short_desc, long_desc = unpack(choice)
-                    display_map[value] = value
+                    value, display_value, short_desc, long_desc = unpack(choice)
+                    display_map[display_value] = value
                     lines.append(
-                        f"{value}{delimiter}{short_desc}{delimiter}{long_desc}"
+                        f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
                     )
 
                 cmd = [
@@ -85,10 +85,10 @@ def select_many(
                 # - Parse output
 
                 # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-                picked_disp1 = [
+                picked_displays = [
                     line.split(delimiter, 1)[0] for line in output.strip().splitlines()
                 ]
-                results = [display_map[d] for d in picked_disp1]
+                results = [display_map[d] for d in picked_displays]
 
                 # - Try again if no results
 
@@ -108,18 +108,18 @@ def select_many(
     q_choices = []
 
     for choice in choices:
-        value, short_desc, long_desc = unpack(choice)
+        value, display_value, short_desc, long_desc = unpack(choice)
 
         if long_desc and short_desc:
             # suffix after the short description
-            title = f"{value} - {short_desc} ({long_desc})"
+            title = f"{display_value} - {short_desc} ({long_desc})"
         elif long_desc and not short_desc:
-            # no short_desc, suffix after the value
-            title = f"{value} ({long_desc})"
+            # no short_desc, suffix after the display_value
+            title = f"{display_value} ({long_desc})"
         elif short_desc:
-            title = f"{value} - {short_desc}"
+            title = f"{display_value} - {short_desc}"
         else:
-            title = value
+            title = display_value
 
         q_choices.append(
             QuestionaryChoice(
