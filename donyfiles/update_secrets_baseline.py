@@ -1,7 +1,7 @@
 import dony
 
 
-@dony.command()
+@dony.command(working_dir="git_root")
 def update_secrets_baseline():
     """Update .secrets.baseline file"""
 

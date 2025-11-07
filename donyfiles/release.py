@@ -6,7 +6,7 @@ import dony
 __NAME__ = "release:0.1.1"
 
 
-@dony.command()
+@dony.command(working_dir="git_root")
 def release(
     version: Optional[str] = None,
     uv_publish_token: Optional[str] = None,

@@ -7,7 +7,7 @@ import dony
 __NAME__ = "squash:0.1.10"
 
 
-@dony.command()
+@dony.command(working_dir="git_root")
 def squash(
     new_branch: Optional[str] = None,
     target_branch: Optional[str] = None,
