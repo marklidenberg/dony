@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import dony
+from dotenv import load_dotenv
 
 __NAME__ = "release:0.1.1"
 
@@ -12,6 +13,10 @@ def release(
     uv_publish_token: Optional[str] = None,
 ):
     """Bump version and publish to PyPI"""
+
+    # - Load .env
+
+    load_dotenv()
 
     # - Get main branch
 
