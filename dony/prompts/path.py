@@ -1,17 +1,10 @@
-from typing import Optional
 import questionary
 from prompt_toolkit.styles import Style
 
 
 def path(
     message: str,
-    provided: Optional[str] = None,
 ) -> str:
-    # - Return provided answer
-
-    if provided is not None:
-        return provided
-
     # - Run path prompt
 
     result = questionary.path(

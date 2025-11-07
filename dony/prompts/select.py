@@ -12,7 +12,6 @@ def select(
     choices: Sequence[Union[str, Choice]],
     default: Optional[str] = None,
     fuzzy: bool = True,
-    provided: Optional[str] = None,
 ) -> str:
     """
     Prompt the user to select from a list of choices, each of which can have:
@@ -23,14 +22,6 @@ def select(
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
-
-    # - Check if provided answer is set
-
-    if provided is not None:
-        choice_values = [c.value if isinstance(c, Choice) else c for c in choices]
-        if provided not in choice_values:
-            raise ValueError(f"Provided answer '{provided}' is not in choices.")
-        return provided
 
     # - Helper to unpack a choice to (value, short_desc, long_desc)
 

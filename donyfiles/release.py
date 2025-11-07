@@ -27,14 +27,13 @@ def release(
 
     # - Select default arguments
 
-    version = dony.select(
+    version = version or dony.select(
         "Choose version",
         choices=[
             "patch",
             "minor",
             "major",
         ],
-        provided=version,
     )
 
     uv_publish_token = dony.input(

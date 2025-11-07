@@ -12,7 +12,6 @@ def select_many(
     choices: Sequence[Union[str, Choice]],
     default: Optional[Sequence[str]] = None,
     fuzzy: bool = True,
-    provided: Optional[Sequence[str]] = None,
     allow_empty_selection: bool = False,
 ) -> Sequence[str]:
     """
@@ -24,15 +23,6 @@ def select_many(
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
-
-    # - Check if provided answer is set
-
-    if provided is not None:
-        choice_values = [c.value if isinstance(c, Choice) else c for c in choices]
-        for p in provided:
-            if p not in choice_values:
-                raise ValueError(f"Provided answer '{p}' is not in choices.")
-        return provided
 
     # - Helper to unpack a choice to (value, short_desc, long_desc)
 

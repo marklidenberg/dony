@@ -1,4 +1,3 @@
-from typing import Optional
 import questionary
 from prompt_toolkit.styles import Style
 
@@ -7,14 +6,8 @@ def input(
     message: str,
     default: str = "",
     allow_empty: bool = False,
-    provided: Optional[str] = None,
     multiline: bool = False,
 ) -> str:
-    # - Return provided answer
-
-    if provided is not None:
-        return provided
-
     # - Run input prompt
 
     while True:

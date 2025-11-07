@@ -12,7 +12,6 @@ def select_or_input(
     fuzzy: bool = True,
     allow_empty: bool = False,
     reject_choice: str = "✏️ Enter your own",
-    provided: Optional[str] = None,
 ) -> str:
     """
     Prompt the user to select from a list of choices or enter their own value.
@@ -20,11 +19,6 @@ def select_or_input(
     If the user selects the reject_choice option, they will be prompted to enter
     their own value using the input prompt.
     """
-
-    # - Return provided answer
-
-    if provided is not None:
-        return provided
 
     # - Run select prompt
 
