@@ -11,7 +11,6 @@ from typing import Optional, Union
 from dony.prompts.error import error as dony_error
 from dony.prompts.print import print as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
-from dony.get_donyfiles_root import get_donyfiles_root
 
 
 class DonyShellError(Exception):
@@ -26,7 +25,7 @@ def shell(
     exit_on_error: bool = True,
     error_on_unset: bool = True,
     echo_commands: bool = False,
-    working_directory: Optional[Union[str, Path]] = None,
+    working_dir: Optional[Union[str, Path]] = None,
     quiet: bool = False,
     dry_run: bool = False,
     raise_on_error: bool = True,
@@ -45,7 +44,7 @@ def shell(
         exit_on_error: Prepends 'set -e' (exit on any error).
         error_on_unset: Prepends 'set -u' (error on unset variables).
         echo_commands: Prepends 'set -x' (echo commands before executing).
-        working_directory: Changes the working directory before executing the command.
+        working_dir: Changes the working directory before executing the command.
         quiet: Suppresses output.
         dry_run: Prints the command without executing it.
         raise_on_error: Raises an exception if the command exits with a non-zero status.
@@ -111,15 +110,10 @@ def shell(
         ):
             return dony_error("Aborted")
 
-    # - Convert working_directory to string
+    # - Convert working_dir to string
 
-    if isinstance(working_directory, Path):
-        working_directory = str(working_directory)
-
-    # - If relative - concat working directory with dony root
-
-    if isinstance(working_directory, str) and not os.path.isabs(working_directory):
-        working_directory = get_donyfiles_root() / working_directory
+    if isinstance(working_dir, Path):
+        working_dir = str(working_dir)
 
     # - Build the `set` prefix from the enabled flags
 
@@ -146,7 +140,7 @@ def shell(
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=text,
-        cwd=working_directory,
+        cwd=working_dir,
     )
 
     # - Capture output
@@ -207,7 +201,7 @@ def example():
 
     # - Run in a different directory
 
-    output = shell("ls", working_directory="/tmp")
+    output = shell("ls", working_dir="/tmp")
     print("Contents of /tmp:", output)
 
     try:

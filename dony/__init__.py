@@ -7,6 +7,7 @@ except Exception:
 
 from .command import command
 from .shell import shell
+from .get_git_root import get_git_root
 from .prompts.autocomplete import autocomplete
 from .prompts.confirm import confirm
 from .prompts.input import input

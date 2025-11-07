@@ -1,9 +1,12 @@
 import inspect
+import os
+from pathlib import Path
 import sys
 import types
 from functools import wraps
-from typing import get_origin, get_args, Union
+from typing import get_origin, get_args, Union, Literal
 
+from dony.get_git_root import get_git_root
 from dony.prompts.error import error
 from dony.prompts.success import success
 
@@ -14,8 +17,15 @@ else:
     _union_type = None  # or skip using it
 
 
-def command():
-    """Decorator to mark a function as a dony command."""
+def command(
+    working_dir: Union[str, Literal["git_root", "command_dir"], None] = None,
+):
+    """Decorator to mark a function as a dony command.
+
+    Args:
+        working_dir: Optional working directory for the command.
+                    Can be a path string, "git_root", "command_dir", or None.
+    """
 
     def decorator(func):
         sig = inspect.signature(func)
@@ -72,6 +82,16 @@ def command():
 
         @wraps(func)
         def wrapper(*args, **kwargs):
+            # - Change directory to working_dir
+
+            if working_dir:
+                if working_dir == "git_root":
+                    os.chdir(get_git_root())
+                elif working_dir == "command_dir":
+                    os.chdir(Path(__file__).parent)
+
+            # - Run command
+
             try:
                 result = func(*args, **kwargs)
                 success(f"Command '{func.__name__}' succeeded")
