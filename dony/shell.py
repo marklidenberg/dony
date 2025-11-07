@@ -22,12 +22,11 @@ def shell(
     *,
     capture_output: bool = True,
     exit_on_error: bool = True,
-    error_on_unset: bool = True,
+    forbid_unset_variables: bool = True,
     trace_execution: bool = False,
     working_dir: Optional[Union[str, Path]] = None,
     quiet: bool = False,
     dry_run: bool = False,
-    raise_on_error: bool = True,
     show_command: bool = True,
     confirm: bool = False,
 ) -> Optional[str]:
@@ -40,12 +39,11 @@ def shell(
         capture_output: Captures and returns the full combined stdout+stderr;
                         if False, prints only and returns None.
         exit_on_error: Prepends 'set -e' (exit on any error).
-        error_on_unset: Prepends 'set -u' (error on unset variables).
+        forbid_unset_variables: Prepends 'set -u' (error on unset variables).
         trace_execution: Prepends 'set -x' (traces command execution at shell level).
         working_dir: Changes the working directory before executing the command.
         quiet: Suppresses output.
         dry_run: Prints the command without executing it.
-        raise_on_error: Raises an exception if the command exits with a non-zero status.
         show_command: Shows the formatted command before executing it.
         confirm: Asks for confirmation before executing the command.
 
@@ -119,7 +117,7 @@ def shell(
         flag
         for flag, enabled in (
             ("e", exit_on_error),
-            ("u", error_on_unset),
+            ("u", forbid_unset_variables),
             ("x", trace_execution),
         )
         if enabled
@@ -163,8 +161,8 @@ def shell(
 
     # - Raise if exit code is non-zero
 
-    if return_code != 0 and raise_on_error:
-        if "KeyboardInterrupt" in output:
+    if return_code != 0:
+        if output and "KeyboardInterrupt" in output:
             raise KeyboardInterrupt
         raise DonyShellError("Dony command failed")
 

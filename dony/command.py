@@ -18,7 +18,7 @@ else:
 
 
 def command(
-    working_dir: Union[str, Literal["git_root", "command_dir"], None] = None,
+    working_dir: Union[str, Literal["git_root", "command_dir"], None] = "command_dir",
 ):
     """Decorator to mark a function as a dony command.
 
