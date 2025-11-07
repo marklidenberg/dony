@@ -4,7 +4,8 @@ from pathlib import Path
 import sys
 import types
 from functools import wraps
-from typing import get_origin, get_args, Union, Literal, Callable, TypeVar, Any
+from typing import get_origin, get_args, Union, Callable, TypeVar, Any
+from enum import Enum
 
 from dony.get_git_root import get_git_root
 from dony.prompts.error import error
@@ -20,14 +21,22 @@ else:
 F = TypeVar("F", bound=Callable[..., Any])
 
 
+class RunFrom(str, Enum):
+    """Enum for specifying where a command should run from."""
+
+    GIT_ROOT = "git_root"
+    COMMAND_DIR = "command_dir"
+
+
 def command(
-    working_dir: Union[str, Literal["git_root", "command_dir"], None] = "command_dir",
+    run_from: Union[str, RunFrom, None] = RunFrom.COMMAND_DIR,
+    show_success: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
 
     Args:
-        working_dir: Optional working directory for the command.
-                    Can be a path string, "git_root", "command_dir", or None.
+        run_from: Where to run the command from.
+                 Can be a path string, RunFrom.GIT_ROOT, RunFrom.COMMAND_DIR, or None.
     """
 
     def decorator(func):
@@ -45,23 +54,24 @@ def command(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # - Change directory to working_dir
+            # - Change directory to run_from
 
-            if working_dir:
+            if run_from:
                 command_dir = Path(inspect.getfile(func)).parent
 
-                if working_dir == "git_root":
+                if run_from in (RunFrom.GIT_ROOT, "git_root"):
                     os.chdir(get_git_root(start_path=command_dir))
-                elif working_dir == "command_dir":
+                elif run_from in (RunFrom.COMMAND_DIR, "command_dir"):
                     os.chdir(command_dir)
                 else:
-                    os.chdir(Path(working_dir))
+                    os.chdir(Path(run_from))
 
             # - Run command
 
             try:
                 result = func(*args, **kwargs)
-                success(f"Command '{func.__name__}' succeeded")
+                if show_success:
+                    success(f"Command '{func.__name__}' succeeded")
                 return result
             except KeyboardInterrupt:
                 return error("Dony command interrupted")

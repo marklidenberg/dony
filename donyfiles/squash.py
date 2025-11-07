@@ -2,12 +2,13 @@ import re
 from typing import Optional
 
 import dony
+from dony.command import RunFrom
 
 
 __NAME__ = "squash:0.1.10"
 
 
-@dony.command(working_dir="git_root")
+@dony.command(run_from=RunFrom.GIT_ROOT)
 def squash(
     new_branch: Optional[str] = None,
     target_branch: Optional[str] = None,
