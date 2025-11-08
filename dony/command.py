@@ -2,12 +2,13 @@ import inspect
 import os
 from pathlib import Path
 import sys
+import tempfile
 import types
 from functools import wraps
 from typing import get_origin, get_args, Union, Callable, TypeVar, Any
 from enum import Enum
 
-from dony.get_git_root import get_git_root
+from dony.find_git_root import find_git_root
 from dony.prompts.error import error
 from dony.prompts.success import success
 
@@ -25,50 +26,48 @@ class RunFrom(str, Enum):
     """Enum for specifying where a command should run from."""
 
     GIT_ROOT = "git_root"
-    COMMAND_DIR = "command_dir"
+    COMMAND_FILE = "command_file"
+    CURRENT = "current"
+    TEMP = "temp"
 
 
 def command(
-    run_from: Union[str, RunFrom, None] = RunFrom.COMMAND_DIR,
+    run_from: Union[str, Path, RunFrom] = RunFrom.COMMAND_FILE,
     show_success: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
 
     Args:
         run_from: Where to run the command from.
-                 Can be a path string, RunFrom.GIT_ROOT, RunFrom.COMMAND_DIR, or None.
+                 Can be a Path, path string, or RunFrom enum value.
     """
 
     def decorator(func):
-        sig = inspect.signature(func)
-
-        # - Validate that all parameters have default values
-
-        for name, param in sig.parameters.items():
-            if param.default is inspect._empty:
-                raise ValueError(
-                    f"Command '{func.__name__}': parameter '{name}' must have a default value"
-                )
-
         # - Wrap function
 
         @wraps(func)
         def wrapper(*args, **kwargs):
             # - Save original directory
             original_dir = Path.cwd()
+            temp_dir = None
 
             try:
                 # - Change directory to run_from
 
-                if run_from:
-                    command_dir = Path(inspect.getfile(func)).parent
+                command_dir = Path(inspect.getfile(func)).parent
 
-                    if run_from in (RunFrom.GIT_ROOT, "git_root"):
-                        os.chdir(get_git_root(start_path=command_dir))
-                    elif run_from in (RunFrom.COMMAND_DIR, "command_dir"):
-                        os.chdir(command_dir)
-                    else:
-                        os.chdir(Path(run_from))
+                if run_from in (RunFrom.GIT_ROOT, "git_root"):
+                    os.chdir(find_git_root(start_path=command_dir))
+                elif run_from in (RunFrom.COMMAND_FILE, "command_file", "command_dir"):
+                    os.chdir(command_dir)
+                elif run_from in (RunFrom.TEMP, "temp"):
+                    temp_dir = tempfile.mkdtemp()
+                    os.chdir(temp_dir)
+                elif run_from in (RunFrom.CURRENT, "current"):
+                    pass  # Stay in current directory
+                else:
+                    # Assume it's a path string or Path object
+                    os.chdir(Path(run_from))
 
                 # - Run command
 
@@ -82,6 +81,12 @@ def command(
             finally:
                 # - Restore original directory
                 os.chdir(original_dir)
+
+                # - Clean up temp directory if created
+                if temp_dir:
+                    import shutil
+
+                    shutil.rmtree(temp_dir, ignore_errors=True)
 
         return wrapper
 

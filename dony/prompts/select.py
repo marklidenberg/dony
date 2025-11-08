@@ -1,10 +1,24 @@
-from typing import Sequence, Union, Optional, Dict
+from dataclasses import dataclass
+from typing import Any, Sequence, Union, Optional, Dict
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
 
-from dony.prompts.choice import Choice
+
+@dataclass
+class Choice:
+    """A choice with optional descriptions for select prompts."""
+
+    value: Any
+    display_value: str = ""
+    short_desc: str = ""
+    long_desc: str = ""
+
+    def __post_init__(self):
+        # If display_value is not provided, use str(value)
+        if not self.display_value:
+            self.display_value = str(self.value)
 
 
 def select(

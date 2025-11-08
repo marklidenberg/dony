@@ -16,7 +16,7 @@ from dony.prompts.confirm import confirm as dony_confirm
 def shell(
     command: str,
     *,
-    working_dir: Optional[Union[str, Path]] = None,
+    run_from: Optional[Union[str, Path]] = None,
     dry_run: bool = False,
     quiet: bool = False,
     capture_output: bool = True,
@@ -32,7 +32,7 @@ def shell(
 
     Args:
         command: The command line string to execute.
-        working_dir: Changes the working directory before executing the command.
+        run_from: Changes the working directory before executing the command.
         dry_run: Prints the command without executing it.
         quiet: Suppresses output.
         capture_output: Captures and returns the full combined stdout+stderr;
@@ -104,10 +104,10 @@ def shell(
             dony_error("Aborted")
             return None
 
-    # - Convert working_dir to string
+    # - Convert run_from to string
 
-    if isinstance(working_dir, Path):
-        working_dir = str(working_dir)
+    if isinstance(run_from, Path):
+        run_from = str(run_from)
 
     # - Build the `set` prefix from the enabled flags
 
@@ -134,7 +134,7 @@ def shell(
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
-        cwd=working_dir,
+        cwd=run_from,
     )
 
     # - Capture output
@@ -196,7 +196,7 @@ def example():
 
     # - Run in a different directory
 
-    output = shell("ls", working_dir="/tmp")
+    output = shell("ls", run_from="/tmp")
     print("Contents of /tmp:", output)
 
     try:

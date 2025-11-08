@@ -1,10 +1,10 @@
-from typing import Sequence, Union, Optional, Dict
+from typing import List, Sequence, Union, Optional, Dict
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
 
-from dony.prompts.choice import Choice
+from dony.prompts.select import Choice
 
 
 def select_many(
@@ -13,7 +13,7 @@ def select_many(
     default: Optional[Sequence[str]] = None,
     fuzzy: bool = True,
     allow_empty_selection: bool = False,
-) -> Sequence[str]:
+) -> List[str]:
     """
     Prompt the user to select multiple items from a list of choices, each of which can have:
       - a value (the actual value returned)
