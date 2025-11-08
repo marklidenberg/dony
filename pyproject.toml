@@ -28,14 +28,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "build>=1.2.2.post1",
-    "dony",
     "jprint2>=0.2.0",
-    "pyperclip>=1.9.0",
     "twine>=6.1.0",
 ]
-
-[project.scripts]
-dony = "dony.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
