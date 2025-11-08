@@ -27,7 +27,7 @@ class RunFrom(Enum):
 
     GIT_ROOT = "git_root"
     COMMAND_FILE = "command_file"
-    CURRENT = "current"
+    CWD = "cwd"
     TEMP = "temp"
 
 
@@ -57,13 +57,13 @@ def command(
                 command_dir = Path(inspect.getfile(func)).parent
 
                 if run_from == RunFrom.GIT_ROOT:
-                    os.chdir(find_git_root(start_path=command_dir))
+                    os.chdir(find_git_root(path=command_dir))
                 elif run_from == RunFrom.COMMAND_FILE:
                     os.chdir(command_dir)
                 elif run_from == RunFrom.TEMP:
                     temp_dir = tempfile.mkdtemp()
                     os.chdir(temp_dir)
-                elif run_from == RunFrom.CURRENT:
+                elif run_from == RunFrom.CWD:
                     pass  # Stay in current directory
                 else:
                     # Assume it's a path string or Path object
@@ -77,7 +77,8 @@ def command(
                         success(f"Command '{func.__name__}' succeeded")
                     return result
                 except KeyboardInterrupt:
-                    return error("Dony command interrupted")
+                    error("Dony command interrupted")
+                    raise
             finally:
                 # - Restore original directory
                 os.chdir(original_dir)

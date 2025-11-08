@@ -1,4 +1,4 @@
-from typing import List, Sequence, Union, Optional, Dict
+from typing import Any, List, Sequence, Union, Optional, Dict
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
@@ -13,7 +13,7 @@ def select_many(
     default: Optional[Sequence[str]] = None,
     fuzzy: bool = True,
     allow_empty_selection: bool = False,
-) -> List[str]:
+) -> List[Any]:
     """
     Prompt the user to select multiple items from a list of choices, each of which can have:
       - a value (the actual value returned)
@@ -104,7 +104,9 @@ def select_many(
                 return results
 
             except FileNotFoundError:
-                break
+                raise FileNotFoundError(
+                    "fzf is not installed. Install it or set fuzzy=False to use the default prompt."
+                )
 
     # - Fallback to questionary
 
@@ -178,10 +180,20 @@ def example():
     selected = select_many(
         "Select multiple paths",
         choices=[
-            Choice("foo", long_desc="This is the long description for foo."),
-            Choice("bar", "second option", "Detailed info about bar goes here."),
-            Choice("baz", "third one", "Here's a more in-depth explanation of baz."),
-            Choice("qux", long_desc="Qux has no short description, only a long one."),
+            Choice(value="foo", long_desc="This is the long description for foo."),
+            Choice(
+                value="bar",
+                display_value="second option",
+                short_desc="Detailed info about bar goes here.",
+            ),
+            Choice(
+                value="baz",
+                display_value="third one",
+                short_desc="Here's a more in-depth explanation of baz.",
+            ),
+            Choice(
+                value="qux", long_desc="Qux has no short description, only a long one."
+            ),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
         fuzzy=False,

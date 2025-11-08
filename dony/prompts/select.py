@@ -29,7 +29,7 @@ def select(
     allow_custom: bool = False,
     custom_choice_text: str = "Custom",
     allow_empty: bool = False,
-) -> str:
+) -> Any:
     """
     Prompt the user to select from a list of choices, each of which can have:
       - a value (the actual value returned)
@@ -130,7 +130,9 @@ def select(
             return result
 
         except FileNotFoundError:
-            pass
+            raise FileNotFoundError(
+                "fzf is not installed. Install it or set fuzzy=False to use the default prompt."
+            )
 
     # - Fallback to questionary
 

@@ -77,16 +77,6 @@ def shell(
             color_style="ansipurple",
         )
 
-        # - Copy to clipboard if possible
-
-        try:
-            import pyperclip
-
-            pyperclip.copy(formatted_command)
-        except Exception:
-            # todo later: specify exception types
-            pass
-
         return ""
 
     # - Print command
