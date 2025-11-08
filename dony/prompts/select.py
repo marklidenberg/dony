@@ -26,16 +26,10 @@ def select(
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
 
-    If allow_custom is True, adds a custom option that prompts for text entry.
+    Args:
+        allow_custom: If True, adds a custom option that prompts for text entry.
+        custom_choice_text: The text to display for the custom option (default: "Custom").
     """
-
-    # - Helper to unpack a choice to (value, display_value, short_desc, long_desc)
-
-    def unpack(c):
-        if isinstance(c, Choice):
-            return (c.value, c.display_value, c.short_desc, c.long_desc)
-        else:
-            return (c, str(c), "", "")
 
     # - Add custom choice if requested
 
@@ -56,7 +50,17 @@ def select(
             display_map: Dict[str, str] = {}
 
             for choice in actual_choices:
-                value, display_value, short_desc, long_desc = unpack(choice)
+                if isinstance(choice, Choice):
+                    value = choice.value
+                    display_value = choice.display_value
+                    short_desc = choice.short_desc
+                    long_desc = choice.long_desc
+                else:
+                    value = choice
+                    display_value = str(choice)
+                    short_desc = ""
+                    long_desc = ""
+
                 display_map[display_value] = value
                 lines.append(
                     f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
@@ -119,7 +123,16 @@ def select(
     q_choices = []
 
     for choice in actual_choices:
-        value, display_value, short_desc, long_desc = unpack(choice)
+        if isinstance(choice, Choice):
+            value = choice.value
+            display_value = choice.display_value
+            short_desc = choice.short_desc
+            long_desc = choice.long_desc
+        else:
+            value = choice
+            display_value = str(choice)
+            short_desc = ""
+            long_desc = ""
 
         if long_desc and short_desc:
             # suffix after the short description

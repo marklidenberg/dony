@@ -16,21 +16,14 @@ def select_many(
 ) -> Sequence[str]:
     """
     Prompt the user to select multiple items from a list of choices, each of which can have:
-      - a display value
+      - a value (the actual value returned)
+      - a display value (shown in the list)
       - a short description (shown after the value)
       - a long description (shown in a right-hand sidebar in fuzzy mode)
 
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
     """
-
-    # - Helper to unpack a choice to (value, display_value, short_desc, long_desc)
-
-    def unpack(c):
-        if isinstance(c, Choice):
-            return (c.value, c.display_value, c.short_desc, c.long_desc)
-        else:
-            return (c, str(c), "", "")
 
     # - Run fuzzy select prompt
 
@@ -46,7 +39,17 @@ def select_many(
                 display_map: Dict[str, str] = {}
 
                 for choice in choices:
-                    value, display_value, short_desc, long_desc = unpack(choice)
+                    if isinstance(choice, Choice):
+                        value = choice.value
+                        display_value = choice.display_value
+                        short_desc = choice.short_desc
+                        long_desc = choice.long_desc
+                    else:
+                        value = choice
+                        display_value = str(choice)
+                        short_desc = ""
+                        long_desc = ""
+
                     display_map[display_value] = value
                     lines.append(
                         f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
@@ -108,7 +111,16 @@ def select_many(
     q_choices = []
 
     for choice in choices:
-        value, display_value, short_desc, long_desc = unpack(choice)
+        if isinstance(choice, Choice):
+            value = choice.value
+            display_value = choice.display_value
+            short_desc = choice.short_desc
+            long_desc = choice.long_desc
+        else:
+            value = choice
+            display_value = str(choice)
+            short_desc = ""
+            long_desc = ""
 
         if long_desc and short_desc:
             # suffix after the short description
