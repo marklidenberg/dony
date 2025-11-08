@@ -4,7 +4,7 @@ from prompt_toolkit.formatted_text import FormattedText
 
 
 def success(
-    message: str = "Success!",
+    message: str,
     prefix: str = "✓ ",
 ) -> None:
     return print_formatted_text(

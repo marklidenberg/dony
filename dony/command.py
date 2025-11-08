@@ -74,7 +74,7 @@ def command(
                 try:
                     result = func(*args, **kwargs)
                     if show_success:
-                        success(f"Command '{func.__name__}' succeeded")
+                        success(f"✓ Command '{func.__name__}' succeeded")
                     return result
                 except KeyboardInterrupt:
                     error("Dony command interrupted")

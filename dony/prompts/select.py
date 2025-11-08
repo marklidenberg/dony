@@ -1,16 +1,19 @@
 from dataclasses import dataclass
-from typing import Any, Sequence, Union, Optional, Dict
+from typing import Sequence, Union, Optional, Dict, TypeVar, Generic
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
 
 
+T = TypeVar("T")
+
+
 @dataclass
-class Choice:
+class Choice(Generic[T]):
     """A choice with optional descriptions for select prompts."""
 
-    value: Any
+    value: T
     display_value: str = ""
     short_desc: str = ""
     long_desc: str = ""
@@ -23,13 +26,13 @@ class Choice:
 
 def select(
     message: str,
-    choices: Sequence[Union[str, Choice]],
+    choices: Sequence[Union[str, Choice[T]]],
     default: Optional[str] = None,
     fuzzy: bool = True,
     allow_custom: bool = False,
     custom_choice_text: str = "Custom",
     allow_empty: bool = False,
-) -> Any:
+) -> Union[T, str]:
     """
     Prompt the user to select from a list of choices, each of which can have:
       - a value (the actual value returned)
