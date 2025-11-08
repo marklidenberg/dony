@@ -10,7 +10,6 @@ from .shell import shell
 from .find_git_root import find_git_root
 from .prompts.confirm import confirm
 from .prompts.input_text import input_text
-from .prompts.input_path import input_path
 from .prompts.press_any_key import press_any_key
 from .prompts.select import Choice, select
 from .prompts.select_many import select_many
@@ -26,7 +25,6 @@ __all__ = [
     "find_git_root",
     "confirm",
     "input_text",
-    "input_path",
     "press_any_key",
     "Choice",
     "select",
