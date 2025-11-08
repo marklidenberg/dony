@@ -2,7 +2,7 @@ import questionary
 from prompt_toolkit.styles import Style
 
 
-def path(
+def input_path(
     message: str,
 ) -> str:
     # - Run path prompt
@@ -29,7 +29,7 @@ def path(
 
 def example():
     print(
-        path(
+        input_path(
             "Give me that path",
         )
     )

@@ -37,7 +37,7 @@ def release(
         ],
     )
 
-    uv_publish_token = uv_publish_token or dony.enter(
+    uv_publish_token = uv_publish_token or dony.input_text(
         "Enter UV publish token (usually a PyPI token)",
         default=os.getenv("UV_PUBLISH_TOKEN", ""),
     )

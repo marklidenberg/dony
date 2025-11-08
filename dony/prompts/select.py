@@ -118,9 +118,9 @@ def select(
             # - Handle custom input if selected
 
             if allow_custom and result == custom_choice_text:
-                from dony.prompts.enter import enter
+                from dony.prompts.input_text import input_text
 
-                return enter(
+                return input_text(
                     message=message,
                     allow_empty=allow_empty,
                 )
@@ -190,9 +190,9 @@ def select(
     # - Handle custom input if selected
 
     if allow_custom and result == custom_choice_text:
-        from dony.prompts.enter import enter
+        from dony.prompts.input_text import input_text
 
-        return enter(
+        return input_text(
             message=message,
             allow_empty=allow_empty,
         )

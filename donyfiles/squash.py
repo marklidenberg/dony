@@ -20,7 +20,7 @@ def squash(
 
     # - Get target branch
 
-    target_branch = target_branch or dony.enter(
+    target_branch = target_branch or dony.input_text(
         "Enter target branch:",
         default=dony.shell(
             "git branch --list main | grep -q main && echo main || echo master",
@@ -104,7 +104,7 @@ def squash(
 
     if not commit_message:
         while True:
-            commit_message = dony.enter(
+            commit_message = dony.input_text(
                 f"Enter commit message for merging branch {merged_branch} to {target_branch}:"
             )
             if bool(
