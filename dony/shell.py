@@ -27,7 +27,7 @@ def shell(
     trace_execution: bool = False,
     show_command: bool = True,
     confirm: bool = False,
-) -> Optional[str]:
+) -> str:
     """
     Execute a shell command, streaming its output to stdout as it runs,
     and automatically applying 'set -e', 'set -u' and/or 'set -x' as requested.
@@ -106,7 +106,7 @@ def shell(
             "Are you sure you want to run the above command?",
         ):
             dony_error("Aborted")
-            return None
+            return ""
 
     # - Convert run_from to string
 
@@ -183,7 +183,7 @@ def shell(
 
     # - Return output
 
-    return output.strip() if output else None
+    return output.strip() if output else ""
 
 
 def example():
