@@ -8,6 +8,8 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Union
 
+import questionary
+
 from dony.prompts.error import error as dony_error
 from dony.prompts.echo import echo as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
@@ -64,6 +66,10 @@ def shell(
                 quiet=True,
                 show_command=False,
             )
+
+            if not formatted_command:
+                raise Exception("Failed to format command")
+
         except Exception:
             formatted_command = command
     else:
@@ -74,7 +80,11 @@ def shell(
     if dry_run:
         dony_print(
             "🐚 Dry run\n" + formatted_command,
-            color_style="ansipurple",
+            style=questionary.Style(
+                [
+                    ("question", "fg:ansipurple"),
+                ]
+            ),
         )
 
         return ""
@@ -84,7 +94,11 @@ def shell(
     if (show_command and not quiet) or confirm:
         dony_print(
             "🐚\n" + formatted_command,
-            color_style="ansipurple",
+            style=questionary.Style(
+                [
+                    ("question", "fg:ansipurple"),
+                ]
+            ),
         )
 
     if confirm:
@@ -160,7 +174,11 @@ def shell(
     if show_command and not quiet:
         dony_print(
             "—" * 80,
-            color_style="ansipurple",
+            style=questionary.Style(
+                [
+                    ("question", "fg:ansipurple"),
+                ]
+            ),
         )
 
     # - Return output

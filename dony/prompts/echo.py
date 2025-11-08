@@ -7,7 +7,7 @@ from prompt_toolkit.formatted_text import FormattedText
 
 
 def echo(
-    text: str,
+    message: str,
     style: questionary.Style = questionary.Style(
         [
             ("question", "fg:ansiwhite"),
@@ -17,7 +17,7 @@ def echo(
     return print_formatted_text(
         FormattedText(
             [
-                ("class:question", dedent(text).strip()),
+                ("class:question", dedent(message).strip()),
             ]
         ),
         style=style,
@@ -26,7 +26,7 @@ def echo(
 
 def example():
     echo(
-        """echo "{"a": "b"}\nfoobar""",
+        message="""echo "{"a": "b"}\nfoobar""",
     )
 
 
