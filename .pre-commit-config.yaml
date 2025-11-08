@@ -15,7 +15,6 @@ repos:
         args: [
           "--fix",
           "--config", "pyproject.toml",
-          "--ignore", "E722", # "Do not use bare 'except'"
           "--ignore", "E731", # "Do not assign a lambda expression, use a def"
           "--ignore", "F401" # "Module imported but unused"
         ]
