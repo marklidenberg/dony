@@ -64,7 +64,7 @@ def select(
             lines = []
 
             # Map from the displayed first field back to the real value
-            display_map: Dict[str, str] = {}
+            display_map: Dict[str, Union[T, str]] = {}
 
             for choice in actual_choices:
                 if isinstance(choice, Choice):

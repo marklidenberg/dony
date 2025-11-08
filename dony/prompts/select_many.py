@@ -1,4 +1,4 @@
-from typing import List, Sequence, Union, Optional, Dict, TypeVar
+from typing import List, Sequence, Union, Optional, Dict, TypeVar, Generic
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice
@@ -39,7 +39,7 @@ def select_many(
                 lines = []
 
                 # Map from the displayed first field back to the real value
-                display_map: Dict[str, str] = {}
+                display_map: Dict[str, Union[T, str]] = {}
 
                 for choice in choices:
                     if isinstance(choice, Choice):

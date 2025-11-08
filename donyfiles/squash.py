@@ -13,8 +13,8 @@ def squash(
     new_branch: Optional[str] = None,
     target_branch: Optional[str] = None,
     commit_message: Optional[str] = None,
-    checkout_to_new_branch: Optional[str] = None,
-    remove_merged_branch: Optional[str] = None,
+    checkout_to_new_branch: Optional[bool] = None,
+    remove_merged_branch: Optional[bool] = None,
 ):
     """Squashes current branch to main, checkouts to a new branch"""
 
