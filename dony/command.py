@@ -22,7 +22,7 @@ else:
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-class RunFrom(str, Enum):
+class RunFrom(Enum):
     """Enum for specifying where a command should run from."""
 
     GIT_ROOT = "git_root"
@@ -56,14 +56,14 @@ def command(
 
                 command_dir = Path(inspect.getfile(func)).parent
 
-                if run_from in (RunFrom.GIT_ROOT, "git_root"):
+                if run_from == RunFrom.GIT_ROOT:
                     os.chdir(find_git_root(start_path=command_dir))
-                elif run_from in (RunFrom.COMMAND_FILE, "command_file", "command_dir"):
+                elif run_from == RunFrom.COMMAND_FILE:
                     os.chdir(command_dir)
-                elif run_from in (RunFrom.TEMP, "temp"):
+                elif run_from == RunFrom.TEMP:
                     temp_dir = tempfile.mkdtemp()
                     os.chdir(temp_dir)
-                elif run_from in (RunFrom.CURRENT, "current"):
+                elif run_from == RunFrom.CURRENT:
                     pass  # Stay in current directory
                 else:
                     # Assume it's a path string or Path object
