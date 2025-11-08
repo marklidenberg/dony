@@ -24,7 +24,7 @@ def success(
 
 
 def example():
-    success()
+    success(message="Success")
 
 
 if __name__ == "__main__":

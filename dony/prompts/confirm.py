@@ -17,7 +17,7 @@ def confirm(
 
     answer = select(
         message=message,
-        choices=["[Yes]", "No"] if default else ["[No]", "Yes"],
+        choices=["Yes", "No"] if default else ["No", "Yes"],
         fuzzy=False,
     )
 
