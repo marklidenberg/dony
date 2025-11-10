@@ -1,4 +1,4 @@
-from typing import List, Sequence, Union, Optional, Dict, TypeVar, Generic
+from typing import List, Sequence, Union, Optional, Dict, TypeVar
 import subprocess
 import questionary
 from questionary import Choice as QuestionaryChoice

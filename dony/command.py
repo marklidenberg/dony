@@ -1,22 +1,14 @@
 import inspect
 import os
 from pathlib import Path
-import sys
 import tempfile
-import types
 from functools import wraps
-from typing import get_origin, get_args, Union, Callable, TypeVar, Any
+from typing import Union, Callable, TypeVar, Any
 from enum import Enum
 
 from dony.find_git_root import find_git_root
 from dony.prompts.error import error
 from dony.prompts.success import success
-
-
-if sys.version_info >= (3, 10):
-    _union_type = types.UnionType
-else:
-    _union_type = None  # or skip using it
 
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -33,13 +25,14 @@ class RunFrom(Enum):
 
 def command(
     run_from: Union[str, Path, RunFrom] = RunFrom.COMMAND_FILE,
-    show_success: bool = True,
+    verbose: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
 
     Args:
         run_from: Where to run the command from.
                  Can be a Path, path string, or RunFrom enum value.
+        verbose: If True, shows success message on completion and error message on failure.
     """
 
     def decorator(func):
@@ -73,11 +66,16 @@ def command(
 
                 try:
                     result = func(*args, **kwargs)
-                    if show_success:
-                        success(f"✓ Command '{func.__name__}' succeeded")
+                    if verbose:
+                        success(f"Command '{func.__name__}' succeeded")
                     return result
                 except KeyboardInterrupt:
-                    error("Dony command interrupted")
+                    if verbose:
+                        error("Dony command interrupted")
+                    raise
+                except Exception:
+                    if verbose:
+                        error(f"Command '{func.__name__}' failed")
                     raise
             finally:
                 # - Restore original directory

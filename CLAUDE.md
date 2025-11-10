@@ -1,0 +1,3 @@
+- Run ty typecheking (`uvx ty check .`) after you've completed your assignment. Fix issues
+- Run ruff (`ruff check .`) after you've completed your assignment. Fix issues
+- Never summarize your work. After finish your work, just say "Done."

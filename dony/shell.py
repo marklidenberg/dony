@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import os.path
 import subprocess
-import sys
-from inspect import currentframe
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Union
@@ -46,7 +43,7 @@ def shell(
         confirm: Asks for confirmation before executing the command.
 
     Returns:
-        The full command output as a string (or bytes if text=False), or None if capture_output=False.
+        The full command output as a string. Returns empty string if no output or capture_output=False.
 
     Raises:
         RuntimeError: If the command exits with a non-zero status.
@@ -132,42 +129,40 @@ def shell(
 
     # - Execute with optional working directory
 
-    proc = subprocess.Popen(
+    with subprocess.Popen(
         full_cmd,
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
         cwd=run_from,
-    )
+    ) as proc:
+        # - Capture output
 
-    # - Capture output
+        buffer = []
+        if proc.stdout is None:
+            raise RuntimeError("Process stdout is unexpectedly None")
+        while True:
+            try:
+                for line in proc.stdout:
+                    if not quiet:
+                        print(line, end="")
+                    if capture_output:
+                        buffer.append(line)
+                break
+            except UnicodeDecodeError:
+                dony_error("Error decoding output. Skipping the line")
 
-    buffer = []
-    if proc.stdout is None:
-        raise RuntimeError("Process stdout is unexpectedly None")
-    while True:
-        try:
-            for line in proc.stdout:
-                if not quiet:
-                    print(line, end="")
-                if capture_output:
-                    buffer.append(line)
-            break
-        except UnicodeDecodeError:
-            dony_error("Error decoding output. Skipping the line")
+        return_code = proc.wait()
 
-    proc.stdout.close()
-    return_code = proc.wait()
+        output = "".join(buffer) if capture_output else ""
 
-    output = "".join(buffer) if capture_output else None
+        # - Raise if exit code is non-zero
 
-    # - Raise if exit code is non-zero
-
-    if return_code != 0:
-        if output and "KeyboardInterrupt" in output:
-            raise KeyboardInterrupt
-        raise RuntimeError("Dony command failed")
+        if return_code != 0:
+            if output and "KeyboardInterrupt" in output:
+                raise KeyboardInterrupt
+            raise RuntimeError("Dony command failed")
 
     # - Print closing message
 
@@ -183,7 +178,7 @@ def shell(
 
     # - Return output
 
-    return output.strip() if output else ""
+    return output.strip()
 
 
 def example():

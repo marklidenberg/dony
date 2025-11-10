@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 
 def find_git_root(path: Union[str, Path]) -> Path:

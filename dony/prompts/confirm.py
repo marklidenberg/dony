@@ -1,6 +1,3 @@
-from prompt_toolkit.styles import Style
-
-
 def confirm(
     message: str,
     default: bool = True,
@@ -28,7 +25,7 @@ def confirm(
 
     # - Return result
 
-    return "Yes" in answer
+    return answer == "Yes"
 
 
 def example():
