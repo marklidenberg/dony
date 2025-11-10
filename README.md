@@ -1,10 +1,13 @@
 # 🍥️ dony
 
-A lightweight Python command runner. A [just](https://github.com/casey/just) alternative.
+A lightweight Python-based command runner. A [just](https://github.com/casey/just) alternative.
 
 ## How it works
 
-Define your commands in `donyfiles/` in the root of your project.
+Write Python functions decorated with `@dony.command()` in `donyfiles/` directory. Each command is a regular Python function with access to:
+- **Shell execution**: `dony.shell()` for running shell commands
+- **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
+- **Styling**: `dony.print()`, `dony.error()`, `dony.success()`
 
 ```python
 # donyfiles/hello_world.py
@@ -22,11 +25,9 @@ if __name__ == "__main__":
     hello_world()
 ```
 
-Run commands directly 
-- with python: `python donyfiles/<command_name>.py`
-- with dony cli: `dony <command_name> [--arg value]`
-
-or just run `dony` command to select from all available commands:
+Run commands in two ways:
+- **Python directly**: `python donyfiles/<command_name>.py`
+- **Interactive menu**: `dony` (select from all available commands)
 
 ```
                                                                                                                                                                                                                    
@@ -62,7 +63,12 @@ dony --init
 dony
 ```
 
-## Commands
+## Core API
+
+Dony provides three main capabilities:
+
+### 1. Commands
+Decorate Python functions with `@dony.command()` to make them runnable via CLI:
 
 ```python
 import dony
@@ -73,14 +79,32 @@ def greet(
     greeting: str = 'Hello',
     name: Optional[str] = None
 ):
+    """Greets the user"""
     name = dony.input('What is your name?', provided=name)
     dony.shell(f"echo {greeting}, {name}!")
 ```
 
-- Use the convenient shell wrapper `dony.shell`
-- Use a bundle of useful user interaction functions, like `input`, `confirm` and `press_any_key_to_continue`
-- Run commands without arguments – defaults are mandatory
+- All function parameters must have default values
+- Parameters with `None` default will prompt for user input using the `provided` parameter pattern
+- Use `dony.input()`, `dony.select()` etc. with `provided=param` to enable interactive prompting
 
+### 2. Shell Execution
+Execute shell commands with enhanced control and safety:
+
+```python
+result = dony.shell('git status', quiet=True)
+dony.shell('npm test', confirm=True)  # Ask for confirmation first
+```
+
+### 3. User Prompts
+Rich interactive prompts for user input:
+
+```python
+name = dony.input('Enter your name:', default='World')
+if dony.confirm('Continue?'):
+    framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'])
+    dony.success(f'You chose {framework}!')
+```
 
 ## Use cases
 - Build, deploy, release
@@ -89,10 +113,18 @@ def greet(
 - Git management
 - Repo chores
 
-## Things to know
+## Important Notes
 
-- All commands run from the project root (where `donyfiles/` is located)
-- Available prompts based on `questionary`:
+- **Working directory**: All commands run from the project root (where `donyfiles/` is located)
+- **Pure Python**: Commands are just Python functions - no special client or runtime needed
+- **Shell integration**: Use `dony.shell()` for any shell operations
+- **Interactive by default**: Prompts make commands interactive and user-friendly
+
+## API Reference
+
+### Available Prompts
+
+All prompts are based on `questionary` and support rich interactions:
   - `dony.input`: text entry with optional autocompletions
   - `dony.confirm`: yes/no ([Y/n] or [y/N])
   - `dony.select`: option picker (supports fuzzy matching with fzf)
