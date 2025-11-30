@@ -25,7 +25,8 @@ dependencies = [
     "questionary>=2.1.0",
 ]
 
-[project.optional-dependencies]
+
+[dependency-groups]
 dev = [
     "build>=1.2.2.post1",
     "jprint2>=0.2.0",

@@ -5,6 +5,7 @@ A lightweight Python-based command runner. A [just](https://github.com/casey/jus
 ## How it works
 
 Write Python functions decorated with `@dony.command()` in `donyfiles/` directory. Each command is a regular Python function with access to:
+
 - **Shell execution**: `dony.shell()` for running shell commands
 - **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
 - **Styling**: `dony.print()`, `dony.error()`, `dony.success()`
@@ -26,16 +27,17 @@ if __name__ == "__main__":
 ```
 
 Run commands in two ways:
+
 - **Python directly**: `python donyfiles/<command_name>.py`
 - **Interactive menu**: `dony` (select from all available commands)
 
 ```
-                                                                                                                                                                                                                   
-  📝 squash                                                                                                                                                                                             
-  📝 release                                                                                                                                                                                                        
-▌ 📝 hello_world                                                                                                                                                                                                    
+                                                                                                                                                                                                                 
+  📝 squash                                                                                                                                                                                           
+  📝 release                                                                                                                                                                                                      
+▌ 📝 hello_world                                                                                                                                                                                                  
   3/3 ─────────────────────────────────────────────────────────────────── 
-Select command 👆                                                                                                                                                                                                   
+Select command 👆                                                                                                                                                                                                 
 ╭───────────────────────────────────────────────────────────────────────╮
 │ Prints "Hello, World!"                                                │
 ╰───────────────────────────────────────────────────────────────────────╯
@@ -44,6 +46,7 @@ Select command 👆
 ## Quick Start
 
 For MacOS:
+
 ```bash
 
 # - Install prerequisites (pipx for global install, fzf and shfmt are optional)
@@ -68,6 +71,7 @@ dony
 Dony provides three main capabilities:
 
 ### 1. Commands
+
 Decorate Python functions with `@dony.command()` to make them runnable via CLI:
 
 ```python
@@ -89,6 +93,7 @@ def greet(
 - Use `dony.input()`, `dony.select()` etc. with `provided=param` to enable interactive prompting
 
 ### 2. Shell Execution
+
 Execute shell commands with enhanced control and safety:
 
 ```python
@@ -97,6 +102,7 @@ dony.shell('npm test', confirm=True)  # Ask for confirmation first
 ```
 
 ### 3. User Prompts
+
 Rich interactive prompts for user input:
 
 ```python
@@ -107,6 +113,7 @@ if dony.confirm('Continue?'):
 ```
 
 ## Use cases
+
 - Build, deploy, release
 - DevOps operations
 - Testing
@@ -125,16 +132,17 @@ if dony.confirm('Continue?'):
 ### Available Prompts
 
 All prompts are based on `questionary` and support rich interactions:
-  - `dony.input`: text entry with optional autocompletions
-  - `dony.confirm`: yes/no ([Y/n] or [y/N])
-  - `dony.select`: option picker (supports fuzzy matching with fzf)
-  - `dony.select_many`: multi-option picker (supports fuzzy matching with fzf)
-  - `dony.select_or_input`: option picker + custom input fallback
-  - `dony.press_any_key_to_continue`: pause until keypress
-  - `dony.path`: filesystem path entry
-  - `dony.print`: styled text output
-  - `dony.error`: ❌ error message
-  - `dony.success`: ✅ success message
+
+- `dony.input`: text entry with optional autocompletions
+- `dony.confirm`: yes/no ([Y/n] or [y/N])
+- `dony.select`: option picker (supports fuzzy matching with fzf)
+- `dony.select_many`: multi-option picker (supports fuzzy matching with fzf)
+- `dony.select_or_input`: option picker + custom input fallback
+- `dony.press_any_key_to_continue`: pause until keypress
+- `dony.path`: filesystem path entry
+- `dony.print`: styled text output
+- `dony.error`: ❌ error message
+- `dony.success`: ✅ success message
 
 ### Rich Choice Objects
 
@@ -226,14 +234,14 @@ def squash(
 
         # push if there are unpushed commits
         git diff --name-only | grep -q . && git push
-        
+      
         git fetch origin
         git checkout {target_branch}
         git pull
         git checkout {merged_branch}
 
         git merge {target_branch}
-        
+      
         if ! git diff-index --quiet HEAD --; then
 
           # try to commit twice, in case of formatting errors that are fixed by the first commit
@@ -250,7 +258,7 @@ def squash(
   dony.shell(
     f"""
         root=$(git rev-parse --show-toplevel)
-        
+      
         git diff {target_branch} --name-only -z \
         | while IFS= read -r -d '' file; do
             full="$root/$file"
@@ -325,7 +333,7 @@ def squash(
         # - Merge
 
         git merge --squash {merged_branch}
-        
+      
         # try to commit twice, in case of formatting errors that are fixed by the first commit
         git commit -m "{commit_message}" || git commit -m "{commit_message}"
         git push 
@@ -359,4 +367,3 @@ MIT License
 ## Author
 
 Mark Lidenberg [marklidenberg@gmail.com](mailto:marklidenberg@gmail.com)
-

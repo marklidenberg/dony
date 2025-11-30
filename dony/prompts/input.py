@@ -2,7 +2,7 @@ import questionary
 from prompt_toolkit.styles import Style
 
 
-def input_text(
+def input(
     message: str,
     default: str = "",
     allow_empty: bool = False,
@@ -37,7 +37,7 @@ def input_text(
 
 
 def example():
-    print(input_text(message="What is your name?"))
+    print(input(message="What is your name?"))
 
 
 if __name__ == "__main__":
