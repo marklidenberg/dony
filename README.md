@@ -74,10 +74,12 @@ The decorator handles:
 Working directory options:
 
 ```python
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)  # Run from git root
-@dony.command(run_from=dony.RunFrom.COMMAND_FILE)  # Run from script's directory (default)
-@dony.command(run_from=dony.RunFrom.CWD)  # Run from current directory
-@dony.command(run_from=dony.RunFrom.TEMP)  # Run from temporary directory
+from dony import RunFrom
+
+@dony.command(run_from=RunFrom.GIT_ROOT)  # Run from git root
+@dony.command(run_from=RunFrom.COMMAND_FILE)  # Run from script's directory (default)
+@dony.command(run_from=RunFrom.CWD)  # Run from current directory
+@dony.command(run_from=RunFrom.TEMP)  # Run from temporary directory
 @dony.command(run_from="/custom/path")  # Run from custom path
 ```
 
@@ -164,8 +166,9 @@ dony.shell(
 
 ```python
 import dony
+from dony import RunFrom
 
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)
+@dony.command(run_from=RunFrom.GIT_ROOT)
 def deploy():
     """Deploy application"""
 
