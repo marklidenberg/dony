@@ -1,183 +1,176 @@
-from typing import Sequence, Union, Optional, Tuple
+from dataclasses import dataclass
+from typing import Sequence, Union, Optional, Dict, TypeVar, Generic
 import subprocess
 import questionary
-from questionary import Choice
+from questionary import Choice as QuestionaryChoice
+from prompt_toolkit.styles import Style
 
 
-from dony import confirm
+T = TypeVar("T")
+
+
+@dataclass
+class Choice(Generic[T]):
+    """A choice with optional descriptions for select prompts."""
+
+    value: T
+    display_value: str = ""
+    short_desc: str = ""
+    long_desc: str = ""
+
+    def __post_init__(self):
+        # If display_value is not provided, use str(value)
+        if not self.display_value:
+            self.display_value = str(self.value)
 
 
 def select(
     message: str,
-    choices: Sequence[Union[str, Tuple[str, str], Tuple[str, str, str]]],
-    default: Optional[Union[str, Sequence[str]]] = None,
-    multi: bool = False,
+    choices: Sequence[Union[str, Choice[T]]],
+    default: Optional[str] = None,
     fuzzy: bool = True,
-    default_confirm: bool = False,
-    provided: Optional[str] = None,
-    require_any_choice: bool = True,
-) -> Union[None, str, Sequence[str]]:
+    allow_custom: bool = False,
+    custom_choice_text: str = "Custom",
+    allow_empty: bool = False,
+) -> Union[T, str]:
     """
     Prompt the user to select from a list of choices, each of which can have:
-      - a display value
-      - a short description (shown after the value)
+      - a value (the actual value returned)
+      - a display value (shown in the list)
+      - a short description (shown after the display value)
       - a long description (shown in a right-hand sidebar in fuzzy mode)
 
     If fuzzy is True, uses fzf with a preview pane for the long descriptions.
     Falls back to questionary if fzf is not available or fuzzy is False.
+
+    Args:
+        allow_custom: If True, adds a custom option that prompts for text entry.
+        custom_choice_text: The text to display for the custom option (default: "Custom").
     """
 
-    # - Check if provided answer is set
+    # - Add custom choice if requested
 
-    if provided is not None:
-        if provided not in choices:
-            raise ValueError(f"Provided answer '{provided}' is not in choices.")
-        return provided
-
-    # - If default is present and default_confirm is True, then ask for confirmation to just use default
-
-    if default is not None and default_confirm:
-        # - Ask for confirmation
-
-        if confirm(message + f"\nUse default? [{default}]"):
-            return default
-
-    # - Helper to unpack a choice tuple or treat a plain string
-
-    def unpack(c):
-        if isinstance(c, tuple):
-            if len(c) == 3:
-                return c  # (value, short_desc, long_desc)
-            elif len(c) == 2:
-                return (c[0], c[1], "")
-            elif len(c) == 1:
-                return (c[0], "", "")
-        else:
-            return (c, "", "")
+    actual_choices = list(choices)
+    if allow_custom:
+        actual_choices.append(custom_choice_text)
 
     # - Run fuzzy select prompt
 
     if fuzzy:
-        while True:
-            try:
-                # - Build command
+        try:
+            # - Build command
 
-                delimiter = "\t"
-                lines = []
+            delimiter = "\t"
+            lines = []
 
-                # Map from the displayed first field back to the real value
-                display_map: dict[str, str] = {}
+            # Map from the displayed first field back to the real value
+            display_map: Dict[str, Union[T, str]] = {}
 
-                for choice in choices:
-                    value, short_desc, long_desc = unpack(choice)
-                    display_map[value] = value
-                    lines.append(
-                        f"{value}{delimiter}{short_desc}{delimiter}{long_desc}"
-                    )
+            for choice in actual_choices:
+                if isinstance(choice, Choice):
+                    value = choice.value
+                    display_value = choice.display_value
+                    short_desc = choice.short_desc
+                    long_desc = choice.long_desc
+                else:
+                    value = choice
+                    display_value = str(choice)
+                    short_desc = ""
+                    long_desc = ""
 
-                cmd = [
-                    "fzf",
-                    "--read0",  # ← treat NUL as item separator
-                    "--prompt",
-                    f"{message} 👆",
-                    "--with-nth",
-                    "1,2",
-                    "--delimiter",
-                    delimiter,
-                    "--preview",
-                    "echo {} | cut -f3",
-                    "--preview-window",
-                    "down:30%:wrap",
-                ] + (["--multi"] if multi else [])
-
-                # - Run command
-
-                proc = subprocess.Popen(
-                    cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
+                display_map[display_value] = value
+                lines.append(
+                    f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
                 )
-                output, _ = proc.communicate(input="\0".join(lines))
 
-                if output == "":
-                    raise KeyboardInterrupt
+            cmd = [
+                "fzf",
+                "--read0",  # ← treat NUL as item separator
+                "--prompt",
+                f"{message} 👆",
+                "--with-nth",
+                "1,2",
+                "--delimiter",
+                delimiter,
+                "--preview",
+                "echo {} | cut -f3",
+                "--preview-window",
+                "down:30%:wrap",
+            ]
 
-                # - Parse output
+            # - Run command
 
-                # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
-                picked_disp1 = [
-                    line.split(delimiter, 1)[0] for line in output.strip().splitlines()
-                ]
-                results = [display_map[d] for d in picked_disp1]
+            proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+            output, _ = proc.communicate(input="\0".join(lines))
 
-                # - Try again if no results
+            if output == "":
+                raise KeyboardInterrupt
 
-                if not results and require_any_choice:
-                    # try again
-                    continue
+            # - Parse output
 
-                # - Return if all is good
+            # fzf returns lines like "disp1<sep>disp2", so split on the delimiter
+            picked_display = output.strip().split(delimiter, 1)[0]
+            result = display_map[picked_display]
 
-                return results if multi else (results[0] if results else None)
+            # - Handle custom input if selected
 
-            except FileNotFoundError:
-                pass
+            if allow_custom and result == custom_choice_text:
+                from dony.prompts.input_text import input_text
+
+                return input_text(
+                    message=message,
+                    allow_empty=allow_empty,
+                )
+
+            # - Return if all is good
+
+            return result
+
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                "fzf is not installed. Install it or set fuzzy=False to use the default prompt."
+            )
 
     # - Fallback to questionary
 
     q_choices = []
 
-    for choice in choices:
-        value, short_desc, long_desc = unpack(choice)
+    for choice in actual_choices:
+        if isinstance(choice, Choice):
+            value = choice.value
+            display_value = choice.display_value
+            short_desc = choice.short_desc
+            long_desc = choice.long_desc
+        else:
+            value = choice
+            display_value = str(choice)
+            short_desc = ""
+            long_desc = ""
 
         if long_desc and short_desc:
             # suffix after the short description
-            title = f"{value} - {short_desc} (description available)"
+            title = f"{display_value} - {short_desc} ({long_desc})"
         elif long_desc and not short_desc:
-            # no short_desc, suffix after the value
-            title = f"{value} (description available)"
+            # no short_desc, suffix after the display_value
+            title = f"{display_value} ({long_desc})"
         elif short_desc:
-            title = f"{value} - {short_desc}"
+            title = f"{display_value} - {short_desc}"
         else:
-            title = value
+            title = display_value
 
         q_choices.append(
-            Choice(
+            QuestionaryChoice(
                 title=title,
                 value=value,
-                checked=value in (default or []),
+                checked=value == default,
             )
         )
-
-    # - Run checkbox select prompt
-
-    if multi:
-        while True:
-            # - Ask
-
-            result = questionary.checkbox(
-                message=message,
-                choices=q_choices,
-                qmark="•",
-                instruction="",
-            ).ask()
-
-            # - Raise if KeyboardInterrupt
-
-            if result is None:
-                raise KeyboardInterrupt
-
-            # - Repeat if require_any_choice and no result
-
-            if not result and require_any_choice:
-                # try again
-                continue
-
-            # - Return if all is good
-
-            return result
 
     # - Run select prompt
 
@@ -187,12 +180,27 @@ def select(
         default=default,
         qmark="•",
         instruction=" ",
+        style=Style(
+            [
+                ("question", "fg:ansiblue"),  # the question text
+            ]
+        ),
     ).ask()
 
     # - Raise KeyboardInterrupt if no result
 
     if result is None:
         raise KeyboardInterrupt
+
+    # - Handle custom input if selected
+
+    if allow_custom and result == custom_choice_text:
+        from dony.prompts.input_text import input_text
+
+        return input_text(
+            message=message,
+            allow_empty=allow_empty,
+        )
 
     # - Return
 
@@ -203,16 +211,14 @@ def example():
     selected = select(
         "Give me that path",
         choices=[
-            ("foo", "", "This is the long description for foo."),
-            ("bar", "second option", "Detailed info about bar goes here."),
-            ("baz", "third one", "Here’s a more in-depth explanation of baz."),
-            ("qux", "", "Qux has no short description, only a long one."),
+            Choice("foo", long_desc="This is the long description for foo."),
+            Choice("bar", "second option", "Detailed info about bar goes here."),
+            Choice("baz", "third one", "Here's a more in-depth explanation of baz."),
+            Choice("qux", long_desc="Qux has no short description, only a long one."),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
-        multi=False,
         fuzzy=False,
-        default=["foo"],
-        default_confirm=True,
+        default="foo",
     )
     print(selected)
 

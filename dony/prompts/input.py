@@ -1,4 +1,3 @@
-from typing import Optional
 import questionary
 from prompt_toolkit.styles import Style
 
@@ -6,14 +5,9 @@ from prompt_toolkit.styles import Style
 def input(
     message: str,
     default: str = "",
-    allow_empty_string: bool = False,
-    provided: Optional[str] = None,
-):
-    # - Return provided answer
-
-    if provided is not None:
-        return provided
-
+    allow_empty: bool = False,
+    multiline: bool = False,
+) -> str:
     # - Run input prompt
 
     while True:
@@ -28,6 +22,7 @@ def input(
                     ("question", "fg:ansiblue"),  # the question text
                 ]
             ),
+            multiline=multiline,
         ).ask()
 
         # - Raise KeyboardInterrupt if no result
@@ -37,7 +32,7 @@ def input(
 
         # - Return result
 
-        if allow_empty_string or result:
+        if allow_empty or result:
             return result
 
 

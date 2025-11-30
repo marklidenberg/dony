@@ -1,166 +1,92 @@
 import inspect
 import os
-import re
-import sys
-import types
 from pathlib import Path
+import tempfile
 from functools import wraps
-from dataclasses import make_dataclass, fields, field
-from typing import Any, get_origin, get_args, Optional, Union
+from typing import Union, Callable, TypeVar, Any
+from enum import Enum
 
-from dotenv import load_dotenv
-
-from dony.get_donyfiles_root import get_donyfiles_root
-from dony.shell import shell
+from dony.find_git_root import find_git_root
 from dony.prompts.error import error
-from dony.get_donyfiles_path import get_donyfiles_path
 from dony.prompts.success import success
 
 
-if sys.version_info >= (3, 10):
-    _union_type = types.UnionType
-else:
-    _union_type = None  # or skip using it
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-def command(path: Optional[str] = None):
-    """Decorator to mark a function as a dony command."""
+class RunFrom(Enum):
+    """Enum for specifying where a command should run from."""
+
+    GIT_ROOT = "git_root"
+    COMMAND_FILE = "command_file"
+    CWD = "cwd"
+    TEMP = "temp"
+
+
+def command(
+    run_from: Union[str, Path, RunFrom] = RunFrom.COMMAND_FILE,
+    verbose: bool = True,
+) -> Callable[[F], F]:
+    """Decorator to mark a function as a dony command.
+
+    Args:
+        run_from: Where to run the command from.
+                 Can be a Path, path string, or RunFrom enum value.
+        verbose: If True, shows success message on completion and error message on failure.
+    """
 
     def decorator(func):
-        sig = inspect.signature(func)
-
-        # - Validate that all parameters have default values
-
-        for name, param in sig.parameters.items():
-            if param.default is inspect._empty:
-                raise ValueError(
-                    f"Command '{func.__name__}': parameter '{name}' must have a default value"
-                )
-
-        # - Validate all parameters have string or List[str] types
-
-        for name, param in sig.parameters.items():
-            # - Extract annotation
-
-            annotation = param.annotation
-
-            # - Extract top-level origin and args for type inspection
-
-            origin = get_origin(annotation)
-            args = get_args(annotation)
-
-            # - Remove NoneType from type arguments (to handle Optional[...] which is Union[..., None])
-
-            non_none = tuple(a for a in args if a is not type(None))
-
-            if not (
-                (annotation is str)  # str
-                or (origin is list and args and args[0] is str)  # List[str]
-                or (  # Optional[str] or Optional[List[str]]
-                    origin
-                    in (
-                        Union,
-                        _union_type,
-                    )  # Check for typing.Union or Python 3.10+ X | None
-                    and len(non_none) == 1  # Only one non-None type in the union
-                    and (
-                        non_none[0] is str
-                        or (
-                            get_origin(non_none[0]) is list
-                            and get_args(non_none[0])
-                            and get_args(non_none[0])[0] is str
-                        )
-                    )
-                )
-            ):
-                raise ValueError(
-                    f"Command '{func.__name__}': parameter '{name}' must be str, List[str], Optional[str], or Optional[List[str]]"
-                )
-
-        # - Get file_path
-
-        source_file = inspect.getsourcefile(func)
-        if not source_file:
-            raise RuntimeError(
-                f"Could not locate source file for command '{func.__name__}'"
-            )
-        file_path = Path(source_file).resolve()
-
-        # - Compute or use provided path
-
-        if path is None:
-            # - Init path
-
-            func._path = str(file_path)
-
-            # - Get paths
-
-            donyfiles_path = str(get_donyfiles_path(file_path))
-            project_path = str(get_donyfiles_root(file_path))
-
-            # - Remove donyfiles prefix if present
-
-            func._path = func._path.replace(donyfiles_path, "")
-
-            # - Remove project prefix if present
-
-            func._path = func._path.replace(project_path, "")
-
-            # - Remove leading /
-
-            if func._path.startswith("/"):
-                func._path = func._path[1:]
-
-            # - Remove .py extension
-
-            func._path = func._path.replace(".py", "")
-        else:
-            func._path = path
-
-        func._dony_command = True
+        # - Wrap function
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # - Load dotenv in dony path or its parent
-
-            if (
-                os.path.basename(inspect.currentframe().f_back.f_code.co_filename)
-                == "run_with_list_arguments.py"
-            ):
-                # running from command client
-                donyfiles_path = get_donyfiles_path(
-                    inspect.currentframe().f_back.f_back.f_back.f_code.co_filename
-                )
-            else:
-                donyfiles_path = get_donyfiles_path(
-                    inspect.currentframe().f_back.f_code.co_filename
-                )
-
-            load_dotenv(dotenv_path=donyfiles_path / ".env")
-            load_dotenv(dotenv_path=donyfiles_path.parent / ".env")
-
-            # - Bind partial to allow positional or keyword
-
-            bound = sig.bind_partial(*args, **kwargs)
-            bound.apply_defaults()
-
-            # - Change directory to dony root
-
-            os.chdir(donyfiles_path.parent)
-
-            # - Call original function with resolved args
+            # - Save original directory
+            original_dir = Path.cwd()
+            temp_dir = None
 
             try:
-                result = func(**bound.arguments)
-                success(f"Command '{func.__name__}' succeeded")
-                return result
-            except KeyboardInterrupt:
-                return error("Dony command interrupted")
+                # - Change directory to run_from
 
-        # - Attach metadata to wrapper
+                command_dir = Path(inspect.getfile(func)).parent
 
-        wrapper._dony_command = True
-        wrapper._path = func._path
+                if run_from == RunFrom.GIT_ROOT:
+                    os.chdir(find_git_root(path=command_dir))
+                elif run_from == RunFrom.COMMAND_FILE:
+                    os.chdir(command_dir)
+                elif run_from == RunFrom.TEMP:
+                    temp_dir = tempfile.mkdtemp()
+                    os.chdir(temp_dir)
+                elif run_from == RunFrom.CWD:
+                    pass  # Stay in current directory
+                else:
+                    # Assume it's a path string or Path object
+                    os.chdir(Path(run_from))
+
+                # - Run command
+
+                try:
+                    result = func(*args, **kwargs)
+                    if verbose:
+                        success(f"Command '{func.__name__}' succeeded")
+                    return result
+                except KeyboardInterrupt:
+                    if verbose:
+                        error("Dony command interrupted")
+                    raise
+                except Exception:
+                    if verbose:
+                        error(f"Command '{func.__name__}' failed")
+                    raise
+            finally:
+                # - Restore original directory
+                os.chdir(original_dir)
+
+                # - Clean up temp directory if created
+                if temp_dir:
+                    import shutil
+
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+
         return wrapper
 
     return decorator

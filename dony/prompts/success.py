@@ -4,14 +4,14 @@ from prompt_toolkit.formatted_text import FormattedText
 
 
 def success(
-    text: str = "Success!",
-    prefix: str = "✅ ",
-):
+    message: str,
+    prefix: str = "✓ ",
+) -> None:
     return print_formatted_text(
         FormattedText(
             [
-                ("class:qmark", "• "),
-                ("class:question", prefix + text),
+                ("class:qmark", ""),
+                ("class:question", prefix + message),
             ]
         ),
         style=questionary.Style(
@@ -24,7 +24,7 @@ def success(
 
 
 def example():
-    success()
+    success(message="Success")
 
 
 if __name__ == "__main__":

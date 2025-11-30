@@ -4,14 +4,13 @@ from prompt_toolkit.formatted_text import FormattedText
 
 
 def error(
-    text: str,
-    prefix: str = "❌ ",
-):
+    message: str,
+    prefix: str = "✕ ",
+) -> None:
     return print_formatted_text(
         FormattedText(
             [
-                ("class:qmark", "• "),
-                ("class:question", prefix + text),
+                ("class:question", prefix + message),
             ]
         ),
         style=questionary.Style(

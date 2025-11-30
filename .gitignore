@@ -24,4 +24,5 @@
 !*.template
 !*.sh
 !*.yaml
+!*.md
 
