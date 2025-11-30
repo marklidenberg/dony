@@ -100,7 +100,9 @@ def split_merge():
     # - Wait for the user to do commits
 
     while True:
-        dony.press_any_key_to_continue("Press any key when you are done with commits...")
+        dony.press_any_key_to_continue(
+            "Press any key when you are done with commits..."
+        )
 
         if not has_local_changes():
             break
