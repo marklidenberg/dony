@@ -254,7 +254,7 @@ wheels = [
 
 [[package]]
 name = "dony"
-version = "0.2.1"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "jprint2" },
@@ -262,26 +262,26 @@ dependencies = [
     { name = "questionary" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "build" },
     { name = "jprint2" },
-    { name = "pyperclip" },
     { name = "twine" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "build", marker = "extra == 'dev'", specifier = ">=1.2.2.post1" },
-    { name = "dony", marker = "extra == 'dev'", editable = "." },
     { name = "jprint2", specifier = ">=0.2.0" },
-    { name = "jprint2", marker = "extra == 'dev'", specifier = ">=0.2.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
-    { name = "pyperclip", marker = "extra == 'dev'", specifier = ">=1.9.0" },
     { name = "questionary", specifier = ">=2.1.0" },
-    { name = "twine", marker = "extra == 'dev'", specifier = ">=6.1.0" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "build", specifier = ">=1.2.2.post1" },
+    { name = "jprint2", specifier = ">=0.2.0" },
+    { name = "twine", specifier = ">=6.1.0" },
+]
 
 [[package]]
 name = "id"
@@ -589,12 +589,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293, upload-time = "2025-01-06T17:26:25.553Z" },
 ]
-
-[[package]]
-name = "pyperclip"
-version = "1.9.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/30/23/2f0a3efc4d6a32f3b63cdff36cd398d9701d26cda58e3ab97ac79fb5e60d/pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310", size = 20961, upload-time = "2024-06-18T20:38:48.401Z" }
 
 [[package]]
 name = "pyproject-hooks"
