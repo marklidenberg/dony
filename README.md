@@ -1,17 +1,17 @@
 # 🍥️ dony
 
-A lightweight Python-based command runner. A [just](https://github.com/casey/just) alternative.
+A lightweight Python library for writing shell scripts. Just Python functions that run shell commands.
 
 ## How it works
 
-Write Python functions decorated with `@dony.command()` in `donyfiles/` directory. Each command is a regular Python function with access to:
+Write Python functions decorated with `@dony.command()`. Each command is a regular Python script with access to:
 
 - **Shell execution**: `dony.shell()` for running shell commands
 - **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
-- **Styling**: `dony.print()`, `dony.error()`, `dony.success()`
+- **Styling**: `dony.echo()`, `dony.error()`, `dony.success()`
 
 ```python
-# donyfiles/hello_world.py
+# hello_world.py
 
 import dony
 
@@ -26,44 +26,28 @@ if __name__ == "__main__":
     hello_world()
 ```
 
-Run commands in two ways:
+Run it:
 
-- **Python directly**: `python donyfiles/<command_name>.py`
-- **Interactive menu**: `dony` (select from all available commands)
-
-```
-                                                                                                                                                                                                                 
-  📝 squash                                                                                                                                                                                           
-  📝 release                                                                                                                                                                                                      
-▌ 📝 hello_world                                                                                                                                                                                                  
-  3/3 ─────────────────────────────────────────────────────────────────── 
-Select command 👆                                                                                                                                                                                                 
-╭───────────────────────────────────────────────────────────────────────╮
-│ Prints "Hello, World!"                                                │
-╰───────────────────────────────────────────────────────────────────────╯
+```bash
+python hello_world.py
 ```
 
 ## Quick Start
 
-For MacOS:
+Install dony:
 
 ```bash
+pip install dony
+```
 
-# - Install prerequisites (pipx for global install, fzf and shfmt are optional)
+Optional dependencies for better experience:
 
-brew install pipx, fzf, shfmt
+```bash
+# fzf for fuzzy selection (optional)
+brew install fzf
 
-# - Install dony
-
-pipx install dony
-
-# - Init dony (bootstraps hello-world example)
-
-dony --init
-
-# - Run dony
-
-dony
+# shfmt for shell command formatting (optional)
+brew install shfmt
 ```
 
 ## Core API

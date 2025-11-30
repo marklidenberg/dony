@@ -18,12 +18,10 @@ def has_local_changes():
 
 @dony.command()
 def split_merge():
-    """Хелпер для мерджа текущей ветки в main без PR:
-    - позволяет разбивать изменения на несколько коммитов,
-    - лишнее можно застешить,
-    - итог — чистая история в main.
-
-    Для администраторов.
+    """Helper for merging the current branch into main without a PR:
+    - allows splitting changes into multiple commits,
+    - unnecessary changes can be stashed,
+    - result — clean history in main.
     """
 
     # - Check that github email is properly set
