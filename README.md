@@ -1,6 +1,6 @@
 # 🍥️ dony
 
-A lightweight Python library for writing shell scripts. Just Python functions that run shell commands.
+A lightweight Python command runner with user interactions.
 
 ## How it works
 
@@ -8,7 +8,6 @@ Write Python functions decorated with `@dony.command()`. Each command is a regul
 
 - **Shell execution**: `dony.shell()` for running shell commands
 - **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
-- **Styling**: `dony.echo()`, `dony.error()`, `dony.success()`
 
 ```python
 # hello_world.py
@@ -18,7 +17,6 @@ import dony
 
 @dony.command()
 def hello_world():
-    """Hello, world!"""
     dony.shell('echo "Hello, world!"')
 
 
@@ -52,29 +50,36 @@ brew install shfmt
 
 ## Core API
 
-Dony provides three main capabilities:
-
 ### 1. Commands
 
-Decorate Python functions with `@dony.command()` to make them runnable via CLI:
+Decorate Python functions with `@dony.command()`:
 
 ```python
 import dony
-from typing import Optional
 
 @dony.command()
-def greet(
-    greeting: str = 'Hello',
-    name: Optional[str] = None
-):
+def greet(name: str = 'World'):
     """Greets the user"""
-    name = dony.input('What is your name?', provided=name)
-    dony.shell(f"echo {greeting}, {name}!")
+    dony.shell(f"echo Hello, {name}!")
+
+if __name__ == "__main__":
+    greet()
 ```
 
-- All function parameters must have default values
-- Parameters with `None` default will prompt for user input using the `provided` parameter pattern
-- Use `dony.input()`, `dony.select()` etc. with `provided=param` to enable interactive prompting
+The decorator handles:
+
+- Changing to the correct working directory (configurable via `run_from`)
+- Success/failure messages (configurable via `verbose`)
+
+Working directory options:
+
+```python
+@dony.command(run_from=dony.RunFrom.GIT_ROOT)  # Run from git root
+@dony.command(run_from=dony.RunFrom.COMMAND_FILE)  # Run from script's directory (default)
+@dony.command(run_from=dony.RunFrom.CWD)  # Run from current directory
+@dony.command(run_from=dony.RunFrom.TEMP)  # Run from temporary directory
+@dony.command(run_from="/custom/path")  # Run from custom path
+```
 
 ### 2. Shell Execution
 
@@ -83,6 +88,7 @@ Execute shell commands with enhanced control and safety:
 ```python
 result = dony.shell('git status', quiet=True)
 dony.shell('npm test', confirm=True)  # Ask for confirmation first
+dony.shell('ls', run_from='/tmp')  # Run in specific directory
 ```
 
 ### 3. User Prompts
@@ -98,53 +104,42 @@ if dony.confirm('Continue?'):
 
 ## Use cases
 
-- Build, deploy, release
-- DevOps operations
-- Testing
-- Git management
-- Repo chores
+- Build, deploy, release scripts
+- DevOps automation
+- Testing workflows
+- Git operations
+- Any shell automation task
 
 ## Important Notes
 
-- **Working directory**: All commands run from the project root (where `donyfiles/` is located)
-- **Pure Python**: Commands are just Python functions - no special client or runtime needed
+- **Pure Python**: Scripts are just Python functions - run them directly with `python script.py`
 - **Shell integration**: Use `dony.shell()` for any shell operations
-- **Interactive by default**: Prompts make commands interactive and user-friendly
+- **Interactive by default**: Built-in prompts make scripts user-friendly
+- **CLI** is not currently implemented
 
 ## API Reference
 
-### Available Prompts
+### Available Functions
 
-All prompts are based on `questionary` and support rich interactions:
+**Prompts** (based on `questionary`):
 
-- `dony.input`: text entry with optional autocompletions
-- `dony.confirm`: yes/no ([Y/n] or [y/N])
-- `dony.select`: option picker (supports fuzzy matching with fzf)
-- `dony.select_many`: multi-option picker (supports fuzzy matching with fzf)
-- `dony.select_or_input`: option picker + custom input fallback
-- `dony.press_any_key_to_continue`: pause until keypress
-- `dony.path`: filesystem path entry
-- `dony.print`: styled text output
-- `dony.error`: ❌ error message
-- `dony.success`: ✅ success message
+- `dony.input(message, default='', allow_empty=False, multiline=False)`: text entry
+- `dony.confirm(message, default=True)`: yes/no confirmation (uses select internally)
+- `dony.select(message, choices, default=None, fuzzy=True, allow_custom=False)`: single option picker
+- `dony.select_many(message, choices, default=None, fuzzy=True)`: multi-option picker
+- `dony.press_any_key(message)`: pause until keypress
 
-### Rich Choice Objects
+**Output**:
 
-Selection prompts (`select`, `select_many`, `select_or_input`) support rich `Choice` objects with descriptions:
+- `dony.echo(message, style)`: styled text output
+- `dony.error(message, prefix='✕ ')`: error message in red
+- `dony.success(message, prefix='✓ ')`: success message in green
 
-```python
-from dony.prompts.choice import Choice
+**Utilities**:
 
-framework = dony.select(
-    "Select a framework",
-    choices=[
-        Choice("react", "React", "A JavaScript library for building user interfaces"),
-        Choice("vue", "Vue.js", "The Progressive JavaScript Framework"),
-        Choice("angular", "Angular", "Platform for building mobile and desktop web applications"),
-    ],
-    fuzzy=True  # Uses fzf with preview pane for long descriptions
-)
-```
+- `dony.shell(command, **options)`: execute shell commands
+- `dony.command(run_from, verbose)`: decorator for command functions
+- `dony.find_git_root(path)`: find git repository root
 
 ### Shell Command API
 
@@ -153,198 +148,52 @@ The `dony.shell()` function executes shell commands with enhanced features:
 ```python
 dony.shell(
     command: str,
-    working_dir: Optional[Union[str, Path]] = None,
-    dry_run: bool = False,
-    quiet: bool = False,
-    capture_output: bool = True,
-    abort_on_failure: bool = True,        # Prepends 'set -e'
-    abort_on_unset_variable: bool = True, # Prepends 'set -u'
-    trace_execution: bool = False,        # Prepends 'set -x'
-    show_command: bool = True,
-    confirm: bool = False,
-) -> Optional[str]
+    run_from: Optional[Union[str, Path]] = None,  # Working directory
+    dry_run: bool = False,                         # Print command without executing
+    quiet: bool = False,                           # Suppress output
+    capture_output: bool = True,                   # Return output as string
+    abort_on_failure: bool = True,                 # Prepends 'set -e'
+    abort_on_unset_variable: bool = True,          # Prepends 'set -u'
+    trace_execution: bool = False,                 # Prepends 'set -x'
+    show_command: bool = True,                     # Display formatted command
+    confirm: bool = False,                         # Ask before executing
+) -> str
 ```
 
 ## Example
 
 ```python
 import dony
-import re
-from typing import Optional
 
-@dony.command()
-def squash(
-    new_branch: Optional[str] = None,
-    target_branch: Optional[str] = None,
-    commit_message: Optional[str] = None,
-    checkout_to_new_branch: Optional[str] = None,
-    remove_merged_branch: Optional[str] = None,
-):
-  """Squashes current branch to main, checkouts to a new branch"""
+@dony.command(run_from=dony.RunFrom.GIT_ROOT)
+def deploy():
+    """Deploy application"""
 
-  # - Get target branch
+    # Confirm action
+    if not dony.confirm("Deploy to production?"):
+        return
 
-  target_branch = dony.input(
-    "Enter target branch:",
-    default=dony.shell(
-      "git branch --list main | grep -q main && echo main || echo master",
-      quiet=True,
-    ),
-    provided=target_branch,
-  )
+    # Select environment
+    env = dony.select(
+        "Select environment:",
+        choices=["staging", "production"],
+        fuzzy=False
+    )
 
-  # - Get github username
+    # Run build
+    dony.shell("npm run build")
 
-  github_username = dony.shell(
-    "git config --get user.name",
-    quiet=True,
-  )
+    # Run tests
+    dony.shell("npm test")
 
-  # - Get default branch if not set
+    # Deploy
+    dony.shell(f"./deploy.sh {env}", confirm=True)
 
-  new_branch = new_branch or f"{github_username}-flow"
-
-  # - Get current branch
-
-  merged_branch = dony.shell(
-    "git branch --show-current",
-    quiet=True,
-  )
-
-  # - Merge with target branch first
-
-  dony.shell(
-    f"""
-
-        # push if there are unpushed commits
-        git diff --name-only | grep -q . && git push
-      
-        git fetch origin
-        git checkout {target_branch}
-        git pull
-        git checkout {merged_branch}
-
-        git merge {target_branch}
-      
-        if ! git diff-index --quiet HEAD --; then
-
-          # try to commit twice, in case of formatting errors that are fixed by the first commit
-          git commit -m "Merge with target branch" || git commit -m "Merge with target branch"
-          git push
-        else
-          echo "Nothing merged – no commit made."
-        fi
-        """,
-  )
-
-  # - Do git diff
-
-  dony.shell(
-    f"""
-        root=$(git rev-parse --show-toplevel)
-      
-        git diff {target_branch} --name-only -z \
-        | while IFS= read -r -d '' file; do
-            full="$root/$file"
-            printf '\033[1;35m%s\033[0m\n' "$full"
-            git --no-pager diff --color=always {target_branch} -- "$file" \
-              | sed $'s/^/\t/'
-            printf '\n'
-          done
-""",
-  )
-
-  # - Ask user to confirm
-
-  if not dony.confirm("Start squashing?"):
-    return
-
-  # - Check if target branch exists
-
-  if not dony.shell(f"git branch --list {target_branch}"):
-    return dony.error(f"Target branch {target_branch} does not exist")
-
-  # - Get commit message from the user
-
-  if not commit_message:
-    while True:
-      commit_message = dony.input(
-        f"Enter commit message for merging branch {merged_branch} to {target_branch}:"
-      )
-      if bool(
-              re.match(
-                r"^(?:(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(?:\([A-Za-z0-9_-]+\))?(!)?:)\s.+$",
-                commit_message.splitlines()[0],
-              )
-      ):
-        break
-      dony.print("Only conventional commits are allowed, try again")
-
-  # - Check if user wants to checkout to a new branch
-
-  checkout_to_new_branch = dony.confirm(
-    f"Checkout to new branch {new_branch}?",
-    provided=checkout_to_new_branch,
-  )
-
-  # - Check if user wants to remove merged branch
-
-  remove_merged_branch = dony.confirm(
-    f"Remove merged branch {merged_branch}?",
-    provided=remove_merged_branch,
-  )
-
-  # - Do the process
-
-  dony.shell(
-    f"""
-
-        # - Make up to date
-
-        git diff --name-only | grep -q . && git stash push -m "squash-{merged_branch}"
-        git checkout {target_branch}
-
-        # - Set upstream if needed
-
-        if ! git ls-remote --heads --exit-code origin "{target_branch}" >/dev/null; then
-            git push --set-upstream origin {target_branch} --force
-        fi
-
-        # - Pull target branch
-
-        git pull
-
-        # - Merge
-
-        git merge --squash {merged_branch}
-      
-        # try to commit twice, in case of formatting errors that are fixed by the first commit
-        git commit -m "{commit_message}" || git commit -m "{commit_message}"
-        git push 
-
-        # - Remove merged branch
-
-        if {str(remove_merged_branch).lower()}; then
-            git branch -D {merged_branch}
-            git push origin --delete {merged_branch}
-        fi
-
-        # - Create new branch
-
-        if {str(checkout_to_new_branch).lower()}; then
-            git checkout -b {new_branch}
-            git push --set-upstream origin {new_branch}
-        fi
-    """,
-  )
-
+    dony.success(f"Deployed to {env}")
 
 if __name__ == "__main__":
-    squash()
-
+    deploy()
 ```
-
-## License
 
 MIT License
 
