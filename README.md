@@ -1,13 +1,21 @@
 # 🍥️ dony
 
-A lightweight Python command runner with user interactions.
+A lightweight Python command runner with shell execution and user interactions.
 
-## How it works
+## Installation
 
-Write Python functions decorated with `@dony.command()`. Each command is a regular Python script with access to:
+```bash
+pip install dony
+```
 
-- **Shell execution**: `dony.shell()` for running shell commands
-- **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
+Optional dependencies:
+
+```bash
+brew install fzf     # For fuzzy selection
+brew install shfmt   # For shell command formatting
+```
+
+## Quick Example
 
 ```python
 import dony
@@ -16,24 +24,13 @@ import dony
 def deploy():
     """Deploy application"""
 
-    # Confirm action
     if not dony.confirm("Deploy to production?"):
         return
 
-    # Select environment
-    env = dony.select(
-        "Select environment:",
-        choices=["staging", "production"],
-        fuzzy=False
-    )
+    env = dony.select("Select environment:", ["staging", "production"])
 
-    # Run build
     dony.shell("npm run build")
-
-    # Run tests
     dony.shell("npm test")
-
-    # Deploy
     dony.shell(f"./deploy.sh {env}", confirm=True)
 
     dony.success(f"Deployed to {env}")
@@ -42,134 +39,29 @@ if __name__ == "__main__":
     deploy()
 ```
 
-Run it:
+Run with `python deploy.py`
 
-```bash
-python hello_world.py
-```
+## Core Features
 
-## Quick Start
+### Commands
 
-Install dony:
-
-```bash
-pip install dony
-```
-
-Optional dependencies for better experience:
-
-```bash
-# fzf for fuzzy selection (optional)
-brew install fzf
-
-# shfmt for shell command formatting (optional)
-brew install shfmt
-```
-
-## Core API
-
-### 1. Commands
-
-Decorate Python functions with `@dony.command()`:
+The `@dony.command()` decorator handles working directory management and success/failure messaging:
 
 ```python
-import dony
-
-@dony.command()
-def greet(name: str = 'World'):
-    """Greets the user"""
-    dony.shell(f"echo Hello, {name}!")
-
-if __name__ == "__main__":
-    greet()
+@dony.command(run_from=dony.RunFrom.GIT_ROOT)     # Run from git root
+@dony.command(run_from=dony.RunFrom.COMMAND_FILE) # Run from script's directory (default)
+@dony.command(run_from=dony.RunFrom.CWD)          # Run from current directory
+@dony.command(run_from=dony.RunFrom.TEMP)         # Run from temporary directory
+@dony.command(run_from="/custom/path")            # Run from custom path
 ```
 
-The decorator handles:
-
-- Changing to the correct working directory (configurable via `run_from`)
-- Success/failure messages (configurable via `verbose`)
-
-Working directory options:
-
-```python
-from dony import RunFrom
-
-@dony.command(run_from=RunFrom.GIT_ROOT)  # Run from git root
-@dony.command(run_from=RunFrom.COMMAND_FILE)  # Run from script's directory (default)
-@dony.command(run_from=RunFrom.CWD)  # Run from current directory
-@dony.command(run_from=RunFrom.TEMP)  # Run from temporary directory
-@dony.command(run_from="/custom/path")  # Run from custom path
-```
-
-### 2. Shell Execution
-
-Execute shell commands with enhanced control and safety:
-
-```python
-result = dony.shell('git status', quiet=True)
-dony.shell('npm test', confirm=True)  # Ask for confirmation first
-dony.shell('ls', run_from='/tmp')  # Run in specific directory
-```
-
-### 3. User Prompts
-
-Rich interactive prompts for user input:
-
-```python
-name = dony.input('Enter your name:', default='World')
-if dony.confirm('Continue?'):
-    framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'])
-    dony.success(f'You chose {framework}!')
-```
-
-## Use cases
-
-- Build, deploy, release scripts
-- DevOps automation
-- Testing workflows
-- Git operations
-- Any shell automation task
-
-## Important Notes
-
-- **Pure Python**: Scripts are just Python functions - run them directly with `python script.py`
-- **Shell integration**: Use `dony.shell()` for any shell operations
-- **Interactive by default**: Built-in prompts make scripts user-friendly
-- **CLI** is not currently implemented
-
-## API Reference
-
-### Available Functions
-
-**Prompts** (based on `questionary`):
-
-- `dony.input(message, default='', allow_empty=False, multiline=False)`: text entry
-- `dony.confirm(message, default=True)`: yes/no confirmation (uses select internally)
-- `dony.select(message, choices, default=None, fuzzy=True, allow_custom=False)`: single option picker
-- `dony.select_many(message, choices, default=None, fuzzy=True)`: multi-option picker
-- `dony.press_any_key(message)`: pause until keypress
-
-**Output**:
-
-- `dony.echo(message, style)`: styled text output
-- `dony.error(message, prefix='✕ ')`: error message in red
-- `dony.success(message, prefix='✓ ')`: success message in green
-
-**Utilities**:
-
-- `dony.shell(command, **options)`: execute shell commands
-- `dony.command(run_from, verbose)`: decorator for command functions
-- `dony.find_git_root(path)`: find git repository root
-
-### Shell Command API
-
-The `dony.shell()` function executes shell commands with enhanced features:
+### Shell Execution
 
 ```python
 dony.shell(
     command: str,
     run_from: Optional[Union[str, Path]] = None,  # Working directory
-    dry_run: bool = False,                         # Print command without executing
+    dry_run: bool = False,                         # Print without executing
     quiet: bool = False,                           # Suppress output
     capture_output: bool = True,                   # Return output as string
     abort_on_failure: bool = True,                 # Prepends 'set -e'
@@ -180,6 +72,47 @@ dony.shell(
 ) -> str
 ```
 
+Examples:
+
+```python
+result = dony.shell('git status', quiet=True)
+dony.shell('npm test', confirm=True)
+dony.shell('ls', run_from='/tmp')
+```
+
+### User Prompts
+
+```python
+# Text input
+name = dony.input('Enter your name:', default='World')
+
+# Confirmation
+if dony.confirm('Continue?', default=True):
+    pass
+
+# Single selection
+framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'], fuzzy=True)
+
+# Multiple selection
+features = dony.select_many('Pick features:', ['auth', 'api', 'ui'], fuzzy=True)
+
+# Pause
+dony.press_any_key('Press any key to continue...')
+
+dony.echo('Message', style='bold')
+dony.success('Operation completed!')  # Green with ✓
+dony.error('Operation failed!')       # Red with ✕
+```
+
+
+## Use Cases
+
+- Build, deploy, and release scripts
+- DevOps automation
+- Testing workflows
+- Git operations
+
+## License
 
 MIT License
 
