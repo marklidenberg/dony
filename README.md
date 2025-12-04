@@ -10,18 +10,36 @@ Write Python functions decorated with `@dony.command()`. Each command is a regul
 - **User prompts**: `dony.input()`, `dony.confirm()`, `dony.select()` and more
 
 ```python
-# hello_world.py
-
 import dony
 
+@dony.command(run_from=dony.RunFrom.GIT_ROOT)
+def deploy():
+    """Deploy application"""
 
-@dony.command()
-def hello_world():
-    dony.shell('echo "Hello, world!"')
+    # Confirm action
+    if not dony.confirm("Deploy to production?"):
+        return
 
+    # Select environment
+    env = dony.select(
+        "Select environment:",
+        choices=["staging", "production"],
+        fuzzy=False
+    )
+
+    # Run build
+    dony.shell("npm run build")
+
+    # Run tests
+    dony.shell("npm test")
+
+    # Deploy
+    dony.shell(f"./deploy.sh {env}", confirm=True)
+
+    dony.success(f"Deployed to {env}")
 
 if __name__ == "__main__":
-    hello_world()
+    deploy()
 ```
 
 Run it:
@@ -162,41 +180,6 @@ dony.shell(
 ) -> str
 ```
 
-## Example
-
-```python
-import dony
-from dony import RunFrom
-
-@dony.command(run_from=RunFrom.GIT_ROOT)
-def deploy():
-    """Deploy application"""
-
-    # Confirm action
-    if not dony.confirm("Deploy to production?"):
-        return
-
-    # Select environment
-    env = dony.select(
-        "Select environment:",
-        choices=["staging", "production"],
-        fuzzy=False
-    )
-
-    # Run build
-    dony.shell("npm run build")
-
-    # Run tests
-    dony.shell("npm test")
-
-    # Deploy
-    dony.shell(f"./deploy.sh {env}", confirm=True)
-
-    dony.success(f"Deployed to {env}")
-
-if __name__ == "__main__":
-    deploy()
-```
 
 MIT License
 
