@@ -80,20 +80,15 @@ dony.shell('ls', run_from='/tmp')
 ### User Prompts
 
 ```python
-# Text input
 name = dony.input('Enter your name:', default='World')
 
-# Confirmation
 if dony.confirm('Continue?', default=True):
     pass
 
-# Single selection
 framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'], fuzzy=True)
 
-# Multiple selection
 features = dony.select_many('Pick features:', ['auth', 'api', 'ui'], fuzzy=True)
 
-# Pause
 dony.press_any_key('Press any key to continue...')
 
 dony.echo('Message', style='bold')
