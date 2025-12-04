@@ -70,11 +70,8 @@ dony.shell(
     show_command: bool = True,                     # Display formatted command
     confirm: bool = False,                         # Ask before executing
 ) -> str
-```
+    ...
 
-Examples:
-
-```python
 result = dony.shell('git status', quiet=True)
 dony.shell('npm test', confirm=True)
 dony.shell('ls', run_from='/tmp')
