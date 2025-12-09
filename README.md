@@ -49,15 +49,15 @@ The `@dony.command()` decorator handles working directory management and success
 ```python
 @dony.command(run_from=RunFrom.GIT_ROOT)     # Run from git root
 @dony.command(run_from=RunFrom.COMMAND_FILE) # Run from script's directory (default)
-@dony.command(run_from=RunFrom.CWD)          # Run from current directory
-@dony.command(run_from=RunFrom.TEMP)         # Run from temporary directory
+@dony.command(run_from=RunFrom.CURRENT_DIR)  # Run from current directory
+@dony.command(run_from=RunFrom.TEMP_DIR)     # Run from temporary directory
 @dony.command(run_from="/custom/path")       # Run from custom path
 ```
 
 ## Shell Execution
 
 ```python
-dony.shell(
+def dony.shell(
     command: str,
     run_from: Optional[Union[str, Path]] = None,  # Working directory
     dry_run: bool = False,                         # Print without executing

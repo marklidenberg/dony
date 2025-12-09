@@ -19,8 +19,8 @@ class RunFrom(Enum):
 
     GIT_ROOT = "git_root"
     COMMAND_FILE = "command_file"
-    CWD = "cwd"
-    TEMP = "temp"
+    CURRENT_DIR = "current_dir"
+    TEMP_DIR = "temp_dir"
 
 
 def command(
@@ -53,10 +53,10 @@ def command(
                     os.chdir(find_git_root(path=command_dir))
                 elif run_from == RunFrom.COMMAND_FILE:
                     os.chdir(command_dir)
-                elif run_from == RunFrom.TEMP:
+                elif run_from == RunFrom.TEMP_DIR:
                     temp_dir = tempfile.mkdtemp()
                     os.chdir(temp_dir)
-                elif run_from == RunFrom.CWD:
+                elif run_from == RunFrom.CURRENT_DIR:
                     pass  # Stay in current directory
                 else:
                     # Assume it's a path string or Path object
