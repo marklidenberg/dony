@@ -49,7 +49,7 @@ Run with `python deploy.py`
   - `"command_file"`
   - `"temp_dir"`
   - Custom path string
-- Available prompts based on questionary:
+- Available prompts based on [questionary](https://github.com/tmbo/questionary):
   - `dony.input()`: free-text entry
   - `dony.confirm()`: yes/no ([Y/n] or [y/N])
   - `dony.select()`: option picker (supports fuzzy)
@@ -62,14 +62,14 @@ Run with `python deploy.py`
 ## API Reference
 
 ```python
-# Command decorator
-@dony.command(
+def command(
     run_from: Union[str, Path, Literal[ "current_dir", "git_root", "command_file", "temp_dir"]] = "current_dir",
     verbose: bool = True,
-)
+): 
+    ...
 
 # Shell execution
-dony.shell(
+def dony.shell(
     command: str,
     run_from: Optional[Union[str, Path]] = None,
     dry_run: bool = False,
@@ -80,7 +80,8 @@ dony.shell(
     trace_execution: bool = False,
     show_command: bool = True,
     confirm: bool = False,
-) -> str
+) -> str:
+    ...
 
 
 ## License
