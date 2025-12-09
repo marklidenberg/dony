@@ -41,18 +41,30 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
-## Notes
+## Things to know
 
-- Available directories to run from: `"current_dir"` (default), `"git_root"`, `"command_file"`, `"temp_dir"`, or custom path string
-- User prompts: `dony.input()`, `dony.confirm()`, `dony.select()`, `dony.select_many()`, `dony.press_any_key()`
-- Outputs: `dony.error()`, `dony.success
+- Available directories to run from:
+  - `"current_dir"` (default)
+  - `"git_root"`
+  - `"command_file"`
+  - `"temp_dir"`
+  - Custom path string
+- Available prompts based on questionary:
+  - `dony.input()`: free-text entry
+  - `dony.confirm()`: yes/no ([Y/n] or [y/N])
+  - `dony.select()`: option picker (supports fuzzy)
+  - `dony.select_many()`: multiple option picker (supports fuzzy)
+  - `dony.press_any_key()`: pause until keypress
+  - `dony.echo()`: styled text output
+  - `dony.error()`: ✕ error message
+  - `dony.success()`: ✓ success message
 
 ## API Reference
 
 ```python
 # Command decorator
 @dony.command(
-    run_from: Union[str, Path, Literal["git_root", "command_file", "current_dir", "temp_dir"]] = "current_dir",
+    run_from: Union[str, Path, Literal[ "current_dir", "git_root", "command_file", "temp_dir"]] = "current_dir",
     verbose: bool = True,
 )
 
@@ -70,18 +82,6 @@ dony.shell(
     confirm: bool = False,
 ) -> str
 
-# User prompts
-dony.input(prompt: str, default: str = "") -> str
-dony.confirm(message: str, default: bool = False) -> bool
-dony.select(message: str, choices: list, fuzzy: bool = False) -> str
-dony.select_many(message: str, choices: list, fuzzy: bool = False) -> list[str]
-dony.press_any_key(message: str = "Press any key to continue...")
-
-# Output
-dony.echo(message: str, style: str = "")
-dony.success(message: str)
-dony.error(message: str)
-```
 
 ## License
 
