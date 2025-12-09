@@ -68,18 +68,17 @@ def command(
 ): 
     ...
 
-# Shell execution
 def dony.shell(
     command: str,
-    run_from: Optional[Union[str, Path]] = None,
-    dry_run: bool = False,
-    quiet: bool = False,
-    capture_output: bool = True,
-    abort_on_failure: bool = True,
-    abort_on_unset_variable: bool = True,
-    trace_execution: bool = False,
-    show_command: bool = True,
-    confirm: bool = False,
+    run_from: Optional[Union[str, Path]] = None,   # Working directory
+    dry_run: bool = False,                         # Print without executing
+    quiet: bool = False,                           # Suppress printing output
+    capture_output: bool = True,                   # Return output as string
+    abort_on_failure: bool = True,                 # Prepends 'set -e'
+    abort_on_unset_variable: bool = True,          # Prepends 'set -u'
+    trace_execution: bool = False,                 # Prepends 'set -x'
+    show_command: bool = True,                     # Print formatted command
+    confirm: bool = False,                         # Ask before executing
 ) -> str:
     ...
 

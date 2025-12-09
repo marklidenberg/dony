@@ -2,13 +2,12 @@ import os
 from typing import Optional
 
 import dony
-from dony.command import RunFrom
 from dotenv import load_dotenv
 
 __NAME__ = "release:0.1.1"
 
 
-@dony.command(run_from=RunFrom.GIT_ROOT)
+@dony.command(run_from="git_root")
 def release(
     version: Optional[str] = None,
     uv_publish_token: Optional[str] = None,
