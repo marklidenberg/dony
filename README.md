@@ -15,12 +15,13 @@ brew install fzf     # For fuzzy selection
 brew install shfmt   # For shell command formatting
 ```
 
-## Quick Example
+## Example
 
 ```python
 import dony
+from dony import RunFrom
 
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)
+@dony.command(run_from=RunFrom.GIT_ROOT)
 def deploy():
     """Deploy application"""
 
@@ -41,21 +42,19 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
-## Core Features
-
-### Commands
+## Commands
 
 The `@dony.command()` decorator handles working directory management and success/failure messaging:
 
 ```python
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)     # Run from git root
-@dony.command(run_from=dony.RunFrom.COMMAND_FILE) # Run from script's directory (default)
-@dony.command(run_from=dony.RunFrom.CWD)          # Run from current directory
-@dony.command(run_from=dony.RunFrom.TEMP)         # Run from temporary directory
-@dony.command(run_from="/custom/path")            # Run from custom path
+@dony.command(run_from=RunFrom.GIT_ROOT)     # Run from git root
+@dony.command(run_from=RunFrom.COMMAND_FILE) # Run from script's directory (default)
+@dony.command(run_from=RunFrom.CWD)          # Run from current directory
+@dony.command(run_from=RunFrom.TEMP)         # Run from temporary directory
+@dony.command(run_from="/custom/path")       # Run from custom path
 ```
 
-### Shell Execution
+## Shell Execution
 
 ```python
 dony.shell(
@@ -77,7 +76,7 @@ dony.shell('npm test', confirm=True)
 dony.shell('ls', run_from='/tmp')
 ```
 
-### User Prompts
+## User Prompts
 
 ```python
 name = dony.input('Enter your name:', default='World')
@@ -95,7 +94,6 @@ dony.echo('Message', style='bold')
 dony.success('Operation completed!')  # Green with ✓
 dony.error('Operation failed!')       # Red with ✕
 ```
-
 
 ## Use Cases
 
