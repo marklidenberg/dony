@@ -65,7 +65,7 @@ Run with `python deploy.py`
 def command(
     run_from: Union[str, Path, Literal[ "current_dir", "git_root", "command_file", "temp_dir"]] = "current_dir",
     verbose: bool = True,
-): 
+) -> Callable[[F], F]:
     ...
 
 def dony.shell(
@@ -81,7 +81,7 @@ def dony.shell(
     confirm: bool = False,                         # Ask before executing
 ) -> str:
     ...
-
+```
 
 ## License
 
