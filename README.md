@@ -58,7 +58,7 @@ The `@dony.command()` decorator handles working directory management and success
 ### Shell Execution
 
 ```python
-dony.shell(
+def dony.shell(
     command: str,
     run_from: Optional[Union[str, Path]] = None,  # Working directory
     dry_run: bool = False,                         # Print without executing
