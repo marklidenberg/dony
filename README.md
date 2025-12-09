@@ -45,6 +45,7 @@ Run with `python deploy.py`
 
 - Available directories to run from: `"current_dir"` (default), `"git_root"`, `"command_file"`, `"temp_dir"`, or custom path string
 - User prompts: `dony.input()`, `dony.confirm()`, `dony.select()`, `dony.select_many()`, `dony.press_any_key()`
+- Outputs: `dony.error()`, `dony.success
 
 ## API Reference
 
