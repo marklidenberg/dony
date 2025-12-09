@@ -41,6 +41,17 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
+## Commands
+
+The `@dony.command()` decorator handles working directory management and success/failure messaging:
+
+```python
+@dony.command(run_from="git_root")
+@dony.command(run_from="command_file")
+@dony.command(run_from="current_dir")
+@dony.command(run_from="temp_dir")
+@dony.command(run_from="/custom/path")
+```
 
 ### Notes
 
