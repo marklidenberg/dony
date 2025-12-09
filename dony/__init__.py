@@ -5,7 +5,7 @@ try:
 except Exception:
     __version__ = "unknown"
 
-from .command import command, RunFrom
+from .command import command
 from .shell import shell
 from .find_git_root import find_git_root
 from .prompts.confirm import confirm
@@ -20,7 +20,6 @@ from .prompts.success import success
 __all__ = [
     "__version__",
     "command",
-    "RunFrom",
     "shell",
     "find_git_root",
     "confirm",

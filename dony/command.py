@@ -3,8 +3,7 @@ import os
 from pathlib import Path
 import tempfile
 from functools import wraps
-from typing import Union, Callable, TypeVar, Any
-from enum import Enum
+from typing import Union, Callable, TypeVar, Any, Literal
 
 from dony.find_git_root import find_git_root
 from dony.prompts.error import error
@@ -13,18 +12,11 @@ from dony.prompts.success import success
 
 F = TypeVar("F", bound=Callable[..., Any])
 
-
-class RunFrom(Enum):
-    """Enum for specifying where a command should run from."""
-
-    GIT_ROOT = "git_root"
-    COMMAND_FILE = "command_file"
-    CURRENT_DIR = "current_dir"
-    TEMP_DIR = "temp_dir"
+RunFrom = Literal["git_root", "command_file", "current_dir", "temp_dir"]
 
 
 def command(
-    run_from: Union[str, Path, RunFrom] = RunFrom.COMMAND_FILE,
+    run_from: Union[str, Path, RunFrom] = "command_file",
     verbose: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
@@ -49,14 +41,14 @@ def command(
 
                 command_dir = Path(inspect.getfile(func)).parent
 
-                if run_from == RunFrom.GIT_ROOT:
+                if run_from == "git_root":
                     os.chdir(find_git_root(path=command_dir))
-                elif run_from == RunFrom.COMMAND_FILE:
+                elif run_from == "command_file":
                     os.chdir(command_dir)
-                elif run_from == RunFrom.TEMP_DIR:
+                elif run_from == "temp_dir":
                     temp_dir = tempfile.mkdtemp()
                     os.chdir(temp_dir)
-                elif run_from == RunFrom.CURRENT_DIR:
+                elif run_from == "current_dir":
                     pass  # Stay in current directory
                 else:
                     # Assume it's a path string or Path object

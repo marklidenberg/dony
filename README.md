@@ -19,9 +19,8 @@ brew install shfmt   # For shell command formatting
 
 ```python
 import dony
-from dony import RunFrom
 
-@dony.command(run_from=RunFrom.GIT_ROOT)
+@dony.command(run_from="git_root")
 def deploy():
     """Deploy application"""
 
@@ -46,10 +45,10 @@ Run with `python deploy.py`
 ### Notes
 
 Available directories to run from:
-- `GIT_ROOT`
-- `COMMAND_FILE` (default)
-- `CURRENT_DIR`
-- `TEMP_DIR`
+- `"git_root"`
+- `"command_file"` (default)
+- `"current_dir"`
+- `"temp_dir"`
 - Custom path string
 
 ## Shell Execution
