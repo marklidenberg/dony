@@ -15,12 +15,12 @@ brew install fzf     # For fuzzy selection
 brew install shfmt   # For shell command formatting
 ```
 
-## Quick Example
+## Example
 
 ```python
 import dony
 
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)
+@dony.command(run_from="git_root")
 def deploy():
     """Deploy application"""
 
@@ -41,68 +41,48 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
-## Core Features
+## Things to know
 
-### Commands
+- Available directories to run from:
+  - `"current_dir"` (default)
+  - `"git_root"`
+  - `"command_file"`
+  - `"temp_dir"`
+  - Custom path string
+- Available prompts based on [questionary](https://github.com/tmbo/questionary):
+  - `dony.input()`: free-text entry
+  - `dony.confirm()`: yes/no ([Y/n] or [y/N])
+  - `dony.select()`: option picker (supports fuzzy)
+  - `dony.select_many()`: multiple option picker (supports fuzzy)
+  - `dony.press_any_key()`: pause until keypress
+  - `dony.echo()`: styled text output
+  - `dony.error()`: ✕ error message
+  - `dony.success()`: ✓ success message
 
-The `@dony.command()` decorator handles working directory management and success/failure messaging:
+## API Reference
 
 ```python
-@dony.command(run_from=dony.RunFrom.GIT_ROOT)     # Run from git root
-@dony.command(run_from=dony.RunFrom.COMMAND_FILE) # Run from script's directory (default)
-@dony.command(run_from=dony.RunFrom.CWD)          # Run from current directory
-@dony.command(run_from=dony.RunFrom.TEMP)         # Run from temporary directory
-@dony.command(run_from="/custom/path")            # Run from custom path
-```
-
-### Shell Execution
-
-```python
-def dony.shell(
-    command: str,
-    run_from: Optional[Union[str, Path]] = None,  # Working directory
-    dry_run: bool = False,                         # Print without executing
-    quiet: bool = False,                           # Suppress output
-    capture_output: bool = True,                   # Return output as string
-    abort_on_failure: bool = True,                 # Prepends 'set -e'
-    abort_on_unset_variable: bool = True,          # Prepends 'set -u'
-    trace_execution: bool = False,                 # Prepends 'set -x'
-    show_command: bool = True,                     # Display formatted command
-    confirm: bool = False,                         # Ask before executing
-) -> str
+def command(
+    run_from: Union[str, Path, Literal[ "current_dir", "git_root", "command_file", "temp_dir"]] = "current_dir",
+    verbose: bool = True,
+): 
     ...
 
-result = dony.shell('git status', quiet=True)
-dony.shell('npm test', confirm=True)
-dony.shell('ls', run_from='/tmp')
-```
+# Shell execution
+def dony.shell(
+    command: str,
+    run_from: Optional[Union[str, Path]] = None,
+    dry_run: bool = False,
+    quiet: bool = False,
+    capture_output: bool = True,
+    abort_on_failure: bool = True,
+    abort_on_unset_variable: bool = True,
+    trace_execution: bool = False,
+    show_command: bool = True,
+    confirm: bool = False,
+) -> str:
+    ...
 
-### User Prompts
-
-```python
-name = dony.input('Enter your name:', default='World')
-
-if dony.confirm('Continue?', default=True):
-    pass
-
-framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'], fuzzy=True)
-
-features = dony.select_many('Pick features:', ['auth', 'api', 'ui'], fuzzy=True)
-
-dony.press_any_key('Press any key to continue...')
-
-dony.echo('Message', style='bold')
-dony.success('Operation completed!')  # Green with ✓
-dony.error('Operation failed!')       # Red with ✕
-```
-
-
-## Use Cases
-
-- Build, deploy, and release scripts
-- DevOps automation
-- Testing workflows
-- Git operations
 
 ## License
 
