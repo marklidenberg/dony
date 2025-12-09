@@ -16,14 +16,14 @@ RunFrom = Literal["git_root", "command_file", "current_dir", "temp_dir"]
 
 
 def command(
-    run_from: Union[str, Path, RunFrom] = "command_file",
+    run_from: Union[str, Path, RunFrom] = "current_dir",
     verbose: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
 
     Args:
         run_from: Where to run the command from.
-                 Can be a Path, path string, or RunFrom enum value.
+                 Can be a Path, path string, or RunFrom literal value.
         verbose: If True, shows success message on completion and error message on failure.
     """
 

@@ -41,74 +41,46 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
-## Commands
+## Notes
 
-The `@dony.command()` decorator handles working directory management and success/failure messaging:
+- Available directories to run from: `"current_dir"` (default), `"git_root"`, `"command_file"`, `"temp_dir"`, or custom path string
+- User prompts: `dony.input()`, `dony.confirm()`, `dony.select()`, `dony.select_many()`, `dony.press_any_key()`
 
-```python
-@dony.command(run_from="git_root")
-@dony.command(run_from="command_file")
-@dony.command(run_from="current_dir")
-@dony.command(run_from="temp_dir")
-@dony.command(run_from="/custom/path")
-```
-
-### Notes
-
-Available directories to run from:
-- `"git_root"`
-- `"command_file"` (default)
-- `"current_dir"`
-- `"temp_dir"`
-- Custom path string
-
-## Shell Execution
+## API Reference
 
 ```python
-def dony.shell(
+# Command decorator
+@dony.command(
+    run_from: Union[str, Path, Literal["git_root", "command_file", "current_dir", "temp_dir"]] = "current_dir",
+    verbose: bool = True,
+)
+
+# Shell execution
+dony.shell(
     command: str,
-    run_from: Optional[Union[str, Path]] = None,  # Working directory
-    dry_run: bool = False,                         # Print without executing
-    quiet: bool = False,                           # Suppress output
-    capture_output: bool = True,                   # Return output as string
-    abort_on_failure: bool = True,                 # Prepends 'set -e'
-    abort_on_unset_variable: bool = True,          # Prepends 'set -u'
-    trace_execution: bool = False,                 # Prepends 'set -x'
-    show_command: bool = True,                     # Display formatted command
-    confirm: bool = False,                         # Ask before executing
+    run_from: Optional[Union[str, Path]] = None,
+    dry_run: bool = False,
+    quiet: bool = False,
+    capture_output: bool = True,
+    abort_on_failure: bool = True,
+    abort_on_unset_variable: bool = True,
+    trace_execution: bool = False,
+    show_command: bool = True,
+    confirm: bool = False,
 ) -> str
-    ...
 
-result = dony.shell('git status', quiet=True)
-dony.shell('npm test', confirm=True)
-dony.shell('ls', run_from='/tmp')
+# User prompts
+dony.input(prompt: str, default: str = "") -> str
+dony.confirm(message: str, default: bool = False) -> bool
+dony.select(message: str, choices: list, fuzzy: bool = False) -> str
+dony.select_many(message: str, choices: list, fuzzy: bool = False) -> list[str]
+dony.press_any_key(message: str = "Press any key to continue...")
+
+# Output
+dony.echo(message: str, style: str = "")
+dony.success(message: str)
+dony.error(message: str)
 ```
-
-## User Prompts
-
-```python
-name = dony.input('Enter your name:', default='World')
-
-if dony.confirm('Continue?', default=True):
-    pass
-
-framework = dony.select('Pick a framework:', ['React', 'Vue', 'Angular'], fuzzy=True)
-
-features = dony.select_many('Pick features:', ['auth', 'api', 'ui'], fuzzy=True)
-
-dony.press_any_key('Press any key to continue...')
-
-dony.echo('Message', style='bold')
-dony.success('Operation completed!')  # Green with ✓
-dony.error('Operation failed!')       # Red with ✕
-```
-
-## Use Cases
-
-- Build, deploy, and release scripts
-- DevOps automation
-- Testing workflows
-- Git operations
 
 ## License
 
