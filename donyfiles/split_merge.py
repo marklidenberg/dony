@@ -41,7 +41,7 @@ def split_merge():
 
     # - Get target branch
 
-    target_branch = dony.input_text(
+    target_branch = dony.input(
         "Target branch:",
         default=dony.shell(
             "git branch --list main | grep -q main && echo main || echo master",

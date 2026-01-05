@@ -29,9 +29,11 @@ def deploy():
 
     env = dony.select("Select environment:", ["staging", "production"])
 
-    dony.shell("npm run build")
-    dony.shell("npm test")
-    dony.shell(f"./deploy.sh {env}", confirm=True)
+    dony.shell(f"""
+        npm run build
+        npm test
+        ./deploy.sh {env}
+    """)
 
     dony.success(f"Deployed to {env}")
 
@@ -40,6 +42,34 @@ if __name__ == "__main__":
 ```
 
 Run with `python deploy.py`
+
+### CLI arguments
+
+To support non-interactive mode, keep all interactions within arguments:
+
+```python
+import dony
+
+@dony.command(run_from="git_root")
+def build(env: str | None = None):
+    """Build application"""
+
+    # CLI arg if provided, otherwise prompt interactively
+    env = env or dony.select("Select environment:", ["staging", "production"])
+
+    dony.shell(f"""
+        npm run build --env={env}
+        npm test
+    """)
+
+    dony.success(f"Built for {env}")
+
+if __name__ == "__main__":
+    build()
+```
+
+Run interactively: `python build.py`
+Run with CLI args: `python build.py --env=production`
 
 ## Things to know
 
