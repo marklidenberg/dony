@@ -37,11 +37,15 @@ def select_many(
 
                 delimiter = "\t"
                 lines = []
+                default_positions = []  # 1-indexed positions of default items
 
                 # Map from the displayed first field back to the real value
                 display_map: Dict[str, Union[T, str]] = {}
 
-                for choice in choices:
+                # Build set of default values for pre-selection
+                default_set: set[str] = set(default or [])
+
+                for idx, choice in enumerate(choices):
                     if isinstance(choice, Choice):
                         value = choice.value
                         display_value = choice.display_value
@@ -54,13 +58,20 @@ def select_many(
                         long_desc = ""
 
                     display_map[display_value] = value
-                    lines.append(
+                    line = (
                         f"{display_value}{delimiter}{short_desc}{delimiter}{long_desc}"
                     )
+                    lines.append(line)
+
+                    # Track positions of default items (1-indexed for fzf)
+                    is_default = value in default_set or display_value in default_set
+                    if is_default:
+                        default_positions.append(idx + 1)
 
                 cmd = [
                     "fzf",
                     "--read0",  # ← treat NUL as item separator
+                    "--sync",  # wait for input to complete before starting
                     "--prompt",
                     f"{message} 👆",
                     "--with-nth",
@@ -73,6 +84,14 @@ def select_many(
                     "down:30%:wrap",
                     "--multi",
                 ]
+
+                # Pre-select default items using pos() to jump to each position
+                if default_positions:
+                    # Build actions: pos(n)+select for each default position
+                    actions = "+".join(
+                        [f"pos({pos})+select" for pos in default_positions]
+                    )
+                    cmd.extend(["--bind", f"start:{actions}"])
 
                 # - Run command
 
@@ -199,8 +218,8 @@ def example():
             ),
         ],
         # choices=['foo', 'bar', 'baz', 'qux'],
-        fuzzy=False,
-        default=["foo"],
+        fuzzy=True,
+        # default=["foo", "baz"],
     )
     print(selected)
 
