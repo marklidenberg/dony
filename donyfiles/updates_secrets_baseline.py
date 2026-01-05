@@ -1,9 +1,5 @@
+from marklidenberg_donyfiles import updates_secrets_baseline
 import dony
 
-
-def main():
-    dony.shell("""
-        set -euo pipefail
-        uv tool install detect-secrets
-        uvx detect-secrets scan > .secrets.baseline
-    """)
+if __name__ == "__main__":
+    dony.command(run_from="git_root")(updates_secrets_baseline)()

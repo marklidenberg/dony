@@ -31,6 +31,7 @@ dependencies = [
 dev = [
     "build>=1.2.2.post1",
     "jprint2>=0.2.0",
+    "marklidenberg-donyfiles>=0.2.0",
     "twine>=6.1.0",
 ]
 
