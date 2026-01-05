@@ -10,6 +10,7 @@ from typing import Union, Callable, TypeVar, Any, Literal
 import typer
 
 from dony.find_git_root import find_git_root
+from dony.typer_partial import typer_partial
 from dony.prompts.error import error
 from dony.prompts.success import success
 
@@ -52,6 +53,7 @@ def command(
         @wraps(func)
         def wrapper(*args, **kwargs):
             # - Save original directory
+
             original_dir = Path.cwd()
             temp_dir = None
             token = _inside_command.set(True)
@@ -93,9 +95,11 @@ def command(
                 _inside_command.reset(token)
 
                 # - Restore original directory
+
                 os.chdir(original_dir)
 
                 # - Clean up temp directory if created
+
                 if temp_dir:
                     import shutil
 
@@ -103,14 +107,17 @@ def command(
 
         @wraps(func)
         def cli_wrapper(*args, **kwargs):
-            # If called with no args and not inside another command, use typer
-            if not args and not kwargs and not _inside_command.get():
-                # Check if there are CLI args (beyond script name)
-                if len(sys.argv) > 1:
-                    return typer.run(wrapper)
+            if not _inside_command.get() and len(sys.argv) > 1:
+                partial_func = typer_partial(func, *args, **kwargs)
+
+                @wraps(partial_func)
+                def typer_target(*a, **kw):
+                    return wrapper(*args, *a, **kwargs, **kw)
+
+                typer_target.__signature__ = partial_func.__signature__
+                return typer.run(typer_target)
             return wrapper(*args, **kwargs)
 
-        # Store reference to the raw wrapper for direct calls
         cli_wrapper._wrapper = wrapper
 
         return cli_wrapper
