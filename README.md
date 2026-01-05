@@ -71,6 +71,8 @@ if __name__ == "__main__":
 Run interactively: `python build.py`
 Run with CLI args: `python build.py --env=production`
 
+CLI argument parsing is powered by [typer](https://github.com/fastapi/typer).
+
 ## Things to know
 
 - Available directories to run from:

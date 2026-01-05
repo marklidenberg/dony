@@ -7,7 +7,7 @@ import tempfile
 from functools import wraps
 from typing import Union, Callable, TypeVar, Any, Literal
 
-import fire
+import typer
 
 from dony.find_git_root import find_git_root
 from dony.prompts.error import error
@@ -35,7 +35,7 @@ def command(
                  Can be a Path, path string, or RunFrom literal value.
         verbose: If True, shows success message on completion and error message on failure.
 
-    When run in __main__, CLI arguments are automatically parsed using fire.Fire.
+    When run in __main__, CLI arguments are automatically parsed using typer.
     For hybrid interactive/CLI interface, use Optional arguments with fallback to prompts:
 
         @dony.command()
@@ -103,11 +103,11 @@ def command(
 
         @wraps(func)
         def cli_wrapper(*args, **kwargs):
-            # If called with no args and not inside another command, use fire.Fire
+            # If called with no args and not inside another command, use typer
             if not args and not kwargs and not _inside_command.get():
                 # Check if there are CLI args (beyond script name)
                 if len(sys.argv) > 1:
-                    return fire.Fire(wrapper)
+                    return typer.run(wrapper)
             return wrapper(*args, **kwargs)
 
         # Store reference to the raw wrapper for direct calls
@@ -119,7 +119,7 @@ def command(
 
 
 def test():
-    # Test that commands with required arguments work (fire.Fire handles CLI parsing)
+    # Test that commands with required arguments work (typer handles CLI parsing)
     @command()
     def foo(
         a: str,
