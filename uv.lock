@@ -256,12 +256,13 @@ wheels = [
 
 [[package]]
 name = "dony"
-version = "0.4.0"
+version = "0.4.1"
 source = { editable = "." }
 dependencies = [
     { name = "fire" },
     { name = "jprint2" },
     { name = "load-dotenv" },
+    { name = "marklidenberg-donyfiles" },
     { name = "questionary" },
 ]
 
@@ -269,7 +270,6 @@ dependencies = [
 dev = [
     { name = "build" },
     { name = "jprint2" },
-    { name = "marklidenberg-donyfiles" },
     { name = "twine" },
 ]
 
@@ -278,6 +278,7 @@ requires-dist = [
     { name = "fire", specifier = ">=0.5.0" },
     { name = "jprint2", specifier = ">=0.2.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
+    { name = "marklidenberg-donyfiles", specifier = "==0.3.0" },
     { name = "questionary", specifier = ">=2.1.0" },
 ]
 
@@ -285,7 +286,6 @@ requires-dist = [
 dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
     { name = "jprint2", specifier = ">=0.2.0" },
-    { name = "marklidenberg-donyfiles", specifier = ">=0.2.0" },
     { name = "twine", specifier = ">=6.1.0" },
 ]
 
@@ -511,14 +511,14 @@ wheels = [
 
 [[package]]
 name = "marklidenberg-donyfiles"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dony" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/c7/5a98378a619df34a192e8844d296eba4fb8fc33ae1f37bfb3ea724c44b93/marklidenberg_donyfiles-0.2.0.tar.gz", hash = "sha256:366f70b0e72872337b9ce211363e221de8d4bf66eb578cc6cd92e9e571e5b746", size = 50765, upload-time = "2026-01-05T15:34:46.503Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/c8/b467f3f26eea2c1c4166b6fd69d3ec6c211e739a5260fa20a9de8e9eb5c3/marklidenberg_donyfiles-0.3.0.tar.gz", hash = "sha256:e3e453f49df512dad6e9cd7791c93dddb2061691a3da40bef0021588cd4d70db", size = 50764, upload-time = "2026-01-05T15:52:04.317Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/06/7c5611dae28bbef5b5bb8eb21b6b87069e5fdcb3e0192e04fda48acb6171/marklidenberg_donyfiles-0.2.0-py3-none-any.whl", hash = "sha256:7b28235d51be5db75c3252071299d48e2f36f6a2e7b764a52e1d15e0b7611e34", size = 4950, upload-time = "2026-01-05T15:34:44.805Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/fb/4ba4449b0dfa7f94bb872f6723cdc2ad3f84019d07ab44a65d31adb642ed/marklidenberg_donyfiles-0.3.0-py3-none-any.whl", hash = "sha256:8c44c71af71a6307e548535eecc77d19be6dd902c667f2319e93e5303ffcc28a", size = 4930, upload-time = "2026-01-05T15:52:03.276Z" },
 ]
 
 [[package]]
