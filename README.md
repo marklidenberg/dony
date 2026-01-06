@@ -45,16 +45,16 @@ Run with `python deploy.py`
 
 ### CLI arguments
 
-To support non-interactive mode, keep all interactions within arguments:
+For CLI support, use optional arguments with [typer](https://github.com/fastapi/typer):
 
 ```python
 import dony
+import typer
 
 @dony.command(run_from="git_root")
 def build(env: str | None = None):
     """Build application"""
 
-    # CLI arg if provided, otherwise prompt interactively
     env = env or dony.select("Select environment:", ["staging", "production"])
 
     dony.shell(f"""
@@ -65,13 +65,11 @@ def build(env: str | None = None):
     dony.success(f"Built for {env}")
 
 if __name__ == "__main__":
-    build()
+    typer.run(build)
 ```
 
 Run interactively: `python build.py`
 Run with CLI args: `python build.py --env=production`
-
-CLI argument parsing is powered by [typer](https://github.com/fastapi/typer).
 
 ## Things to know
 
