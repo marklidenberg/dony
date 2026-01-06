@@ -12,11 +12,11 @@ from dony.prompts.success import success
 
 F = TypeVar("F", bound=Callable[..., Any])
 
-RunFrom = Literal["git_root", "command_file", "current_dir", "temp_dir"]
+RunFrom = Literal["git_root", "script_dir", "cwd", "temp_dir"]
 
 
 def command(
-    run_from: Union[str, Path, RunFrom] = "current_dir",
+    run_from: Union[str, Path, RunFrom] = "cwd",
     verbose: bool = True,
 ) -> Callable[[F], F]:
     """Decorator to mark a function as a dony command.
@@ -42,12 +42,12 @@ def command(
 
                 if run_from == "git_root":
                     os.chdir(find_git_root(path=command_dir))
-                elif run_from == "command_file":
+                elif run_from == "script_dir":
                     os.chdir(command_dir)
                 elif run_from == "temp_dir":
                     temp_dir = tempfile.mkdtemp()
                     os.chdir(temp_dir)
-                elif run_from == "current_dir":
+                elif run_from == "cwd":
                     pass  # Stay in current directory
                 else:
                     # Assume it's a path string or Path object
