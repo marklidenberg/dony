@@ -1,3 +1,4 @@
+import asyncio
 from textwrap import dedent
 
 import questionary
@@ -5,7 +6,7 @@ from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 
 
-def echo(
+async def echo(
     message: str,
     style: questionary.Style = questionary.Style(
         [
@@ -23,11 +24,11 @@ def echo(
     )
 
 
-def example():
-    echo(
+async def example():
+    await echo(
         message="""echo "{"a": "b"}\nfoobar""",
     )
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())

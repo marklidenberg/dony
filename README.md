@@ -43,6 +43,10 @@ if __name__ == "__main__":
 
 Run with `python deploy.py`
 
+## What is a command?
+
+A command is simply a function decorated with `@dony.command()`. Think of it as a function with an execution context. 
+
 ### CLI arguments
 
 For CLI support, use optional arguments with [typer](https://github.com/fastapi/typer):

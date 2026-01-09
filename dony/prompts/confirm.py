@@ -1,4 +1,7 @@
-def confirm(
+import asyncio
+
+
+async def confirm(
     message: str,
     default: bool = True,
 ) -> bool:
@@ -12,7 +15,7 @@ def confirm(
 
     from dony.prompts.select import select  # avoid circular import
 
-    answer = select(
+    answer = await select(
         message=message,
         choices=["Yes", "No"] if default else ["No", "Yes"],
         fuzzy=False,
@@ -28,9 +31,9 @@ def confirm(
     return answer == "Yes"
 
 
-def example():
-    print(confirm("Are you sure?"))
+async def example():
+    print(await confirm("Are you sure?"))
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())
