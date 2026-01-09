@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import subprocess
+import asyncio
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Union
@@ -12,7 +12,7 @@ from dony.prompts.echo import echo as dony_print
 from dony.prompts.confirm import confirm as dony_confirm
 
 
-def shell(
+async def shell(
     command: str,
     *,
     run_from: Optional[Union[str, Path]] = None,
@@ -55,7 +55,7 @@ def shell(
     if show_command or dry_run:
         # if is required to avoid recursion
         try:
-            formatted_command = shell(
+            formatted_command = await shell(
                 f"""
                     shfmt << 'EOF'
                     {command}
@@ -75,7 +75,7 @@ def shell(
     # - Process dry_run
 
     if dry_run:
-        dony_print(
+        await dony_print(
             "🐚 Dry run\n" + formatted_command,
             style=questionary.Style(
                 [
@@ -89,7 +89,7 @@ def shell(
     # - Print command
 
     if (show_command and not quiet) or confirm:
-        dony_print(
+        await dony_print(
             "🐚\n" + formatted_command,
             style=questionary.Style(
                 [
@@ -99,10 +99,10 @@ def shell(
         )
 
     if confirm:
-        if not dony_confirm(
+        if not await dony_confirm(
             "Are you sure you want to run the above command?",
         ):
-            dony_error("Aborted")
+            await dony_error("Aborted")
             return ""
 
     # - Convert run_from to string
@@ -129,45 +129,46 @@ def shell(
 
     # - Execute with optional working directory
 
-    with subprocess.Popen(
+    proc = await asyncio.create_subprocess_shell(
         full_cmd,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
         cwd=run_from,
-    ) as proc:
-        # - Capture output
+    )
 
-        buffer = []
-        if proc.stdout is None:
-            raise RuntimeError("Process stdout is unexpectedly None")
-        while True:
-            try:
-                for line in proc.stdout:
-                    if not quiet:
-                        print(line, end="")
-                    if capture_output:
-                        buffer.append(line)
+    # - Capture output
+
+    buffer = []
+    if proc.stdout is None:
+        raise RuntimeError("Process stdout is unexpectedly None")
+    while True:
+        try:
+            line_bytes = await proc.stdout.readline()
+            if not line_bytes:
                 break
-            except UnicodeDecodeError:
-                dony_error("Error decoding output. Skipping the line")
+            line = line_bytes.decode()
+            if not quiet:
+                print(line, end="")
+            if capture_output:
+                buffer.append(line)
+        except UnicodeDecodeError:
+            await dony_error("Error decoding output. Skipping the line")
 
-        return_code = proc.wait()
+    return_code = await proc.wait()
 
-        output = "".join(buffer) if capture_output else ""
+    output = "".join(buffer) if capture_output else ""
 
-        # - Raise if exit code is non-zero
+    # - Raise if exit code is non-zero
 
-        if return_code != 0:
-            if output and "KeyboardInterrupt" in output:
-                raise KeyboardInterrupt
-            raise RuntimeError("Dony command failed")
+    if return_code != 0:
+        if output and "KeyboardInterrupt" in output:
+            raise KeyboardInterrupt
+        raise RuntimeError("Dony command failed")
 
     # - Print closing message
 
     if show_command and not quiet:
-        dony_print(
+        await dony_print(
             "—" * 80,
             style=questionary.Style(
                 [
@@ -181,17 +182,17 @@ def shell(
     return output.strip()
 
 
-def example():
+async def example():
     # Default: set -eux is applied
 
     # - Run echo command
 
-    print(shell('echo "{"a": "b"}"'))
+    print(await shell('echo "{"a": "b"}"'))
 
     # - Disable only tracing of commands
 
     print(
-        shell(
+        await shell(
             'echo "no x prefix here"',
             trace_execution=False,
         )
@@ -199,15 +200,15 @@ def example():
 
     # - Run in a different directory
 
-    output = shell("ls", run_from="/tmp")
+    output = await shell("ls", run_from="/tmp")
     print("Contents of /tmp:", output)
 
     try:
-        shell('echo "this will fail" && false')
+        await shell('echo "this will fail" && false')
         raise Exception("Should have failed")
     except RuntimeError:
         pass
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())
