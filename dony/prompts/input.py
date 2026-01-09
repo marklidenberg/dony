@@ -1,8 +1,10 @@
+import asyncio
+
 import questionary
 from prompt_toolkit.styles import Style
 
 
-def input(
+async def input(
     message: str,
     default: str = "",
     allow_empty: bool = False,
@@ -13,7 +15,7 @@ def input(
     while True:
         # - Ask
 
-        result = questionary.text(
+        result = await questionary.text(
             message,
             default=default,
             qmark="•",
@@ -23,7 +25,7 @@ def input(
                 ]
             ),
             multiline=multiline,
-        ).ask()
+        ).ask_async()
 
         # - Raise KeyboardInterrupt if no result
 
@@ -36,9 +38,9 @@ def input(
             return result
 
 
-def example():
-    print(input(message="What is your name?"))
+async def example():
+    print(await input(message="What is your name?"))
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())

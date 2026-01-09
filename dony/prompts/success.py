@@ -1,9 +1,11 @@
+import asyncio
+
 import questionary
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 
 
-def success(
+async def success(
     message: str,
     prefix: str = "✓ ",
 ) -> None:
@@ -23,9 +25,9 @@ def success(
     )
 
 
-def example():
-    success(message="Success")
+async def example():
+    await success(message="Success")
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())

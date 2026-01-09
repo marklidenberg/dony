@@ -1,9 +1,11 @@
+import asyncio
+
 import questionary
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 
 
-def error(
+async def error(
     message: str,
     prefix: str = "✕ ",
 ) -> None:
@@ -22,9 +24,9 @@ def error(
     )
 
 
-def example():
-    error("Failed to do something important")
+async def example():
+    await error("Failed to do something important")
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())

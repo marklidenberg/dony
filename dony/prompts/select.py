@@ -1,6 +1,7 @@
+import asyncio
 from dataclasses import dataclass
 from typing import Sequence, Union, Optional, Dict, TypeVar, Generic
-import subprocess
+
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
@@ -24,7 +25,7 @@ class Choice(Generic[T]):
             self.display_value = str(self.value)
 
 
-def select(
+async def select(
     message: str,
     choices: Sequence[Union[str, Choice[T]]],
     default: Optional[str] = None,
@@ -100,14 +101,14 @@ def select(
 
             # - Run command
 
-            proc = subprocess.Popen(
-                cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True,
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL,
             )
-            output, _ = proc.communicate(input="\0".join(lines))
+            stdout, _ = await proc.communicate(input="\0".join(lines).encode())
+            output = stdout.decode()
 
             if output == "":
                 raise KeyboardInterrupt
@@ -121,9 +122,9 @@ def select(
             # - Handle custom input if selected
 
             if allow_custom and result == custom_choice_text:
-                from dony.prompts.input_text import input_text
+                from dony.prompts.input import input as input_text
 
-                return input_text(
+                return await input_text(
                     message=message,
                     allow_empty=allow_empty,
                 )
@@ -174,7 +175,7 @@ def select(
 
     # - Run select prompt
 
-    result = questionary.select(
+    result = await questionary.select(
         message=message,
         choices=q_choices,
         default=default,
@@ -185,7 +186,7 @@ def select(
                 ("question", "fg:ansiblue"),  # the question text
             ]
         ),
-    ).ask()
+    ).ask_async()
 
     # - Raise KeyboardInterrupt if no result
 
@@ -195,9 +196,9 @@ def select(
     # - Handle custom input if selected
 
     if allow_custom and result == custom_choice_text:
-        from dony.prompts.input_text import input_text
+        from dony.prompts.input import input as input_text
 
-        return input_text(
+        return await input_text(
             message=message,
             allow_empty=allow_empty,
         )
@@ -207,8 +208,8 @@ def select(
     return result
 
 
-def example():
-    selected = select(
+async def example():
+    selected = await select(
         "Give me that path",
         choices=[
             Choice("foo", long_desc="This is the long description for foo."),
@@ -224,4 +225,4 @@ def example():
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())

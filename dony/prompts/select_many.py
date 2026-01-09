@@ -1,5 +1,6 @@
+import asyncio
 from typing import List, Sequence, Union, Optional, Dict, TypeVar
-import subprocess
+
 import questionary
 from questionary import Choice as QuestionaryChoice
 from prompt_toolkit.styles import Style
@@ -10,7 +11,7 @@ from dony.prompts.select import Choice
 T = TypeVar("T")
 
 
-def select_many(
+async def select_many(
     message: str,
     choices: Sequence[Union[str, Choice[T]]],
     default: Optional[Sequence[str]] = None,
@@ -95,14 +96,14 @@ def select_many(
 
                 # - Run command
 
-                proc = subprocess.Popen(
-                    cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
+                proc = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdin=asyncio.subprocess.PIPE,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.DEVNULL,
                 )
-                output, _ = proc.communicate(input="\0".join(lines))
+                stdout, _ = await proc.communicate(input="\0".join(lines).encode())
+                output = stdout.decode()
 
                 if output == "":
                     raise KeyboardInterrupt
@@ -170,7 +171,7 @@ def select_many(
     while True:
         # - Ask
 
-        result = questionary.checkbox(
+        result = await questionary.checkbox(
             message=message,
             choices=q_choices,
             qmark="•",
@@ -180,7 +181,7 @@ def select_many(
                     ("question", "fg:ansiblue"),  # the question text
                 ]
             ),
-        ).ask()
+        ).ask_async()
 
         # - Raise if KeyboardInterrupt
 
@@ -198,8 +199,8 @@ def select_many(
         return result
 
 
-def example():
-    selected = select_many(
+async def example():
+    selected = await select_many(
         "Select multiple paths",
         choices=[
             Choice(value="foo", long_desc="This is the long description for foo."),
@@ -225,4 +226,4 @@ def example():
 
 
 if __name__ == "__main__":
-    example()
+    asyncio.run(example())
