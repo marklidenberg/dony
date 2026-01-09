@@ -5,9 +5,8 @@ try:
 except Exception:
     __version__ = "unknown"
 
-from .command import command
 from .shell import shell
-from .find_git_root import find_git_root
+from .find_repo_root import find_repo_root
 from .prompts.confirm import confirm
 from .prompts.input import input
 from .prompts.press_any_key import press_any_key
@@ -19,9 +18,8 @@ from .prompts.success import success
 
 __all__ = [
     "__version__",
-    "command",
     "shell",
-    "find_git_root",
+    "find_repo_root",
     "confirm",
     "input",
     "press_any_key",

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union
 
 
-def find_git_root(path: Union[str, Path]) -> Path:
+def find_repo_root(path: Union[str, Path]) -> Path:
     """Find the git root directory.
 
     Args:
@@ -23,7 +23,7 @@ def find_git_root(path: Union[str, Path]) -> Path:
 
 
 def test():
-    assert find_git_root(Path.cwd()).name == "dony"
+    assert find_repo_root(Path.cwd()).name == "dony"
 
 
 if __name__ == "__main__":
