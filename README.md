@@ -18,71 +18,80 @@ brew install shfmt   # For shell command formatting
 ## Example
 
 ```python
+import asyncio
 import dony
 
-@dony.command(run_from="git_root")
-def deploy():
+async def deploy():
     """Deploy application"""
 
-    if not dony.confirm("Deploy to production?"):
+    if not await dony.confirm("Deploy to production?"):
         return
 
-    env = dony.select("Select environment:", ["staging", "production"])
+    env = await dony.select("Select environment:", ["staging", "production"])
 
-    dony.shell(f"""
+    await dony.shell(f"""
         npm run build
         npm test
         ./deploy.sh {env}
     """)
 
-    dony.success(f"Deployed to {env}")
+    await dony.success(f"Deployed to {env}")
 
 if __name__ == "__main__":
-    deploy()
+    asyncio.run(deploy())
 ```
 
 Run with `python deploy.py`
 
-## What is a command?
+## CLI Support
 
-A command is simply a function decorated with `@dony.command()`. Think of it as a function with an execution context. 
-
-### CLI arguments
-
-For CLI support, use optional arguments with [typer](https://github.com/fastapi/typer):
+For CLI support, use [fire](https://github.com/google/python-fire) or any other CLI framework:
 
 ```python
+import asyncio
 import dony
-import typer
+import fire
 
-@dony.command(run_from="git_root")
-def build(env: str | None = None):
+async def build(env: str = None):
     """Build application"""
 
-    env = env or dony.select("Select environment:", ["staging", "production"])
+    env = env or await dony.select("Select environment:", ["staging", "production"])
 
-    dony.shell(f"""
+    await dony.shell(f"""
         npm run build --env={env}
         npm test
     """)
 
-    dony.success(f"Built for {env}")
+    await dony.success(f"Built for {env}")
 
 if __name__ == "__main__":
-    typer.run(build)
+    fire.Fire(build)
 ```
 
 Run interactively: `python build.py`
 Run with CLI args: `python build.py --env=production`
 
+## Recipes
+
+### Working from git repo root
+
+```python
+import asyncio
+from functools import partial
+import dony
+
+async def main():
+    shell = partial(dony.shell, run_from=dony.find_repo_root(__file__))
+
+    await shell("npm run build")
+    await shell("npm test")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
 ## Things to know
 
-- Available directories to run from:
-  - `"current_dir"` (default)
-  - `"git_root"`
-  - `"command_file"`
-  - `"temp_dir"`
-  - Custom path string
 - Available prompts based on [questionary](https://github.com/tmbo/questionary):
   - `dony.input()`: free-text entry
   - `dony.confirm()`: yes/no ([Y/n] or [y/N])
@@ -96,13 +105,7 @@ Run with CLI args: `python build.py --env=production`
 ## API Reference
 
 ```python
-def command(
-    run_from: Union[str, Path, Literal[ "current_dir", "git_root", "command_file", "temp_dir"]] = "current_dir",
-    verbose: bool = True,
-) -> Callable[[F], F]:
-    ...
-
-def dony.shell(
+async def dony.shell(
     command: str,
     run_from: Optional[Union[str, Path]] = None,   # Working directory
     dry_run: bool = False,                         # Print without executing
@@ -114,6 +117,10 @@ def dony.shell(
     show_command: bool = True,                     # Print formatted command
     confirm: bool = False,                         # Ask before executing
 ) -> str:
+    ...
+
+def dony.find_repo_root(path: Union[str, Path]) -> Path:
+    """Find the git root directory starting from the given path."""
     ...
 ```
 
