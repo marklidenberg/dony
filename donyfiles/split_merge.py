@@ -1,5 +1,6 @@
 from marklidenberg_donyfiles import split_merge
 import dony
+import asyncio
 
 if __name__ == "__main__":
-    dony.command(run_from="git_root")(split_merge)()
+    asyncio.run(split_merge(path=__file__))
