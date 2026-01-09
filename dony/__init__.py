@@ -15,6 +15,7 @@ from .prompts.select_many import select_many
 from .prompts.echo import echo
 from .prompts.error import error
 from .prompts.success import success
+from .command import command
 
 __all__ = [
     "__version__",
@@ -29,4 +30,5 @@ __all__ = [
     "echo",
     "error",
     "success",
+    "command",
 ]

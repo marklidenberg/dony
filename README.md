@@ -2,6 +2,8 @@
 
 A lightweight Python command runner with shell execution and user interactions.
 
+Commands are just Python functions. You run them by running Python files directly (`python deploy.py`).
+
 ## Installation
 
 ```bash
@@ -21,6 +23,7 @@ brew install shfmt   # For shell command formatting
 import asyncio
 import dony
 
+@dony.command()
 async def deploy():
     """Deploy application"""
 
@@ -52,6 +55,7 @@ import asyncio
 import dony
 import fire
 
+@dony.command()
 async def build(env: str = None):
     """Build application"""
 
@@ -92,6 +96,7 @@ if __name__ == "__main__":
 
 ## Things to know
 
+- `@dony.command()`: marker decorator for commands (currently a no-op)
 - Available prompts based on [questionary](https://github.com/tmbo/questionary):
   - `dony.input()`: free-text entry
   - `dony.confirm()`: yes/no ([Y/n] or [y/N])
