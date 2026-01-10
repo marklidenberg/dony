@@ -256,7 +256,7 @@ wheels = [
 
 [[package]]
 name = "dony"
-version = "0.5.0"
+version = "0.5.1"
 source = { editable = "." }
 dependencies = [
     { name = "questionary" },
@@ -279,7 +279,7 @@ dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
     { name = "jprint2", specifier = ">=0.2.0" },
     { name = "load-dotenv", specifier = ">=0.1.0" },
-    { name = "marklidenberg-donyfiles", specifier = "==0.3.1" },
+    { name = "marklidenberg-donyfiles", specifier = "==0.4.0" },
     { name = "twine", specifier = ">=6.1.0" },
 ]
 
@@ -491,14 +491,14 @@ wheels = [
 
 [[package]]
 name = "marklidenberg-donyfiles"
-version = "0.3.1"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dony" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ad/92/2e26024418ef3d426b2b785587c9d6767c2318eb7d41a9c689b0cd5ffdf8/marklidenberg_donyfiles-0.3.1.tar.gz", hash = "sha256:552ec6019d8743528241c05091b8d596397278b4ab1b0dbc440bddee6a041c55", size = 50764, upload-time = "2026-01-05T16:01:12.069Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/97/038a96ece3cf020b768c942f9110707d2d6b77198edd511f302b78d887a2/marklidenberg_donyfiles-0.4.0.tar.gz", hash = "sha256:059b40ef2dff01620f97b583b131c2e6f84c9b763c568c559ea79aff87b20cb6", size = 50325, upload-time = "2026-01-09T15:23:30.113Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/83/a3c7349059cccb25d4e571d14ee063b1e8eed3816e997c3d2f46dc84fbdb/marklidenberg_donyfiles-0.3.1-py3-none-any.whl", hash = "sha256:2537e80ae688c789bc026e224eafa77fd2b1d5569c016706be0ffc754335da0b", size = 4930, upload-time = "2026-01-05T16:01:10.223Z" },
+    { url = "https://files.pythonhosted.org/packages/02/c5/b5fcc58ba17576c13e1a6f9e3c9599604871339d6b388a2a46255bc0d482/marklidenberg_donyfiles-0.4.0-py3-none-any.whl", hash = "sha256:5f22460196df7b45b3f781a71ea4940368217a723ab360f0b40eb8938f228b3f", size = 6777, upload-time = "2026-01-09T15:23:28.689Z" },
 ]
 
 [[package]]
