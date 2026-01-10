@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional, Union
@@ -16,6 +17,7 @@ async def shell(
     command: str,
     *,
     run_from: Optional[Union[str, Path]] = None,
+    envs: Optional[dict[str, str]] = None,
     dry_run: bool = False,
     quiet: bool = False,
     capture_output: bool = True,
@@ -32,6 +34,7 @@ async def shell(
     Args:
         command: The command line string to execute.
         run_from: Changes the working directory before executing the command.
+        envs: Extra environment variables to pass to the command (extends current environment).
         dry_run: Prints the command without executing it.
         quiet: Suppresses output.
         capture_output: Captures and returns the full combined stdout+stderr;
@@ -127,6 +130,10 @@ async def shell(
 
     full_cmd = prefix + dedent(command.strip())
 
+    # - Build environment
+
+    env = {**os.environ, **(envs or {})}
+
     # - Execute with optional working directory
 
     proc = await asyncio.create_subprocess_shell(
@@ -134,6 +141,7 @@ async def shell(
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
         cwd=run_from,
+        env=env,
     )
 
     # - Capture output
@@ -202,6 +210,11 @@ async def example():
 
     output = await shell("ls", run_from="/tmp")
     print("Contents of /tmp:", output)
+
+    # - Run with extra environment variables
+
+    output = await shell("echo $MY_VAR", envs={"MY_VAR": "hello from envs"})
+    assert output == "hello from envs", f"Expected 'hello from envs', got '{output}'"
 
     try:
         await shell('echo "this will fail" && false')
