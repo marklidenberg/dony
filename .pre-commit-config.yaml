@@ -4,21 +4,25 @@ repos:
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=1024"]
-      - id: check-merge-conflict
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
-      # - Run the linter.
       - id: ruff
         types_or: [ python, pyi, jupyter ]
         args: [
           "--fix",
           "--config", "pyproject.toml",
-          "--ignore", "E731", # "Do not assign a lambda expression, use a def"
-          "--ignore", "F401" # "Module imported but unused"
         ]
-      # - Run the formatter.
       - id: ruff-format
         types_or: [ python, pyi, jupyter ]
         args: [ "--config", "pyproject.toml" ]
+
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty
+        entry: uv run ty check
+        language: system
+        types: [python]
+        pass_filenames: false
